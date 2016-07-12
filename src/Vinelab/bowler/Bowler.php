@@ -15,9 +15,25 @@ use PhpAmqpLib\Message\AMQPMessage;
  */
 class Bowler
 {
+    /**
+     * $connection var
+     * @var string
+     */
 	private $connection;
+
+    /**
+     * $channel var
+     * @var string
+     */
     private $channel;
 
+    /**
+     *
+     * @param string  $machine the ip of the rabbitmq server, default: localhost
+     * @param integer $port. default: 5672
+     * @param string  $username, default: guest
+     * @param string  $password, default: guest
+     */
     public function __construct($machine = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
     {
         $this->connection = new AMQPStreamConnection($machine, $port, $username, $password);

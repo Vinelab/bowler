@@ -1,5 +1,17 @@
 {
-    "require": {
-        "php-amqplib/php-amqplib": "v2.6.1"
-    }
+	"name": "vinelab/bowler",
+	"description": "An http library developed for the laravel framework. aliases itself as HttpClient",
+	"license": "MIT",
+	"keywords": ["php", "json", "rabbitmq", "amqp", "api"],
+	"authors": [
+		{
+			"name": "Ali Issa",
+			"email": "ali@vinelab.com"
+		}
+	],
+
+	"require": {
+		"php": ">=5.4",
+		"php-amqplib/php-amqplib": "v2.6.1"
+	},
 }

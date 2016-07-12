@@ -78,8 +78,9 @@ class Consumer
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(MessageProcessor $msgProcessor, Bowler $bowler, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Bowler $bowler, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
     {
+
         $this->bowler = $bowler;
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
@@ -87,7 +88,6 @@ class Consumer
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
         $this->deliveryMode = $deliveryMode;
-        $this->msgProcessor = $msgProcessor;
     }
 
     /**
@@ -108,9 +108,7 @@ class Consumer
             $msg,
             array('correlation_id' => '', 'reply_to' => '')    #properties
             );
-            //$msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
-            //$this->msgProcessor->setMessage($msg->body);
-            // $handler->handle($msg);
+
             new $handler($myMessage);
         };
 
