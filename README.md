@@ -1,5 +1,5 @@
 # bowler
-A library to make the communication with rabbitmq server and AMQP protocol easier.
+A library to make the communication between your php application and rabbitmq server with AMQP protocol easier.
 
 ## Installation
 
