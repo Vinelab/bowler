@@ -50,8 +50,6 @@ class Handler {
 $bowler = new Bowler('localhost', 5672);
 $bowlerConsumer = new Consumer($bowler, 'crud', 'fanout');
 
-// 
 $handler = new App\Messaging\Handler();
-// $bowlerConsumer->listenToQueue($handler);
 $bowlerConsumer->listenToQueue($handler, 'books');
 ```
