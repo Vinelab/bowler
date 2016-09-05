@@ -80,7 +80,6 @@ class Consumer
      */
     public function __construct(Bowler $bowler, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
     {
-
         $this->bowler = $bowler;
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;

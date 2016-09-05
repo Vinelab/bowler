@@ -6,7 +6,8 @@
 	"authors": [
 		{
 			"name": "Ali Issa",
-			"email": "ali@vinelab.com"
+			"email": "ali@vinelab.com",
+			"role": "Backend Software Engineer"
 		}
 	],
 
@@ -14,4 +15,10 @@
 		"php": ">=5.4",
 		"php-amqplib/php-amqplib": "v2.6.1"
 	},
+
+	"autoload": {
+        "psr-4": {
+            "Vinelab\\Bowler\\": "src/"
+        }
+    }
 }

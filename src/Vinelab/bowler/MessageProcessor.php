@@ -7,12 +7,12 @@ class MessageProcessor
     private $message;
 
     public function handle($msg)
-	{
-		$this->setMessage($msg);
-		echo "Handler: ".$msg->body;
-		//
-		//return $this->getMessage();
-	}
+  	{
+  		$this->setMessage($msg);
+  		echo "Handler: ".$msg->body;
+  		//
+  		//return $this->getMessage();
+  	}
 
     // public function __construct($message)
     // {
