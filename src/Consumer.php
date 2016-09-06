@@ -94,7 +94,7 @@ class Consumer
      *
      * @param string $data
      */
-    public function listenToQueue($handler, $route)
+    public function listenToQueue($handler)
     {
         $this->bowler->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         list($queue_name) = $this->bowler->getChannel()->queue_declare('', false, false, false, false);
@@ -103,12 +103,12 @@ class Consumer
         echo ' [*] Waiting for CRUD operations. To exit press CTRL+C', "\n";
 
         $callback = function ($msg) use ($handler) {
-            $myMessage = new AMQPMessage(
-            $msg,
-            array('correlation_id' => '', 'reply_to' => '')    #properties
-            );
-
-            new $handler($myMessage);
+            // $myMessage = new AMQPMessage(
+            // $msg,
+            // array('correlation_id' => '', 'reply_to' => '')    #properties
+            // );
+            echo " [x] Received: ", $msg->body, "\n";
+            $handler->handle($msg);
         };
 
         $this->bowler->getChannel()->basic_qos(null, 1, null);
