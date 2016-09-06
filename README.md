@@ -32,16 +32,9 @@ namespace App\Test;
 
 class Handler {
 
-	public function __construct($msg = '')
+	public function handle($msg)
 	{
-		if ($msg) {
-			$json = json_decode(json_encode($msg), true);
-			if ($json['routing_key'] == 'books') {
-				echo 'Books: ' . $json['body'];
-			} else {
-				echo 'Authors: ' . $WorkingArray['body'];
-			}
-		}
+		echo "Handler: ".$msg->body;
 	}
 }
 ```
