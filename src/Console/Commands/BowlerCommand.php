@@ -30,7 +30,7 @@ class BowlerCommand extends Command
      *
      * @var string
      */
-    protected $name = 'bowler:consume';
+    protected $name = 'consume';
 
     /**
      * The console command description.
