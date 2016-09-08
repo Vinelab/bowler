@@ -26,12 +26,12 @@ class BowlerServiceProvider extends ServiceProvider
             return new Connection();
         });
 
-        $command = new BowlerCommand();
-        $this->app['vinelab.bowler.consume'] = $this->app->share(function ($app) {
-            $command->setName('bowler:consume');
-            return $command;
-        });
-        $this->commands($this->commands);
+        // $command = new BowlerCommand();
+        // $this->app['vinelab.bowler.consume'] = $this->app->share(function ($app) {
+        //     $command->setName('bowler:consume');
+        //     return $command;
+        // });
+        // $this->commands($this->commands);
 
     }
 
