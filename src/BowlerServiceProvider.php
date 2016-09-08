@@ -5,7 +5,7 @@ namespace Vinelab\Bowler;
 use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Console\Commands\BowlerCommand;
-
+use Vinelab\Bowler\RegisterQueues;
 use Artisan;
 
 class BowlerServiceProvider extends ServiceProvider
@@ -37,7 +37,7 @@ class BowlerServiceProvider extends ServiceProvider
         //
         //$kernel = new $this->app->make(Kernel::class);
         //$command = 'Vinelab\Bowler\Console\Commands\BowlerCommand';
-        Artisan::add(new BowlerCommand);
+        Artisan::add(new BowlerCommand(new RegisterQueues()));
 
     }
 
