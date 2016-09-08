@@ -21,7 +21,7 @@ class BowlerCommand extends Command implements SelfHandling
     {
         parent::__construct();
 
-        $this->registerQueues = $registerQueues;
+        //$this->registerQueues = $registerQueues;
         //$this->$consumer = $consumer;
     }
 
@@ -31,7 +31,7 @@ class BowlerCommand extends Command implements SelfHandling
      *
      * @var string
      */
-    protected $name = 'consume';
+    protected $signature = 'bowler:consume';
 
     /**
      * The console command description.
@@ -51,9 +51,21 @@ class BowlerCommand extends Command implements SelfHandling
         // $conn = new Connection();
 
         // foreach ($handlers as $handler) {
-        //     $consumer = new Consumer($conn, $handler->)
+        //$bowler = new Bowler('localhost', 5672);
+        // $bowlerConsumer = new Consumer($bowler, 'crud', 'fanout');
+
+        // // instance
+        // $handler = new App\Messaging\Handler();
+        // $bowlerConsumer->listenToQueue($handler);
         // }
-        echo 'bowler command executed';
+        //echo "bowler command executed\n";
+        //
+        $bowler = new Bowler();
+        $bowlerConsumer = new Consumer($bowler, 'crud', 'fanout');
+
+        // instance
+        $handler = new App\Messaging\Handler();
+        $bowlerConsumer->listenToQueue($handler);
     }
 
 }

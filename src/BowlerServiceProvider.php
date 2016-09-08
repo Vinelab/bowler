@@ -16,19 +16,23 @@ class BowlerServiceProvider extends ServiceProvider
     public function register()
     {
 
-        return $this->app->make(Connection::class);
-
         $this->app->singleton('vinelab.bowler.registrator', function ()
          {
             return new RegisterQueues();
         });
 
-        $this->app->singleton('vinelab.bowler', 'Vinelab\Bowler');
+        $this->app->bind(Connection::class, function ()
+         {
+            return new Connection();
+        });
+
+        $command = new BowlerCommand();
         $this->app['vinelab.bowler.consume'] = $this->app->share(function ($app) {
-            $command = new BowlerCommand();
             $command->setName('bowler:consume');
             return $command;
         });
+        $this->commands($this->commands);
+
     }
 
 }
