@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Console\Commands\BowlerCommand;
 
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
 class BowlerServiceProvider extends ServiceProvider
 {
     /**
@@ -32,6 +34,10 @@ class BowlerServiceProvider extends ServiceProvider
         //     return $command;
         // });
         // $this->commands($this->commands);
+        //
+        $kernel = new $this->app->make(ConsoleKernel::class);
+        $command = 'Vinelab\Bowler\Console\Commands\BowlerCommand';
+        $kernel->getArtisan()->add($command);
 
     }
 

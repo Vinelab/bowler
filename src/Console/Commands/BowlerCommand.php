@@ -65,6 +65,8 @@ class BowlerCommand extends Command
         // instance
         $handler = new App\Messaging\Handler();
         $bowlerConsumer->listenToQueue($handler);
+
+        Registrator::queue('books', 'App\Messaging\BooksHandler');
     }
 
 }
