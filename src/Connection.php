@@ -9,11 +9,11 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
- * Bowler
+ * Connection
  *
  * @author Ali Issa <ali@vinelab.com>
  */
-class Bowler
+class Connection
 {
     /**
      * $connection var
@@ -29,14 +29,14 @@ class Bowler
 
     /**
      *
-     * @param string  $machine the ip of the rabbitmq server, default: localhost
+     * @param string  $host the ip of the rabbitmq server, default: localhost
      * @param integer $port. default: 5672
      * @param string  $username, default: guest
      * @param string  $password, default: guest
      */
-    public function __construct($machine = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
+    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
     {
-        $this->connection = new AMQPStreamConnection($machine, $port, $username, $password);
+        $this->connection = new AMQPStreamConnection($host, $port, $username, $password);
         $this->channel = $this->connection->channel();
     }
 

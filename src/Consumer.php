@@ -14,9 +14,9 @@ class Consumer
     /**
      * the main class of the package where we define the channel and the connection.
      *
-     * @var Vinelab\Bowler
+     * @var Vinelab\Bowler\Connection
      */
-    private $bowler;
+    private $connection;
 
     /**
      * the name of the exchange where the producer sends its messages to.
@@ -70,7 +70,7 @@ class Consumer
     private $msgProcessor;
 
     /**
-     * @param Vinelab\Bowler\Bowler $bowler
+     * @param Vinelab\Bowler\Connection $connection
      * @param string                $exchangeName
      * @param string                $exchangeType
      * @param bool                  $passive
@@ -78,9 +78,9 @@ class Consumer
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(Bowler $bowler, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
     {
-        $this->bowler = $bowler;
+        $this->connection = $connection;
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
         $this->passive = $passive;
@@ -94,28 +94,26 @@ class Consumer
      *
      * @param string $data
      */
-    public function listenToQueue($handler)
+    public function listenToQueue($handlerClass)
     {
-        $this->bowler->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-        list($queue_name) = $this->bowler->getChannel()->queue_declare('', false, false, false, false);
-        $this->bowler->getChannel()->queue_bind($queue_name, $this->exchangeName);
+        $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+        list($queue_name) = $this->connection->getChannel()->queue_declare('', false, false, false, false);
+        $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
 
         echo ' [*] Waiting for CRUD operations. To exit press CTRL+C', "\n";
 
+        $handler = new $handlerClass;
+
         $callback = function ($msg) use ($handler) {
-            // $myMessage = new AMQPMessage(
-            // $msg,
-            // array('correlation_id' => '', 'reply_to' => '')    #properties
-            // );
-            echo " [x] Received: ", $msg->body, "\n";
+            //echo " [x] Received: ", $msg->body, "\n";
             $handler->handle($msg);
         };
 
-        $this->bowler->getChannel()->basic_qos(null, 1, null);
-        $this->bowler->getChannel()->basic_consume($queue_name, '', false, false, false, false, $callback);
+        $this->connection->getChannel()->basic_qos(null, 1, null);
+        $this->connection->getChannel()->basic_consume($queue_name, '', false, false, false, false, $callback);
 
-        while (count($this->bowler->getChannel()->callbacks)) {
-            $this->bowler->getChannel()->wait();
+        while (count($this->connection->getChannel()->callbacks)) {
+            $this->connection->getChannel()->wait();
         }
     }
 

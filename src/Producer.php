@@ -14,9 +14,10 @@ class Producer
 
 	/**
 	 * the main class of the package where we define the channel and the connection
-	 * @var Vinelab\Bowler
+	 *
+	 * @var Vinelab\Bowler\Connection
 	 */
-	private $bowler;
+	private $connection;
 
 	/**
 	 * the name of the exchange where the producer sends its messages to
@@ -64,7 +65,7 @@ class Producer
 
 	/**
 	 *
-	 * @param Vinelab\Bowler\Bowler  $bowler
+	 * @param Vinelab\Bowler\Connection  $connection
 	 * @param string  $exchangeName
 	 * @param string  $exchangeType
 	 * @param boolean $passive
@@ -72,9 +73,9 @@ class Producer
 	 * @param boolean $autoDelete
 	 * @param integer $deliveryMode
 	 */
-	public function __construct(Bowler $bowler, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
+	public function __construct(Connection $connection, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
 	{
-		$this->bowler = $bowler;
+		$this->connection = $connection;
 		$this->exchangeName = $exchangeName;
 		$this->exchangeType = $exchangeType;
 		$this->passive = $passive;
@@ -91,9 +92,9 @@ class Producer
 	 */
     public function publishToExchange($data, $route)
     {
-        $this->bowler->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+        $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
-        $this->bowler->getChannel()->basic_publish($msg, $this->exchangeName, $route);
+        $this->connection->getChannel()->basic_publish($msg, $this->exchangeName, $route);
         echo " [x] Data Package Sent to CRUD Exchange!'\n";
     }
 }
