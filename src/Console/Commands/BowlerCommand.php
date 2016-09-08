@@ -6,12 +6,13 @@ use Vinelab\Bowler\RegisterQueues;
 use Vinelab\Bowler\Consumer;
 use Vinelab\Bowler\Connection;
 
-use Illuminate\Console\Command;
+//use Illuminate\Console\Command;
+use App\Commands\Command;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
  */
-class BowlerCommand extends Command
+class BowlerCommand extends Command implements SelfHandling
 {
     protected $registerQueues;
     //protected $consumer;
