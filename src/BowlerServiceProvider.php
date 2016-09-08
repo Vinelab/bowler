@@ -24,7 +24,7 @@ class BowlerServiceProvider extends ServiceProvider
         });
 
         $this->app['vinelab.bowler.consume'] = $this->app->share(function ($app) {
-            $command = new RunCommand();
+            $command = new BowlerCommand();
             $command->setName('bowler:consume');
             return $command;
         });
