@@ -10,6 +10,9 @@ use Artisan;
 
 class BowlerServiceProvider extends ServiceProvider
 {
+
+    use Artisan;
+
     /**
      * Register any application services.
      *
