@@ -11,8 +11,6 @@ use Artisan;
 class BowlerServiceProvider extends ServiceProvider
 {
 
-    use Artisan;
-
     /**
      * Register any application services.
      *
@@ -40,7 +38,7 @@ class BowlerServiceProvider extends ServiceProvider
         //
         //$kernel = new $this->app->make(Kernel::class);
         //$command = 'Vinelab\Bowler\Console\Commands\BowlerCommand';
-        Artisan::add(new BowlerCommand(new RegisterQueues()));
+        //Artisan::add(new BowlerCommand(new RegisterQueues()));
 
     }
 

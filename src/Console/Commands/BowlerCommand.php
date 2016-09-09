@@ -5,6 +5,7 @@ namespace Vinelab\Bowler\Console\Commands;
 use Vinelab\Bowler\RegisterQueues;
 use Vinelab\Bowler\Consumer;
 use Vinelab\Bowler\Connection;
+use Vinelab\Bowler\Facades\Registrator;
 
 use Illuminate\Console\Command;
 

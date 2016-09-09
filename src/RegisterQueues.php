@@ -17,8 +17,13 @@ class RegisterQueues
 
 	public function queue($queue, $handler, $options = [])
 	{
+		$bowler = new Bowler();
+        $bowlerConsumer = new Consumer($bowler, $queue);
 
-		$handlers->push($handler);
+        // instance
+        //$handler = new App\Messaging\Handler();
+        $bowlerConsumer->listenToQueue($handler);
+		//$handlers->push($handler);
 	}
 
 	public function getHandlers()
