@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Console\Commands\BowlerCommand;
 use Vinelab\Bowler\RegisterQueues;
-use Artisan;
+use Console\InstallCommand;
 
 class BowlerServiceProvider extends ServiceProvider
 {
@@ -19,9 +19,9 @@ class BowlerServiceProvider extends ServiceProvider
     public function register()
     {
 
-        $this->app->singleton('vinelab.bowler.registrator', function ()
+        $this->app->singleton('vinelab.bowler.registrator', function ($app)
          {
-            return new RegisterQueues(new Connection());
+            return new RegisterQueues($app->make('Vinelab\Bowler\Connection'));
         });
 
         $this->app->bind(Connection::class, function ()
@@ -29,16 +29,11 @@ class BowlerServiceProvider extends ServiceProvider
             return new Connection();
         });
 
-        // $command = new BowlerCommand();
-        // $this->app['vinelab.bowler.consume'] = $this->app->share(function ($app) {
-        //     $command->setName('bowler:consume');
-        //     return $command;
-        // });
-        // $this->commands($this->commands);
-        //
-        //$kernel = new $this->app->make(Kernel::class);
-        //$command = 'Vinelab\Bowler\Console\Commands\BowlerCommand';
-        //Artisan::add(new BowlerCommand(new RegisterQueues()));
+        //register command
+        $commands = [
+            'Vinelab\Bowler\Console\Commands\BowlerCommand',
+        ];
+         $this->commands($commands);
 
     }
 

@@ -13,16 +13,16 @@ class RegisterQueues
         $this->connection = $connection;
     }
 
-    public function queue($queue, $handler, $options = [])
+    public function queue($queue, $className, $options = [])
     {
     	$handler = new Handler();
     	$handler->queueName = $queue;
-    	$handler->$className = $queue;
-        $handlers->push($handler);
+    	$handler->className = $className;
+      	array_push($this->handlers, $handler);
     }
 
     public function getHandlers()
     {
-        return $handlers;
+        return $this->handlers;
     }
 }

@@ -15,14 +15,14 @@ use Illuminate\Console\Command;
 class BowlerCommand extends Command
 {
     protected $registerQueues;
-    //protected $consumer;
+    protected $connction;
 
-    public function __construct(RegisterQueues $registerQueues)
+    public function __construct(RegisterQueues $registerQueues, Connection $connection)
     {
         parent::__construct();
 
-        //$this->registerQueues = $registerQueues;
-        //$this->$consumer = $consumer;
+        $this->registerQueues = $registerQueues;
+        $this->connection = $connection;
     }
 
 
@@ -48,9 +48,10 @@ class BowlerCommand extends Command
     public function handle()
     {
         require(app_path().'/Messaging/queues.php');
-        $handlers = $this->registerQueues->getHandlers();
+        $handlers = Registrator::getHandlers();
+
         foreach ($handlers as $handler) {
-            $bowlerConsumer = new Consumer($this->connection, $handler->queue);
+            $bowlerConsumer = new Consumer($this->connection, $handler->queueName);
             $bowlerConsumer->listenToQueue($handler->className);
         }
 

@@ -105,7 +105,6 @@ class Consumer
         $handler = new $handlerClass;
 
         $callback = function ($msg) use ($handler) {
-            //echo " [x] Received: ", $msg->body, "\n";
             $handler->handle($msg);
         };
 
