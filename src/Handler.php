@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Messaging;
+namespace Vinelab\Bowler;
 
 class Handler {
 
-	public function handle($msg)
-	{
-		echo "Handler: ".$msg->body;
-	}
+	public queueName = '';
+	public className = '';
+	public options = [];
+
 }

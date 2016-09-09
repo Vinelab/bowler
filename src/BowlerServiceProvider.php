@@ -21,7 +21,7 @@ class BowlerServiceProvider extends ServiceProvider
 
         $this->app->singleton('vinelab.bowler.registrator', function ()
          {
-            return new RegisterQueues();
+            return new RegisterQueues(new Connection());
         });
 
         $this->app->bind(Connection::class, function ()

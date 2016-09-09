@@ -47,27 +47,13 @@ class BowlerCommand extends Command
      */
     public function handle()
     {
-        // $handlers = $this->registerQueues->getHandlers();
-        // $conn = new Connection();
+        require(app_path().'/Messaging/queues.php');
+        $handlers = $this->registerQueues->getHandlers();
+        foreach ($handlers as $handler) {
+            $bowlerConsumer = new Consumer($this->connection, $handler->queue);
+            $bowlerConsumer->listenToQueue($handler->className);
+        }
 
-        // foreach ($handlers as $handler) {
-        //$bowler = new Bowler('localhost', 5672);
-        // $bowlerConsumer = new Consumer($bowler, 'crud', 'fanout');
-
-        // // instance
-        // $handler = new App\Messaging\Handler();
-        // $bowlerConsumer->listenToQueue($handler);
-        // }
-        //echo "bowler command executed\n";
-        //
-        $bowler = new Bowler();
-        $bowlerConsumer = new Consumer($bowler, 'crud', 'fanout');
-
-        // instance
-        $handler = new App\Messaging\Handler();
-        $bowlerConsumer->listenToQueue($handler);
-
-        Registrator::queue('books', 'App\Messaging\BooksHandler');
     }
 
 }

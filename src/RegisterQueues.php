@@ -2,33 +2,27 @@
 
 namespace Vinelab\Bowler;
 
-use Vinelab\Bowler\Consumer;
-use Vinelab\Bowler\Connection;
+use Vinelab\Bowler\Handler;
 
 class RegisterQueues
 {
-	private $handlers = [];
-	//private $consumer
+    private $handlers = [];
 
-	// public function __construct(Consumer $consumer, Connection $connection)
-	// {
-	// 	$this->consumer = $consumer($connection);
-	// }
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
 
-	public function queue($queue, $handler, $options = [])
-	{
-		$bowler = new Bowler();
-        $bowlerConsumer = new Consumer($bowler, $queue);
+    public function queue($queue, $handler, $options = [])
+    {
+    	$handler = new Handler();
+    	$handler->queueName = $queue;
+    	$handler->$className = $queue;
+        $handlers->push($handler);
+    }
 
-        // instance
-        //$handler = new App\Messaging\Handler();
-        $bowlerConsumer->listenToQueue($handler);
-		//$handlers->push($handler);
-	}
-
-	public function getHandlers()
-	{
-		return $handlers;
-	}
-
+    public function getHandlers()
+    {
+        return $handlers;
+    }
 }
