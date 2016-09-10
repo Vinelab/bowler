@@ -47,12 +47,16 @@ class BowlerCommand extends Command
      */
     public function handle()
     {
+        $queueName = $this->ask('Please specify queue name:');
+
         require(app_path().'/Messaging/queues.php');
         $handlers = Registrator::getHandlers();
 
         foreach ($handlers as $handler) {
+          if ($handler->queueName == $queueName) {
             $bowlerConsumer = new Consumer($this->connection, $handler->queueName);
             $bowlerConsumer->listenToQueue($handler->className);
+          }
         }
 
     }
