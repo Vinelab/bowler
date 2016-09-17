@@ -100,7 +100,7 @@ class Consumer
         list($queue_name) = $this->connection->getChannel()->queue_declare('', false, false, false, false);
         $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
 
-        echo ' [*] Waiting for CRUD operations. To exit press CTRL+C', "\n";
+        echo ' [*] Listening to Queue: ' . $this->exchangeName . ' To exit press CTRL+C', "\n";
 
         $handler = new $handlerClass;
 
@@ -109,7 +109,7 @@ class Consumer
         };
 
         $this->connection->getChannel()->basic_qos(null, 1, null);
-        $this->connection->getChannel()->basic_consume($queue_name, '', false, false, false, false, $callback);
+        $this->connection->getChannel()->basic_consume($queue_name, '', false, true, false, false, $callback);
 
         while (count($this->connection->getChannel()->callbacks)) {
             $this->connection->getChannel()->wait();

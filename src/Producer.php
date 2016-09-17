@@ -90,7 +90,7 @@ class Producer
 	 * @param  string $route: the route where the message should be published to
 	 * @return void
 	 */
-    public function publishToExchange($data, $route)
+    public function publish($data)
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
