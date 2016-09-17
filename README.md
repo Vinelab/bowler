@@ -18,7 +18,7 @@ A package that makes AMQP protocol implementation using rabbitmq server easy and
 // initialize a Bowler object with the rabbitmq server ip and port
 $connection = new Bowler\Connection();
 // initialize a Producer object with a connection, exchange name and type
-$bowlerProducer = new Producer($bowler, 'crud', 'fanout');
+$bowlerProducer = new Producer($connection, 'crud', 'fanout');
 return $bowlerProducer->publish($data);
 ```
 
