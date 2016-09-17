@@ -24,7 +24,9 @@ return $bowlerProducer->publish($data);
 
 ### Consumer
 
-- Modify config/app.php and add `Vinelab\Bowler\BowlerServiceProvider::class,` to the providers array.
+- Modify config/app.php:
+	- add `Vinelab\Bowler\BowlerServiceProvider::class,` to the providers array.
+	- add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array.
 
 - Create your handlers classes to handle the messages received: 
 
