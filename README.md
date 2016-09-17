@@ -1,5 +1,5 @@
 # Bowler
-A library to make the communication between your php application and rabbitmq server with AMQP protocol easier.
+A package that makes AMQP protocol implementation using rabbitmq server easy and straightforward.
 
 ## Installation
 
@@ -16,10 +16,10 @@ A library to make the communication between your php application and rabbitmq se
 ### Producer
 ```
 // initialize a Bowler object with the rabbitmq server ip and port
-$bowler = new Bowler('localhost', 5672);
-// initialize  a Producer object with a bowler object, exchange name and type
+$connection = new Bowler\Connection('localhost', 5672);
+// initialize a Producer object with a connection, exchange name and type
 $bowlerProducer = new Producer($bowler, 'crud', 'fanout');
-return $bowlerProducer->publishToExchange($this->book, 'books');
+return $bowlerProducer->publishToExchange($data, 'route');
 ```
 
 ### Consumer
