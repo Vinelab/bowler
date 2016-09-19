@@ -4,7 +4,7 @@ A package that makes AMQP protocol implementation using rabbitmq server easy and
 ## Installation
 
 ### Composer
-```json
+```php
 {
     "require": {
         "vinelab/bowler"
@@ -14,7 +14,8 @@ A package that makes AMQP protocol implementation using rabbitmq server easy and
 
 ## Usage
 ### Producer
-```
+
+```php
 // initialize a Bowler object with the rabbitmq server ip and port
 $connection = new Bowler\Connection();
 // initialize a Producer object with a connection, exchange name and type
@@ -30,10 +31,7 @@ return $bowlerProducer->publish($data);
 
 - Create your handlers classes to handle the messages received: 
 
-```
-
-<?php
-
+```php
 //this is an example handler class
 
 namespace App\Messaging;
@@ -49,8 +47,7 @@ class AuthorHandler {
 
 - Add all your handlers inside the queues.php file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under App\Messaging folder:
 
-```
-<?php
+```php
 
 Registrator::queue('books', 'App\Messaging\BookHandler');
 
