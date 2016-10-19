@@ -15,14 +15,12 @@ use Illuminate\Console\Command;
 class BowlerCommand extends Command
 {
     protected $registerQueues;
-    protected $connction;
 
-    public function __construct(RegisterQueues $registerQueues, Connection $connection)
+    public function __construct(RegisterQueues $registerQueues)
     {
         parent::__construct();
 
         $this->registerQueues = $registerQueues;
-        $this->connection = $connection;
     }
 
 
@@ -54,7 +52,7 @@ class BowlerCommand extends Command
 
         foreach ($handlers as $handler) {
           if ($handler->queueName == $queueName) {
-            $bowlerConsumer = new Consumer($this->connection, $handler->queueName);
+            $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName);
             $bowlerConsumer->listenToQueue($handler->className);
           }
         }
