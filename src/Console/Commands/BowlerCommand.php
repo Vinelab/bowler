@@ -29,7 +29,7 @@ class BowlerCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bowler:consume';
+    protected $signature = 'bowler:consume {queue}';
 
     /**
      * The console command description.
@@ -45,7 +45,7 @@ class BowlerCommand extends Command
      */
     public function handle()
     {
-        $queueName = $this->ask('Please specify queue name:');
+        $queueName = $this->argument('queue');
 
         require(app_path().'/Messaging/queues.php');
         $handlers = Registrator::getHandlers();
