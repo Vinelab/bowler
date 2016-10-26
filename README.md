@@ -13,6 +13,20 @@ A package that makes AMQP protocol implementation using rabbitmq server easy and
 ```
 
 ## Usage
+
+### Configuration
+
+In order to configure rabbitmq host, port, username and password, add the following inside the connections array in config/queue.php file:
+
+```php
+'rabbitmq' => [
+            'host' => 'host',
+            'port' => port,
+            'username' => 'username',
+            'password' => 'password',
+        ],
+```
+
 ### Producer
 
 ```php

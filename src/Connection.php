@@ -7,6 +7,7 @@ define('__ROOT__', dirname(dirname(dirname(__FILE__))));
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Illuminate\Support\Facades\Config;
 
 /**
  * Connection
@@ -36,7 +37,8 @@ class Connection
      */
     public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
     {
-        $this->connection = new AMQPStreamConnection($host, $port, $username, $password);
+
+        $this->connection = new AMQPStreamConnection(Config::get('queue.connections.rabbitmq.host', 'localhost'), Config::get('queue.connections.rabbitmq.port', '5672'), Config::get('queue.connections.rabbitmq.username', 'guest'), Config::get('queue.connections.rabbitmq.password', 'guest'));
         $this->channel = $this->connection->channel();
     }
 
