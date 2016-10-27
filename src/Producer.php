@@ -73,7 +73,7 @@ class Producer
 	 * @param boolean $autoDelete
 	 * @param integer $deliveryMode
 	 */
-	public function __construct(Connection $connection, $exchangeName, $exchangeType, $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
+	public function __construct(Connection $connection, $exchangeName, $exchangeType, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
 		$this->connection = $connection;
 		$this->exchangeName = $exchangeName;
@@ -94,7 +94,7 @@ class Producer
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
-        $this->connection->getChannel()->basic_publish($msg, $this->exchangeName);
+        $this->connection->getChannel()->basic_publish($msg, '', $this->exchangeName);
         echo " [x] Data Package Sent to CRUD Exchange!'\n";
     }
 }

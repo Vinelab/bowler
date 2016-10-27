@@ -78,7 +78,7 @@ class Consumer
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $passive = false, $durable = false, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->connection = $connection;
         $this->exchangeName = $exchangeName;
@@ -97,7 +97,7 @@ class Consumer
     public function listenToQueue($handlerClass)
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-        list($queue_name) = $this->connection->getChannel()->queue_declare('', false, false, false, false);
+        list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
         $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
 
         echo ' [*] Listening to Queue: ' . $this->exchangeName . ' To exit press CTRL+C', "\n";
@@ -106,10 +106,11 @@ class Consumer
 
         $callback = function ($msg) use ($handler) {
             $handler->handle($msg);
+            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
         };
 
         $this->connection->getChannel()->basic_qos(null, 1, null);
-        $this->connection->getChannel()->basic_consume($queue_name, '', false, true, false, false, $callback);
+        $this->connection->getChannel()->basic_consume($queue_name, '', false, false, false, false, $callback);
 
         while (count($this->connection->getChannel()->callbacks)) {
             $this->connection->getChannel()->wait();
