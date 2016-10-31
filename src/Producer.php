@@ -93,6 +93,10 @@ class Producer
     public function publish($data)
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+
+        list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
+        $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
+
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
         $this->connection->getChannel()->basic_publish($msg, '', $this->exchangeName);
         echo " [x] Data Package Sent to CRUD Exchange!'\n";
