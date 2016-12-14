@@ -52,7 +52,7 @@ class Connection
     	return $this->channel;
     }
 
-    public function __desctruct()
+    public function __destruct()
     {
         $this->channel->close();
         $this->connection->close();
