@@ -94,7 +94,7 @@ class Consumer
      *
      * @param string $data
      */
-    public function listenToQueue($handlerClass)
+    public function listenToQueue($handlerClass, $exceptionHandler)
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
@@ -108,8 +108,8 @@ class Consumer
             try {
                 $handler->handle($msg);
                 $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
-            } catch(Exception $e) {
-                throw $e;
+            } catch(\Exception $e) {
+                $exceptionHandler->reportQueue($e);
             }
         };
 

@@ -2,12 +2,12 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
-use Vinelab\Bowler\RegisterQueues;
 use Vinelab\Bowler\Consumer;
 use Vinelab\Bowler\Connection;
-use Vinelab\Bowler\Facades\Registrator;
-
 use Illuminate\Console\Command;
+use Vinelab\Bowler\RegisterQueues;
+use Vinelab\Bowler\Facades\Registrator;
+use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -53,7 +53,7 @@ class BowlerCommand extends Command
         foreach ($handlers as $handler) {
           if ($handler->queueName == $queueName) {
             $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName);
-            $bowlerConsumer->listenToQueue($handler->className);
+            $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
           }
         }
 
