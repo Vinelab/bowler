@@ -105,7 +105,7 @@ class Consumer
 
         $handler = new $handlerClass;
 
-        $callback = function ($msg) use ($handler) {
+        $callback = function ($msg) use ($handler, $exceptionHandler) {
             try {
                 $handler->handle($msg);
                 $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
