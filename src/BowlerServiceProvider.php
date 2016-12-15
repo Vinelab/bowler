@@ -22,7 +22,7 @@ class BowlerServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(
-            Vinelab\Bowler\Contracts\BowlerExceptionHandler::class,
+            \Vinelab\Bowler\Contracts\BowlerExceptionHandler::class,
             $this->app->getNamespace().\Exceptions\Handler::class
         );
 
