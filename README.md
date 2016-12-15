@@ -43,7 +43,7 @@ return $bowlerProducer->publish($data);
 	- add `Vinelab\Bowler\BowlerServiceProvider::class,` to the providers array.
 	- add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array.
 
-- Create your handlers classes to handle the messages received: 
+- Create your handlers classes to handle the messages received:
 
 ```php
 //this is an example handler class
@@ -71,3 +71,10 @@ Registrator::queue('crud', 'App\Messaging\AuthorHandler');
 
 - Now in order to listen to any queue, run the following command from your console:
 `php artisan bowler:consume`, you wil be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
+
+### Exception Reporting
+
+Bowler supports application level error reporting.
+
+To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`.
+And obviously, implement its methods.
