@@ -8,7 +8,13 @@
 			"name": "Ali Issa",
 			"email": "ali@vinelab.com",
 			"role": "Backend Software Engineer"
-		}
+		},
+		{
+			"name": "Kinane Domloje",
+			"email": "kinane@vinelab.com",
+			"homepage": "https://es.linkedin.com/in/kinanedomloje",
+            "role": "Developer"
+		},
 	],
 
 	"require": {

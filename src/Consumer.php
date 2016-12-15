@@ -9,6 +9,7 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
  * Bowler Consumer.
  *
  * @author Ali Issa <ali@vinelab.com>
+ * @author Kinane Domloje <kinane@vinelab.com>
  */
 class Consumer
 {

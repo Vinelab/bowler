@@ -5,7 +5,10 @@ namespace Vinelab\Bowler;
 use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Console\Commands\BowlerCommand;
 
-
+/**
+ * @author Ali Issa <ali@vinelab.com>
+ * @author Kinane Domloje <kinane@vinelab.com>
+ */
 class BowlerServiceProvider extends ServiceProvider
 {
     /**
