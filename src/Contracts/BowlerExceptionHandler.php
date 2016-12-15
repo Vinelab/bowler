@@ -6,5 +6,5 @@ use Exception;
 
 interface BowlerExceptionHandler
 {
-    public function report(Exception $e);
+    public function reportQueue(Exception $e);
 }

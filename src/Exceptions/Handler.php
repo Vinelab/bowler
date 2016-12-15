@@ -30,7 +30,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @todo should we implement the LoggerInterface
      */
-    public function report(Exception $e)
+    public function reportQueue(Exception $e)
     {
         try {
             $logger = $this->container->make(LoggerInterface::class);

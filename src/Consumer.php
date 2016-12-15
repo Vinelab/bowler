@@ -3,7 +3,6 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
-use Vinelab\Bowler\Exceptions\MessageConsumptionException;
 
 /**
  * Bowler Consumer.
@@ -110,7 +109,7 @@ class Consumer
                 $handler->handle($msg);
                 $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
             } catch(Exception $e) {
-                throw new MessageConsumptionException($e);
+                throw $e;
             }
         };
 
