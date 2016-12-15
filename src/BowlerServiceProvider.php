@@ -21,7 +21,7 @@ class BowlerServiceProvider extends ServiceProvider
             return new Connection();
         });
 
-        $this->app->singleton(
+        $this->app->bind(
             Vinelab\Bowler\Contracts\BowlerExceptionHandler::class,
             $this->app->getNamespace().\Exceptions\Handler::class
         );

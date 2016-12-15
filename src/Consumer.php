@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
  * Bowler Consumer.
@@ -94,7 +95,7 @@ class Consumer
      *
      * @param string $data
      */
-    public function listenToQueue($handlerClass, $exceptionHandler)
+    public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
