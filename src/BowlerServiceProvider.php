@@ -21,6 +21,11 @@ class BowlerServiceProvider extends ServiceProvider
             return new Connection();
         });
 
+        $this->app->singleton(
+            Vinelab\Bowler\Contracts\BowlerExceptionHandler::class,
+            $this->app->getNamespace().\Exceptions\Handler::class
+        );
+
         //register command
         $commands = [
             BowlerCommand::class,
