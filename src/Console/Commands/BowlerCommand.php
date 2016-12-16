@@ -55,6 +55,8 @@ class BowlerCommand extends Command
           if ($handler->queueName == $queueName) {
             $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName);
             $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
+
+            $handler->consumer = $bowlerConsumer;
           }
         }
 
