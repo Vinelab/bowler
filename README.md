@@ -43,7 +43,7 @@ return $bowlerProducer->publish($data);
 	- add `Vinelab\Bowler\BowlerServiceProvider::class,` to the providers array.
 	- add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array.
 
-- Create your handlers classes to handle the messages received: 
+- Create your handlers classes to handle the messages received:
 
 ```php
 //this is an example handler class
@@ -52,10 +52,26 @@ namespace App\Messaging;
 
 class AuthorHandler {
 
+    private $consumer;
+
 	public function handle($msg)
 	{
 		echo "Author: ".$msg->body;
 	}
+
+    public function handleError($e, $msg)
+    {
+        if($e instanceof InvalidInputException) {
+            $this->consumer->rejectMessage($msg);
+        } elseif($e instanceof WhatEverException) {
+            $this->consumer->ackMessage();
+        }
+    }
+
+    public function setConsumer($consumer)
+    {
+        $this->consumer = $consumer;
+    }
 }
 ```
 
@@ -71,3 +87,16 @@ Registrator::queue('crud', 'App\Messaging\AuthorHandler');
 
 - Now in order to listen to any queue, run the following command from your console:
 `php artisan bowler:consume`, you wil be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
+
+### Exception Handling
+Error Handling in Bowler is split into the application and queue domains.
+* `ExceptionHandler::renderQueue($e, $msg)` allows you to render error as you wish. While providing the exception and the que message itsef for maximum flexibility.
+
+* `MessageHandler::handleError($e, $msg)` allows you to perfom action of the messaging queue itself. Whether to acknowledge or reject a message is up to you.
+
+### Exception Reporting
+
+Bowler supports application level error reporting.
+
+To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`.
+And obviously, implement its methods.

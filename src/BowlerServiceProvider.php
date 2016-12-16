@@ -5,7 +5,10 @@ namespace Vinelab\Bowler;
 use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Console\Commands\BowlerCommand;
 
-
+/**
+ * @author Ali Issa <ali@vinelab.com>
+ * @author Kinane Domloje <kinane@vinelab.com>
+ */
 class BowlerServiceProvider extends ServiceProvider
 {
     /**
@@ -20,6 +23,11 @@ class BowlerServiceProvider extends ServiceProvider
         $this->app->bind(Connection::class, function () {
             return new Connection();
         });
+
+        $this->app->bind(
+            \Vinelab\Bowler\Contracts\BowlerExceptionHandler::class,
+            $this->app->getNamespace().\Exceptions\Handler::class
+        );
 
         //register command
         $commands = [

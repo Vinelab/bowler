@@ -3,11 +3,13 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
  * Bowler Consumer.
  *
  * @author Ali Issa <ali@vinelab.com>
+ * @author Kinane Domloje <kinane@vinelab.com>
  */
 class Consumer
 {
@@ -90,11 +92,11 @@ class Consumer
     }
 
     /**
-     * publish a message to a specified exchange.
+     * consume a message from a specified exchange.
      *
      * @param string $data
      */
-    public function listenToQueue($handlerClass)
+    public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
@@ -104,9 +106,22 @@ class Consumer
 
         $handler = new $handlerClass;
 
-        $callback = function ($msg) use ($handler) {
-            $handler->handle($msg);
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+        if(method_exists($handler, 'setConsumer')) {
+            $handler->setConsumer($this);
+        }
+
+        $callback = function ($msg) use ($handler, $exceptionHandler) {
+            try {
+                $handler->handle($msg);
+                $this->ackMessage($msg);
+            } catch(\Exception $e) {
+                $exceptionHandler->reportQueue($e, $msg);
+                $exceptionHandler->renderQueue($e, $msg);
+
+                if(method_exists($handler, 'handleError')) {
+                    $handler->handleError($e, $msg);
+                }
+            }
         };
 
         $this->connection->getChannel()->basic_qos(null, 1, null);
@@ -117,4 +132,23 @@ class Consumer
         }
     }
 
+    /**
+     * acknowledge a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     */
+    public function ackMessage($msg)
+    {
+        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+    }
+
+    /**
+     * reject a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     */
+    public function rejectMessage($msg)
+    {
+        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
+    }
 }
