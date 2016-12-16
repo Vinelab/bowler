@@ -113,7 +113,7 @@ class Consumer
             } catch(\Exception $e) {
                 $exceptionHandler->reportQueue($e, $msg);
                 $exceptionHandler->renderQueue($e, $msg);
-                $handler->handleError($e);
+                $handler->handleError($e, $msg);
             }
         };
 
