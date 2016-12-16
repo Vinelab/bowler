@@ -106,6 +106,10 @@ class Consumer
 
         $handler = new $handlerClass;
 
+        if(method_exists($handler, 'setConsumer')) {
+            $handler->setConsumer($this);
+        }
+
         $callback = function ($msg) use ($handler, $exceptionHandler) {
             try {
                 $handler->handle($msg);
@@ -113,7 +117,10 @@ class Consumer
             } catch(\Exception $e) {
                 $exceptionHandler->reportQueue($e, $msg);
                 $exceptionHandler->renderQueue($e, $msg);
-                $handler->handleError($e, $msg);
+
+                if(method_exists($handler, 'handleError')) {
+                    $handler->handleError($e, $msg);
+                }
             }
         };
 

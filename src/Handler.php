@@ -7,5 +7,4 @@ class Handler {
 	public $queueName = '';
 	public $className = '';
 	public $options = [];
-    public $consumer = null;
 }
