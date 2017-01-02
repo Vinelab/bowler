@@ -43,6 +43,7 @@ return $bowlerProducer->publish($data);
 	- add `Vinelab\Bowler\BowlerServiceProvider::class,` to the providers array.
 	- add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array.
 
+##### Manually
 - Create your handlers classes to handle the messages received:
 
 ```php
@@ -84,6 +85,13 @@ Registrator::queue('books', 'App\Messaging\BookHandler');
 Registrator::queue('crud', 'App\Messaging\AuthorHandler');
 
 ```
+
+##### Console
+- Create the queue with `php artisan bowler:queue analytics_queue AnalyticsData`.
+
+The previous command:
+1. Adds `Registrator::queue('analytics_queue', 'App\Messaging\Handlers\AnalyticsDataMessageHandler');` to `App\Messaging\queues.php`
+2. Create the `AnalyticsDataMessageHandler` in `App\Messaging\Handler` directory.
 
 - Now in order to listen to any queue, run the following command from your console:
 `php artisan bowler:consume`, you wil be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
