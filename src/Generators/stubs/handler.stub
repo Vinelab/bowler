@@ -1,0 +1,41 @@
+<?php
+
+namespace {{namespace}};
+
+class {{handler}}
+{
+    /**
+     * Consumer of queue.
+     */
+    private $consumer;
+
+    /**
+     * Handle message.
+     *
+     * @return void
+     */
+    public function handle($msg)
+    {
+        //
+    }
+
+    /**
+     * Handle error
+     *
+     * @return void
+     */
+    public function handleError($e, $msg)
+    {
+        //
+    }
+
+    /**
+     * Set the handler consumer
+     *
+     * @return void
+     */
+    public function setConsumer($consumer)
+    {
+        $this->consumer = $consumer;
+    }
+}
