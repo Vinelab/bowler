@@ -12,7 +12,7 @@ use Vinelab\Bowler\Generators\QueueGenerator;
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
  */
-class QueueCommand extends Command
+class HandlerCommand extends Command
 {
     public function __construct()
     {
@@ -24,14 +24,14 @@ class QueueCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bowler:queue {queue} {handler}';
+    protected $signature = 'bowler:handler {queue} {handler}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'add queue and generate corresponding message handler';
+    protected $description = 'add queue and generate the corresponding message handler';
 
     /**
      * Run the command.
@@ -40,13 +40,13 @@ class QueueCommand extends Command
      */
     public function handle()
     {
-        $queueGenerator = new QueueGenerator();
+        $handlerGenerator = new HandlerGenerator();
 
         $queue = $this->argument('queue');
-        $handler = studly_case($this->argument('handler')).'MessageHandler';
+        $handler = studly_case($this->argument('handler')).'Handler';
 
         try {
-            $queueGenerator->generate($queue, $handler);
+            $handlerGenerator->generate($queue, $handler);
 
             $this->info(
                 'Queue '.$queue.' added successfully.'.

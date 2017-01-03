@@ -5,10 +5,15 @@ namespace Vinelab\Bowler\Generators;
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
  */
-class QueueGenerator
+class HandlerGenerator
 {
     protected $srcDirectoryName = 'src';
 
+    /**
+     * Generate App\Messaging\queues.php and App\Messaging\Handlers\*MessageHandler.php
+     *
+     * @return void
+     */
     public function generate($queue, $handler)
     {
         $queuePath = $this->findQueuePath();
@@ -17,9 +22,11 @@ class QueueGenerator
 
         $handlerNamespace = $this->findHandlerNamespace();
 
+        // Get queue stub content and replace variables with values
         $queueContent = file_get_contents($this->getQueueStub());
         $queueContent = str_replace(['{{queue}}', '{{handler}}'], ["'".$queue."'", "'".$handlerNamespace.'\\'.$handler."'"], $queueContent);
 
+        // Get handler stub content and replace variables with values
         $handlerContent = file_get_contents($this->getHandlerStub());
         $handlerContent = str_replace(['{{handler}}', '{{namespace}}'], [$handler, $handlerNamespace], $handlerContent);
 
@@ -30,7 +37,7 @@ class QueueGenerator
 
         // Remove <?php string if file already exist
         if(file_exists($queuePath)) {
-            $queueContent = str_replace('<?php', '',$queueContent);
+            $queueContent = str_replace('<?php', '', $queueContent);
         }
 
         // Create or Append to file if it doesn't exist
@@ -40,16 +47,25 @@ class QueueGenerator
         file_put_contents($handlerPath.$handler.'.php', $handlerContent);
     }
 
+    /**
+     * Find queue absolute path
+     */
     public function findQueuePath()
     {
         return app_path().'/Messaging/queues.php';
     }
 
+    /**
+     * Find handler absolute path
+     */
     public function findHandlerPath()
     {
         return app_path().'/Messaging/Handlers/';
     }
 
+    /**
+     * Find handler relative path
+     */
     public function findHandlerNamespace()
     {
         $rootNamespace = $this->findRootNamespace();
@@ -57,11 +73,17 @@ class QueueGenerator
         return $rootNamespace.'\Messaging\Handlers';
     }
 
+    /**
+     * Find queue stub absolute path
+     */
     public function getQueueStub()
     {
         return __DIR__.'/stubs/queue.stub';
     }
 
+    /**
+     * Find handler stub absolute path
+     */
     public function getHandlerStub()
     {
         return __DIR__.'/stubs/handler.stub';
