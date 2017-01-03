@@ -7,7 +7,7 @@ use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
 use Vinelab\Bowler\RegisterQueues;
 use Vinelab\Bowler\Facades\Registrator;
-use Vinelab\Bowler\Generators\QueueGenerator;
+use Vinelab\Bowler\Generators\HandlerGenerator;
 
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
