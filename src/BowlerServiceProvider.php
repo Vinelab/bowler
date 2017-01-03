@@ -4,6 +4,7 @@ namespace Vinelab\Bowler;
 
 use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Console\Commands\BowlerCommand;
+use Vinelab\Bowler\Console\Commands\HandlerCommand;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -32,6 +33,7 @@ class BowlerServiceProvider extends ServiceProvider
         //register command
         $commands = [
             BowlerCommand::class,
+            HandlerCommand::class,
         ];
         $this->commands($commands);
     }
