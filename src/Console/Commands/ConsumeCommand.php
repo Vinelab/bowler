@@ -13,7 +13,7 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
  * @author Ali Issa <ali@vinelab.com>
  * @author Kinane Domloje <kinane@vinelab.com>
  */
-class BowlerCommand extends Command
+class ConsumeCommand extends Command
 {
     protected $registerQueues;
 
