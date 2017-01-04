@@ -91,9 +91,9 @@ Registrator::queue('crud', 'App\Messaging\AuthorHandler');
 
 The previous command:
 
-1. Adds `Registrator::queue('analytics_queue', 'App\Messaging\Handlers\AnalyticsDataMessageHandler');` to `App\Messaging\queues.php`.
+1. Adds `Registrator::queue('analytics_queue', 'App\Messaging\Handlers\AnalyticsDataHandler');` to `App\Messaging\queues.php`.
 
-2. Create the `App\Messaging\Handlers\AnalyticsDataMessageHandler.php` in `App\Messaging\Handler` directory.
+2. Create the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handler` directory.
 
 - Now in order to listen to any queue, run the following command from your console:
 `php artisan bowler:consume`, you wil be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
@@ -102,7 +102,7 @@ The previous command:
 Error Handling in Bowler is split into the application and queue domains.
 * `ExceptionHandler::renderQueue($e, $msg)` allows you to render error as you wish. While providing the exception and the que message itsef for maximum flexibility.
 
-* `MessageHandler::handleError($e, $msg)` allows you to perfom action of the messaging queue itself. Whether to acknowledge or reject a message is up to you.
+* `Handler::handleError($e, $msg)` allows you to perfom action of the messaging queue itself. Whether to acknowledge or reject a message is up to you.
 
 ### Exception Reporting
 
