@@ -87,13 +87,13 @@ Registrator::queue('crud', 'App\Messaging\AuthorHandler');
 ```
 
 ##### Console
-- Create the queue with `php artisan bowler:queue analytics_queue AnalyticsData`.
+- Register a handler for a specific queue with `php artisan bowler:handler analytics_queue AnalyticsData`.
 
 The previous command:
 
 1. Adds `Registrator::queue('analytics_queue', 'App\Messaging\Handlers\AnalyticsDataMessageHandler');` to `App\Messaging\queues.php`.
 
-2. Create the `AnalyticsDataMessageHandler` in `App\Messaging\Handler` directory.
+2. Create the `App\Messaging\Handlers\AnalyticsDataMessageHandler.php` in `App\Messaging\Handler` directory.
 
 - Now in order to listen to any queue, run the following command from your console:
 `php artisan bowler:consume`, you wil be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
