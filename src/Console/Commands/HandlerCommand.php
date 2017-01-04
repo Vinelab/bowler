@@ -43,7 +43,7 @@ class HandlerCommand extends Command
         $handlerGenerator = new HandlerGenerator();
 
         $queue = $this->argument('queue');
-        $handler = studly_case($this->argument('handler')).'Handler';
+        $handler = studly_case(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
 
         try {
             $handlerGenerator->generate($queue, $handler);
