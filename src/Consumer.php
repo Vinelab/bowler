@@ -22,10 +22,22 @@ class Consumer
 
     /**
      * the name of the exchange where the producer sends its messages to.
+     * The name of the queue bound to the exchange where the producer sends its messages.
+     *
+     * @var string
+     */
+    private $queueName;
      *
      * @var string
      */
     private $exchangeName;
+
+    /**
+     * The binding keys used by the exchange to route messages to bounded queues.
+     *
+     * @var string
+     */
+    private $bindingKeys;
 
     /**
      * type of exchange:
@@ -73,18 +85,22 @@ class Consumer
 
     /**
      * @param Vinelab\Bowler\Connection $connection
+     * @param string                $queueName
      * @param string                $exchangeName
      * @param string                $exchangeType
+     * @param array                 $bindingKeys
      * @param bool                  $passive
      * @param bool                  $durable
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType, $bindingKeys, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->connection = $connection;
+        $this->queueName = $queueName;
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
+        $this->bindingKeys = $bindingKeys;
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
@@ -98,11 +114,14 @@ class Consumer
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
-        $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-        list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
-        $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
 
         echo ' [*] Listening to Queue: ' . $this->exchangeName . ' To exit press CTRL+C', "\n";
+        $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete);
+
+        foreach ($this->bindingKeys as $bindingKey) {
+            $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
+        }
 
         $handler = new $handlerClass;
 
@@ -125,7 +144,7 @@ class Consumer
         };
 
         $this->connection->getChannel()->basic_qos(null, 1, null);
-        $this->connection->getChannel()->basic_consume($queue_name, '', false, false, false, false, $callback);
+        $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
 
         while (count($this->connection->getChannel()->callbacks)) {
             $this->connection->getChannel()->wait();

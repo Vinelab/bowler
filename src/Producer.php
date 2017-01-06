@@ -21,9 +21,21 @@ class Producer
 
 	/**
 	 * the name of the exchange where the producer sends its messages to
+     * The name of the queue bound to the exchange where the producer sends its messages.
+     *
+     * @var string
+     */
+    private $queueName;
 	 * @var string
 	 */
 	private $exchangeName;
+
+    /**
+     * The routing keys used by the exchange to route messages to bounded queues.
+     *
+     * @var string
+     */
+    private $routingKeys;
 
 	/**
 	 * type of exchange:
@@ -66,18 +78,22 @@ class Producer
 	/**
 	 *
 	 * @param Vinelab\Bowler\Connection  $connection
-	 * @param string  $exchangeName
-	 * @param string  $exchangeType
-	 * @param boolean $passive
-	 * @param boolean $durable
-	 * @param boolean $autoDelete
-	 * @param integer $deliveryMode
+	 * @param string  	$queueName
+	 * @param string  	$exchangeName
+	 * @param string  	$exchangeType
+	 * @param aray 		$routingKeys
+	 * @param boolean 	$passive
+	 * @param boolean 	$durable
+	 * @param boolean 	$autoDelete
+	 * @param integer 	$deliveryMode
 	 */
-	public function __construct(Connection $connection, $exchangeName, $exchangeType, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+	public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType, $routingKeys, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
 		$this->connection = $connection;
+		$this->queueName = $queueName;
 		$this->exchangeName = $exchangeName;
 		$this->exchangeType = $exchangeType;
+		$this->routingKeys = $routingKeys;
 		$this->passive = $passive;
 		$this->durable = $durable;
 		$this->autoDelete = $autoDelete;
@@ -94,11 +110,14 @@ class Producer
     {
         $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
 
-        list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
-        $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
+        $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+
+        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete);
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
-        $this->connection->getChannel()->basic_publish($msg, '', $this->exchangeName);
         echo " [x] Data Package Sent to CRUD Exchange!'\n";
+        foreach ($this->routingKeys as $routingKey) {
+	        $channel->queue_bind($this->queueName, $this->exchangeName, $routingKey);
+	        $channel->basic_publish($msg, $this->exchangeName, $routingKeys);
     }
 }
