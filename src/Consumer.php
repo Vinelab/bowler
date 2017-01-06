@@ -14,19 +14,21 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 class Consumer
 {
     /**
-     * the main class of the package where we define the channel and the connection.
+     * The main class of the package where we define the channel and the connection.
      *
      * @var Vinelab\Bowler\Connection
      */
     private $connection;
 
     /**
-     * the name of the exchange where the producer sends its messages to.
      * The name of the queue bound to the exchange where the producer sends its messages.
      *
      * @var string
      */
     private $queueName;
+
+    /**
+     * The name of the exchange where the producer sends its messages to.
      *
      * @var string
      */
@@ -81,8 +83,6 @@ class Consumer
      */
     private $deliveryMode;
 
-    private $msgProcessor;
-
     /**
      * @param Vinelab\Bowler\Connection $connection
      * @param string                $queueName
@@ -110,18 +110,21 @@ class Consumer
     /**
      * consume a message from a specified exchange.
      *
-     * @param string $data
+     * @param string $handlerClass
+     * @param Vinelab\Bowler\Contracts\BowlerExceptionHandler $exceptionHandler
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
+        $channel = $this->connection->getChannel();
 
-        echo ' [*] Listening to Queue: ' . $this->exchangeName . ' To exit press CTRL+C', "\n";
         $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete);
 
         foreach ($this->bindingKeys as $bindingKey) {
             $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
         }
+
+        echo " [*] Listening to Queue: ", $this->queueName, " To exit press CTRL+C", "\n";
 
         $handler = new $handlerClass;
 
@@ -143,22 +146,24 @@ class Consumer
             }
         };
 
-        $this->connection->getChannel()->basic_qos(null, 1, null);
+        $channel->basic_qos(null, 1, null);
         $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
 
-        while (count($this->connection->getChannel()->callbacks)) {
-            $this->connection->getChannel()->wait();
+        while (count($channel->callbacks)) {
+            $channel->wait();
         }
     }
 
     /**
-     * acknowledge a messasge.
+     * Acknowledge a messasge.
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
      */
     public function ackMessage($msg)
     {
-        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
+    }
+
     /**
      * Negatively acknowledge a messasge.
      *
@@ -172,12 +177,13 @@ class Consumer
     }
 
     /**
-     * reject a messasge.
+     * Reject a messasge.
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param bool $requeue
      */
-    public function rejectMessage($msg)
+    public function rejectMessage($msg, $requeue = false)
     {
-        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
+        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
     }
 }

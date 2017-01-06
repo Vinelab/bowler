@@ -45,7 +45,7 @@ class ConsumeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'register all consumers to their queues';
+    protected $description = 'Register a consumer to its queue';
 
     /**
      * Run the command.
