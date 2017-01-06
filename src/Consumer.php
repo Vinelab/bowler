@@ -159,6 +159,16 @@ class Consumer
     public function ackMessage($msg)
     {
         $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+    /**
+     * Negatively acknowledge a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param bool  $multiple
+     * @param bool  $requeue
+     */
+    public function nackMessage($msg, $multiple = false, $requeue = false)
+    {
+        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
     }
 
     /**
