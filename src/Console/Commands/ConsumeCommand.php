@@ -33,12 +33,12 @@ class ConsumeCommand extends Command
     protected $signature = 'bowler:consume
                             {queueName : The queue NAME}
                             {--exchangeName= : The exchange NAME. If not specified the queue name will be used}
-                            {--exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic}
+                            {--exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
                             {--bindingKeys=* : The consumer\'s BINDINGKEYS (array)}
-                            {--passive=0 : }
-                            {--durable=1 : Mark exchange and queue as DURABLE}
-                            {--autoDelete=0 : Set exchange and queue to AUTODELETE when all queues and consumers, respectively have finished using it}
-                            {--deliveryMode=2 : The message DELIVERYMODE. Non-persistent 1 or persistent 2}';
+                            {--passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
+                            {--durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
+                            {--autoDelete=0 : Set exchange and queue to AUTODELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
+                            {--deliveryMode=2 : The message DELIVERYMODE. Non-persistent 1 or persistent 2. Defaults to 2}';
 
     /**
      * The console command description.
