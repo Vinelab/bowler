@@ -126,7 +126,7 @@ class Producer
 
         foreach ($this->routingKeys as $routingKey) {
 	        $channel->queue_bind($this->queueName, $this->exchangeName, $routingKey);
-	        $channel->basic_publish($msg, $this->exchangeName, $routingKeys);
+	        $channel->basic_publish($msg, $this->exchangeName, $routingKey);
         }
 
         echo " [x] Data Package Sent to ", $this->exchangeName, " Exchange!", "\n";
