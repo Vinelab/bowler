@@ -82,6 +82,9 @@ class ConsumeCommand extends Command
         foreach ($handlers as $handler) {
           if ($handler->queueName == $queueName) {
             $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
+            if($deadLetterQueueName) {
+                $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTtl);
+            }
             $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
           }
         }
