@@ -107,8 +107,12 @@ class Producer
 	{
 		$this->connection = $connection;
 		$this->queueName = $queueName;
-		$this->exchangeName = $exchangeName;
-		$this->exchangeType = $exchangeType;
+        $this->exchangeType = $exchangeType;
+        if(!$exchangeName) {
+            $this->exchangeName = $queueName;
+        } else {
+            $this->exchangeName = $exchangeName;
+        }
 		$this->routingKeys = $routingKeys;
 		$this->passive = $passive;
 		$this->durable = $durable;
