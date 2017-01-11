@@ -32,13 +32,13 @@ class ConsumeCommand extends Command
      */
     protected $signature = 'bowler:consume
                             {queueName : The queue NAME}
-                            {--xN|exchangeName= : The exchange NAME. Defaults to queueName}
-                            {--xT|exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
-                            {--bK|bindingKeys=* : The consumer\'s BINDING KEYS (array)}
-                            {--P|passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
-                            {--D|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
-                            {--aD|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
-                            {--dM|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}
+                            {--exchangeName= : The exchange NAME. Defaults to queueName}
+                            {--exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
+                            {--bindingKeys=* : The consumer\'s BINDING KEYS (array)}
+                            {--passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
+                            {--durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
+                            {--autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
+                            {--deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}';
 
     /**
      * The console command description.
@@ -56,12 +56,9 @@ class ConsumeCommand extends Command
     {
         $queueName = $this->argument('queueName');
 
-        // If the exchange name has not been set, use the queue name
-        $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName;
+        $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName; // If the exchange name has not been set, use the queue name
         $exchangeType = $this->option('exchangeType');
-
-        // If no bidingKeys are specified push a value of null so that we can still perform the loop
-        $bindingKeys = ($keys = $this->option('bindingKeys')) ? (array) $keys : [null];
+        $bindingKeys = ($keys = $this->option('bindingKeys')) ? (array) $keys : [null]; // If no bidingKeys are specified push a value of null so that we can still perform the loop
         $passive = (bool) $this->option('passive');
         $durable = (bool) $this->option('durable');
         $autoDelete = (bool) $this->option('autoDelete');
@@ -78,5 +75,4 @@ class ConsumeCommand extends Command
         }
 
     }
-
 }
