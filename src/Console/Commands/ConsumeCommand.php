@@ -24,7 +24,6 @@ class ConsumeCommand extends Command
         $this->registerQueues = $registerQueues;
     }
 
-
     /**
      * The console command name.
      *
@@ -38,7 +37,12 @@ class ConsumeCommand extends Command
                             {--p|passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
                             {--d|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
                             {--D|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
-                            {--M|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}';
+                            {--M|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}
+                            {--deadLetterQueueName= : The dead letter queue NAME. Defaults to deadLetterExchangeName}
+                            {--deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName}
+                            {--deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
+                            {--deadLetterRoutingKey= : The dead letter ROUTING KEY}
+                            {--messageTtl= : The dead letter MESSAGE TTL}';
 
     /**
      * The console command description.
@@ -64,12 +68,22 @@ class ConsumeCommand extends Command
         $autoDelete = (bool) $this->option('autoDelete');
         $deliveryMode = (int) $this->option('deliveryMode');
 
+        // Dead Lettering
+        $deadLetterQueueName = ($qName = $this->option('deadLetterQueueName')) ? $qName : (($xName = $this->option('deadLetterExchangeName')) ? $xName : null);
+        $deadLetterExchangeName = ($xName = $this->option('deadLetterExchangeName')) ? $xName : (($qName = $this->option('deadLetterQueueName')) ? $qName : null);
+        $deadLetterExchangeType = $this->option('deadLetterExchangeType');
+        $deadLetterRoutingKey = $this->option('deadLetterRoutingKey');
+        $messageTtl = (int) $this->option('messageTtl');
+
         require(app_path().'/Messaging/queues.php');
         $handlers = Registrator::getHandlers();
 
         foreach ($handlers as $handler) {
           if ($handler->queueName == $queueName) {
             $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
+            if($deadLetterQueueName) {
+                $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTtl);
+            }
             $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
           }
         }
