@@ -94,7 +94,7 @@ class Producer
 	 * @param boolean 	$autoDelete
 	 * @param integer 	$deliveryMode
 	 */
-	public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType, array $routingKeys = [null], bool $passive = false, bool $durable = true, bool $autoDelete = false, int $deliveryMode = 2)
+	public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType, array $routingKeys = [null], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
 		$this->connection = $connection;
 		$this->queueName = $queueName;
