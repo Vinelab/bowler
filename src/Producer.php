@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Traits\DeadLetteringTrait;
 
 /**
  * Bowler Producer
@@ -11,6 +12,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  */
 class Producer
 {
+    use DeadLetteringTrait;
 
 	/**
 	 * The main class of the package where we define the channel and the connection
@@ -82,6 +84,13 @@ class Producer
      */
     private $deliveryMode;
 
+    /**
+     * The arguments that should be added to the `queue_declare` statement for dead lettering
+     *
+     * @var array
+     */
+    private $arguments = [];
+
 	/**
 	 *
 	 * @param Vinelab\Bowler\Connection  $connection
@@ -120,7 +129,7 @@ class Producer
 
         $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
 
-        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete);
+        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
