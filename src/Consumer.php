@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Traits\DeadLetteringTrait;
 use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
@@ -13,6 +14,8 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
  */
 class Consumer
 {
+    use DeadLetteringTrait;
+
     /**
      * The main class of the package where we define the channel and the connection.
      *
@@ -84,6 +87,13 @@ class Consumer
     private $deliveryMode;
 
     /**
+     * The arguments that should be added to the `queue_declare` statement for dead lettering
+     *
+     * @var array
+     */
+    private $arguments = [];
+
+    /**
      * @param Vinelab\Bowler\Connection $connection
      * @param string                $queueName
      * @param string                $exchangeName
@@ -94,7 +104,7 @@ class Consumer
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType, $bindingKeys, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [null], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->connection = $connection;
         $this->queueName = $queueName;
@@ -118,7 +128,8 @@ class Consumer
         $channel = $this->connection->getChannel();
 
         $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete);
+        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
+
 
         foreach ($this->bindingKeys as $bindingKey) {
             $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
