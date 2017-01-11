@@ -42,7 +42,7 @@ class ConsumeCommand extends Command
                             {--deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName}
                             {--deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
                             {--deadLetterRoutingKey= : The dead letter ROUTING KEY}
-                            {--messageTtl= : The dead letter MESSAGE TTL}';
+                            {--messageTtl= : If set, specifies how long, in milliseconds, before a message is declared dead letter}';
 
     /**
      * The console command description.
