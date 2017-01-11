@@ -39,6 +39,11 @@ class ConsumeCommand extends Command
                             {--D|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
                             {--aD|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
                             {--dM|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}
+                            {--dlqN|deadLetterQueueName= : The dead letter queue NAME. Defaults to deadLetterExchangeName}
+                            {--dlxN|deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName}
+                            {--dlxT|deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
+                            {--dlrK|deadLetterRoutingKey= : The dead letter ROUTING KEY}
+                            {--dlmT|messageTtl= : The dead letter MESSAGE TTL}';
 
     /**
      * The console command description.
@@ -56,16 +61,20 @@ class ConsumeCommand extends Command
     {
         $queueName = $this->argument('queueName');
 
-        // If the exchange name has not been set, use the queue name
-        $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName;
+        $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName; // If the exchange name has not been set, use the queue name
         $exchangeType = $this->option('exchangeType');
-
-        // If no bidingKeys are specified push a value of null so that we can still perform the loop
-        $bindingKeys = ($keys = $this->option('bindingKeys')) ? (array) $keys : [null];
+        $bindingKeys = ($keys = $this->option('bindingKeys')) ? (array) $keys : [null]; // If no bidingKeys are specified push a value of null so that we can still perform the loop
         $passive = (bool) $this->option('passive');
         $durable = (bool) $this->option('durable');
         $autoDelete = (bool) $this->option('autoDelete');
         $deliveryMode = (int) $this->option('deliveryMode');
+
+        // Dead Lettering
+        $deadLetterQueueName = ($qName = $this->option('deadLetterQueueName')) ? $qName : (($xName = $this->option('deadLetterExchangeName')) ? $xName : null)
+        $deadLetterExchangeName = ($xName = $this->option('deadLetterExchangeName')) ? $xName : (($qName = $this->option('deadLetterQueueName')) ? $qName : null)
+        $deadLetterExchangeType = $this->option('deadLetterExchangeType');
+        $deadLetterRoutingKey = $this->option('deadLetterRoutingKey');
+        $messageTtl = (int) $this->option('messageTtl');
 
         require(app_path().'/Messaging/queues.php');
         $handlers = Registrator::getHandlers();
@@ -78,5 +87,4 @@ class ConsumeCommand extends Command
         }
 
     }
-
 }
