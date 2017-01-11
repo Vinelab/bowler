@@ -65,13 +65,27 @@ class AuthorHandler {
         if($e instanceof InvalidInputException) {
             $this->consumer->rejectMessage($msg);
         } elseif($e instanceof WhatEverException) {
-            $this->consumer->ackMessage();
+            $this->consumer->ackMessage($msg);
+        } elseif($e instanceof WhatElseException) {
+            $this->consumer->nackMessage($msg);
         }
     }
 
     public function setConsumer($consumer)
     {
         $this->consumer = $consumer;
+    }
+}
+```
+
+If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
+
+```php
+public function handle($msg)
+{
+    switch ($msg->delivery_info['routing_key']) {
+        case 'key 1': //do something
+        case 'key 2': //do something else
     }
 }
 ```
@@ -96,7 +110,43 @@ The previous command:
 2. Create the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handler` directory.
 
 - Now in order to listen to any queue, run the following command from your console:
-`php artisan bowler:consume`, you wil be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
+`php artisan bowler:consume`, you will be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`)
+
+`bowler:consume` complete arguments list description:
+
+```php
+bowler:consume
+queueName : The queue NAME
+--N|exchangeName= : The exchange NAME. Defaults to queueName
+--T|exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
+--K|bindingKeys=* : The consumer\'s BINDING KEYS (array)
+--p|passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
+--d|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1
+--D|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
+--M|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2
+--deadLetterQueueName= : The dead letter queue NAME. Defaults to deadLetterExchangeName
+--deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName
+--deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
+--deadLetterRoutingKey= : The dead letter ROUTING KEY
+--messageTtl= : If set, specifies how long, in milliseconds, before a message is declared dead letter
+```
+
+### Dead Lettering
+#### Producer
+Once a Producer is instantiated, if you wish to enable dead lettering you should:
+```php
+$producer = new Produer(...);
+
+$producer->configureDeadLettering($deadLetterQueueName, $deadLEtterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTtl);
+
+$producer->publish($body);
+```
+
+#### Consumer
+Enabeling dead lettering on the consumer is done through the command line using the same command that run the consumer with the dedicated optional arguments, at least one of `--deadLetterQueueName` or `--deadLetterExchangeName` should be specified.
+```php
+php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlx --deadLetterExchangeName=dlx --deadLetterExchangeType=direct --deadLetterRoutingKey=invalid --messageTtl=10000
+```
 
 ### Exception Handling
 Error Handling in Bowler is split into the application and queue domains.
