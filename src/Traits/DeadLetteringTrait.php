@@ -5,6 +5,72 @@ namespace Vinelab\Bowler\Traits;
 trait DeadLetteringTrait
 {
     /**
+     * Acknowledge a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     */
+    public function ackMessage($msg)
+    {
+        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
+    }
+
+    /**
+     * Negatively acknowledge a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param bool  $multiple
+     * @param bool  $requeue
+     */
+    public function nackMessage($msg, $multiple = false, $requeue = false)
+    {
+        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
+    }
+
+    /**
+     * Reject a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param bool $requeue
+     */
+    public function rejectMessage($msg, $requeue = false)
+    {
+        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
+    }
+
+    /**
+     * Delete a exchange.
+     *
+     * @param string $exchangeName
+     * @param bool $unused
+     */
+    public function deleteExchange($exchangeName, $unused)
+    {
+        $this->connection->getChannel()->exchange_delete($queueName, $unused, $empty);
+    }
+
+    /**
+     * Delete a queue.
+     *
+     * @param string $queueName
+     * @param bool $unused
+     * @param bool $empty
+     */
+    public function deleteQueue($queueName, $unused, $empty)
+    {
+        $this->connection->getChannel()->queue_delete($queueName, $unused, $empty);
+    }
+
+    /**
+     * Purge a queue.
+     *
+     * @param string $queueName
+     */
+    public function purgeQueue($queueName)
+    {
+        $this->connection->getChannel()->queue_purge($queueName);
+    }
+
+    /**
      * Configure Dead Lettering by creating a queue and exchange, and prepares the arguments array to be passed to the messaging queue.
      *
      * @param string    $deadLetterQueueName
