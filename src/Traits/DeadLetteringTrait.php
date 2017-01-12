@@ -94,11 +94,11 @@ trait DeadLetteringTrait
         } catch (\Exception $e) {
             throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(),
                             [
-                                'dead_letter_queue_name' => $deadLetterQueueName,
-                                'dead_letter_exchange_name' => $deadLetterExchangeName,
-                                'dead_letter_exchange_type' => $deadLetterExchangeType,
-                                'dead_letter_routing_key' => $deadLetterRoutingKey,
-                                'message_ttl' => $messageTTL
+                                'deadLetterQueueName' => $deadLetterQueueName,
+                                'deadLetterExchangeName' => $deadLetterExchangeName,
+                                'deadLetterExchangeEype' => $deadLetterExchangeType,
+                                'deadLetterRoutingKey' => $deadLetterRoutingKey,
+                                'messageTTL' => $messageTTL
                             ],
                             $this->arguments);
         }
@@ -140,16 +140,16 @@ trait DeadLetteringTrait
     private function compileParameters()
     {
         $params = [
-                'queue_name' => $this->queueName,
-                'exchange_name' => $this->exchangeName,
-                'exchange_type' => $this->exchangeType,
+                'queueName' => $this->queueName,
+                'exchangeName' => $this->exchangeName,
+                'exchangeType' => $this->exchangeType,
                 'passive' => $this->passive,
                 'durable' => $this->durable,
-                'auto_delete' => $this->autoDelete,
-                'delivery_mode' => $this->deliveryMode
+                'autoDelete' => $this->autoDelete,
+                'deliveryMode' => $this->deliveryMode
             ];
 
-        property_exists($this, 'routingKeys') ? ($params['routing_keys'] = $this->routingKeys) : ($params['binding_keys'] = $this->bindingKeys);
+        property_exists($this, 'routingKeys') ? ($params['routingKeys'] = $this->routingKeys) : ($params['bindingKeys'] = $this->bindingKeys);
 
         return $params;
     }
