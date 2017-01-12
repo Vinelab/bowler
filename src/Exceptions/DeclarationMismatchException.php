@@ -9,17 +9,17 @@ use Exception;
  */
 class DeclarationMismatchException extends Exception
 {
-    private $message;
-    private $code;
-    private $file;
-    private $line;
-    private $trace;
-    private $previous;
-    private $traceAsString;
-    private $parameters;
+    protected $message;
+    protected $code;
+    protected $file;
+    protected $line;
+    protected $trace;
+    protected $previous;
+    protected $traceAsString;
+    protected $parameters;
 
     // Dead lettering arguments
-    private $arguments;
+    protected $arguments;
 
     public function __construct($message, $code, $file, $line, $trace, $previous, $traceAsString, $parameters, $arguments = [])
     {
