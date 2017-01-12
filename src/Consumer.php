@@ -104,7 +104,7 @@ class Consumer
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [null], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->connection = $connection;
         $this->queueName = $queueName;
@@ -130,9 +130,12 @@ class Consumer
         $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
 
-
-        foreach ($this->bindingKeys as $bindingKey) {
-            $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
+        if(!empty($this->bindingKeys)) {
+            foreach ($this->bindingKeys as $bindingKey) {
+                $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
+            }
+        } else {
+            $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
         echo " [*] Listening to Queue: ", $this->queueName, " To exit press CTRL+C", "\n";

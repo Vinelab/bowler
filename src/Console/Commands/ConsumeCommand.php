@@ -62,7 +62,7 @@ class ConsumeCommand extends Command
 
         $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName; // If the exchange name has not been set, use the queue name
         $exchangeType = $this->option('exchangeType');
-        $bindingKeys = ($keys = $this->option('bindingKeys')) ? (array) $keys : [null]; // If no bidingKeys are specified push a value of null so that we can still perform the loop
+        $bindingKeys = (array) $this->option('bindingKeys');
         $passive = (bool) $this->option('passive');
         $durable = (bool) $this->option('durable');
         $autoDelete = (bool) $this->option('autoDelete');

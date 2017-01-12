@@ -103,7 +103,7 @@ class Producer
 	 * @param boolean 	$autoDelete
 	 * @param integer 	$deliveryMode
 	 */
-	public function __construct(Connection $connection, $queueName, $exchangeType = 'fanout', $exchangeName = null,array $routingKeys = [null], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+	public function __construct(Connection $connection, $queueName, $exchangeType = 'fanout', $exchangeName = null,array $routingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
 		$this->connection = $connection;
 		$this->queueName = $queueName;
@@ -137,9 +137,14 @@ class Producer
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        foreach ($this->routingKeys as $routingKey) {
-	        $channel->queue_bind($this->queueName, $this->exchangeName, $routingKey);
-	        $channel->basic_publish($msg, $this->exchangeName, $routingKey);
+        if (!empty($this->routingKeys)) {
+            foreach ($this->routingKeys as $routingKey) {
+                $channel->queue_bind($this->queueName, $this->exchangeName, $routingKey);
+                $channel->basic_publish($msg, $this->exchangeName, $routingKey);
+            }
+        } else {
+            $channel->queue_bind($this->queueName, $this->exchangeName);
+                $channel->basic_publish($msg, $this->exchangeName);
         }
 
         echo " [x] Data Package Sent to ", $this->exchangeName, " Exchange!", "\n";
