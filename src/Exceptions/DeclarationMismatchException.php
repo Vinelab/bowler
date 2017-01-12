@@ -21,7 +21,7 @@ class DeclarationMismatchException extends Exception
     // Dead lettering arguments
     protected $arguments;
 
-    public function __construct($message, $code, $file, $line, $trace, $previous, $traceAsString, $parameters, $arguments = [])
+    public function __construct($message, $code, $file, $line, $trace, $previous, $traceAsString, $parameters = [], $arguments = [])
     {
         $this->message = $message;
         $this->code= $code;
@@ -32,41 +32,6 @@ class DeclarationMismatchException extends Exception
         $this->traceAsString = $traceAsString;
         $this->parameters = $parameters;
         $this->arguments = $arguments;
-    }
-
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    public function getLine()
-    {
-        return $this->line;
-    }
-
-    public function getTrace()
-    {
-        return $this->trace;
-    }
-
-    public function getPrevious()
-    {
-        return $this->previous;
-    }
-
-    public function getTraceAsString()
-    {
-        return $this->traceAsString;
     }
 
     public function getParameters()
