@@ -11,11 +11,11 @@ trait DeadLetteringTrait
      * @param string    $deadLetterExchangeName
      * @param string    $deadLetterExchangeType
      * @param string    $deadLetterRoutingKey
-     * @param int       $messageTtl
+     * @param int       $messageTTL
      *
      * @return void
      */
-    public function configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType = 'fanout', $deadLetterRoutingKey = null, $messageTtl = null)
+    public function configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType = 'fanout', $deadLetterRoutingKey = null, $messageTTL = null)
     {
         $channel = $this->connection->getChannel();
 
@@ -25,7 +25,7 @@ trait DeadLetteringTrait
 
         $channel->queue_bind($deadLetterQueueName, $deadLetterExchangeName);
 
-        $this->compileArguments($deadLetterExchangeName, $deadLetterRoutingKey, $messageTtl);
+        $this->compileArguments($deadLetterExchangeName, $deadLetterRoutingKey, $messageTTL);
     }
 
     /**
@@ -33,20 +33,22 @@ trait DeadLetteringTrait
      *
      * @param string    $deadLetterExchangeName
      * @param string    $deadLetterRoutingKey
-     * @param int       $messageTtl
+     * @param int       $messageTTL
      *
      * @return void
      */
-    private function compileArguments($deadLetterExchangeName, $deadLetterRoutingKey, $messageTtl)
+    private function compileArguments($deadLetterExchangeName, $deadLetterRoutingKey, $messageTTL)
     {
+        // 'S', Rabbitmq data type for long string
         $this->arguments['x-dead-letter-exchange'] = ['S', $deadLetterExchangeName];
 
         if($deadLetterRoutingKey) {
             $this->Arguments['x-dead-letter-routing-key'] = ['S', $deadLetterRoutingKey];
         }
 
-        if($messageTtl) {
-            $this->arguments['x-message-ttl'] = ['I', $messageTtl];
+        if($messageTTL) {
+            // 'I', Rabbitmq data type for long int
+            $this->arguments['x-message-ttl'] = ['I', $messageTTL];
         }
     }
 }
