@@ -2,6 +2,8 @@
 
 namespace Vinelab\Bowler\Traits;
 
+use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
+
 trait DeadLetteringTrait
 {
     /**
@@ -85,9 +87,21 @@ trait DeadLetteringTrait
     {
         $channel = $this->connection->getChannel();
 
-        $channel->exchange_declare($deadLetterExchangeName, $deadLetterExchangeType, $this->passive, $this->durable, false, $this->autoDelete);
+        try {
+            $channel->exchange_declare($deadLetterExchangeName, $deadLetterExchangeType, $this->passive, $this->durable, false, $this->autoDelete);
 
-        $channel->queue_declare($deadLetterQueueName, $this->passive, $this->durable, false, $this->autoDelete);
+            $channel->queue_declare($deadLetterQueueName, $this->passive, $this->durable, false, $this->autoDelete);
+        } catch (\Exception $e) {
+            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(),
+                            [
+                                'dead_letter_queue_name' => $deadLetterQueueName,
+                                'dead_letter_exchange_name' => $deadLetterExchangeName,
+                                'dead_letter_exchange_type' => $deadLetterExchangeType,
+                                'dead_letter_routing_key' => $deadLetterRoutingKey,
+                                'message_ttl' => $messageTTL
+                            ],
+                            $this->arguments);
+        }
 
         $channel->queue_bind($deadLetterQueueName, $deadLetterExchangeName);
 

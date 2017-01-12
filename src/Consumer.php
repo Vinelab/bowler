@@ -4,6 +4,7 @@ namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
+use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
@@ -127,8 +128,12 @@ class Consumer
     {
         $channel = $this->connection->getChannel();
 
-        $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
+        try {
+            $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+            $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
+        } catch (\Exception $e) {
+            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(),  $this->arguments);
+        }
 
         if(!empty($this->bindingKeys)) {
             foreach ($this->bindingKeys as $bindingKey) {
@@ -166,38 +171,5 @@ class Consumer
         while (count($channel->callbacks)) {
             $channel->wait();
         }
-    }
-
-    /**
-     * Acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     */
-    public function ackMessage($msg)
-    {
-        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
-    }
-
-    /**
-     * Negatively acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool  $multiple
-     * @param bool  $requeue
-     */
-    public function nackMessage($msg, $multiple = false, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
-    }
-
-    /**
-     * Reject a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool $requeue
-     */
-    public function rejectMessage($msg, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
     }
 }

@@ -4,6 +4,7 @@ namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
+use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 
 /**
  * Bowler Producer
@@ -131,11 +132,16 @@ class Producer
     {
     	$channel = $this->connection->getChannel();
 
-        $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+        try {
+            $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
 
-        // The exchange corresponding queue is declared here because we cannot afford loosing any messages if there were no consumers already running. By doing this we make sure that there always be a queue bound to this exchange. This results in an anti-pattern where the producer knows about the consumer identity.
-        // If loosing some messasges while the consumer is up and runing is no issue, we could disregard the queue descralation and binding to this exchange, and leave as the consumer's responsability.
-        $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
+            // The exchange corresponding queue is declared here because we cannot afford loosing any messages if there were no consumers already running. By doing this we make sure that there always be a queue bound to this exchange. This results in an anti-pattern where the producer knows about the consumer identity.
+            // If loosing some messasges while the consumer is up and runing is no issue, we could disregard the queue descralation and binding to this exchange, and leave as the consumer's responsability.
+            $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
+        } catch (\Exception $e) {
+            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(), $this->arguments
+                    );
+        }
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
