@@ -117,4 +117,26 @@ trait DeadLetteringTrait
             $this->arguments['x-message-ttl'] = ['I', $messageTTL];
         }
     }
+
+    /**
+     * Compiles the parameters passed to the constructor.
+     *
+     * @return array
+     */
+    private function compileParameters()
+    {
+        $params = [
+                'queue_name' => $this->queueName,
+                'exchange_name' => $this->exchangeName,
+                'exchange_type' => $this->exchangeType,
+                'passive' => $this->passive,
+                'durable' => $this->durable,
+                'auto_delete' => $this->autoDelete,
+                'delivery_mode' => $this->deliveryMode
+            ];
+
+        property_exists($this, 'routingKeys') ? ($params['routing_keys'] = $this->routingKeys) : ($params['binding_keys'] = $this->bindingKeys);
+
+        return $params;
+    }
 }
