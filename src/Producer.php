@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
 use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 
@@ -13,6 +14,7 @@ use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
  */
 class Producer
 {
+    use HelperTrait;
     use DeadLetteringTrait;
 
 	/**
