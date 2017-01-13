@@ -105,6 +105,8 @@ class Producer
 	 * @param boolean 	$durable
 	 * @param boolean 	$autoDelete
 	 * @param integer 	$deliveryMode
+     *
+     * @todo add a `criticalDelivery` param that allow the user to decide whether the producer should declare and bind the queue, or not.
 	 */
 	public function __construct(Connection $connection, $queueName, $exchangeType = 'fanout', $exchangeName = null, $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
