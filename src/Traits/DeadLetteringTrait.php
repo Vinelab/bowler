@@ -4,6 +4,9 @@ namespace Vinelab\Bowler\Traits;
 
 use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 
+/**
+ * @author Kinane Domloje <kinane@vinelab.com>
+ */
 trait DeadLetteringTrait
 {
     /**
