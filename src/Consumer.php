@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
 use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
@@ -15,6 +16,7 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
  */
 class Consumer
 {
+    use AdminTrait;
     use DeadLetteringTrait;
 
     /**
