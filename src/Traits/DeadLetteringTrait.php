@@ -7,37 +7,6 @@ use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 trait DeadLetteringTrait
 {
     /**
-     * Acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     */
-    public function ackMessage($msg)
-    {
-        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
-    }
-
-    /**
-     * Negatively acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool  $multiple
-     * @param bool  $requeue
-     */
-    public function nackMessage($msg, $multiple = false, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
-    }
-
-    /**
-     * Reject a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool $requeue
-     */
-    public function rejectMessage($msg, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
-    }
 
     /**
      * Delete a exchange.
