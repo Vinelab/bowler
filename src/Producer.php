@@ -39,11 +39,11 @@ class Producer
 	private $exchangeName;
 
     /**
-     * The routing keys used by the exchange to route messages to bounded queues.
+     * The routing key used by the exchange to route messages to bounded queues.
      *
      * @var string
      */
-    private $routingKeys;
+    private $routingKey;
 
 	/**
 	 * type of exchange:
@@ -100,13 +100,13 @@ class Producer
 	 * @param string  	$queueName
 	 * @param string  	$exchangeName
 	 * @param string  	$exchangeType
-	 * @param aray 		$routingKeys
+	 * @param string 	$routingKey
 	 * @param boolean 	$passive
 	 * @param boolean 	$durable
 	 * @param boolean 	$autoDelete
 	 * @param integer 	$deliveryMode
 	 */
-	public function __construct(Connection $connection, $queueName, $exchangeType = 'fanout', $exchangeName = null,array $routingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+	public function __construct(Connection $connection, $queueName, $exchangeType = 'fanout', $exchangeName = null, $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
 		$this->connection = $connection;
 		$this->queueName = $queueName;
@@ -116,7 +116,7 @@ class Producer
         } else {
             $this->exchangeName = $exchangeName;
         }
-		$this->routingKeys = $routingKeys;
+		$this->routingKey = $routingKey;
 		$this->passive = $passive;
 		$this->durable = $durable;
 		$this->autoDelete = $autoDelete;
@@ -138,7 +138,7 @@ class Producer
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
 
             // The exchange corresponding queue is declared here because we cannot afford loosing any messages if there were no consumers already running. By doing this we make sure that there always be a queue bound to this exchange. This results in an anti-pattern where the producer knows about the consumer identity.
-            // If loosing some messasges while the consumer is up and runing is no issue, we could disregard the queue descralation and binding to this exchange, and leave as the consumer's responsability.
+            // If loosing some messasges while the consumer is up and runing is no issue, we could disregard the queue decralation and binding to this exchange, and leave as the consumer's responsability.
             $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
         } catch (\Exception $e) {
             throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(), $this->arguments
@@ -147,15 +147,8 @@ class Producer
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        if (!empty($this->routingKeys)) {
-            foreach ($this->routingKeys as $routingKey) {
-                $channel->queue_bind($this->queueName, $this->exchangeName, $routingKey);
-                $channel->basic_publish($msg, $this->exchangeName, $routingKey);
-            }
-        } else {
-            $channel->queue_bind($this->queueName, $this->exchangeName);
-                $channel->basic_publish($msg, $this->exchangeName);
-        }
+        $channel->queue_bind($this->queueName, $this->exchangeName, $this->routingKey);
+        $channel->basic_publish($msg, $this->exchangeName, $this->routingKey);
 
         echo " [x] Data Package Sent to ", $this->exchangeName, " Exchange!", "\n";
     }
