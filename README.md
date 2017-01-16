@@ -36,6 +36,7 @@ And add `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in 
 $connection = new Bowler\Connection();
 // initialize a Producer object with a connection, exchange name and type
 $bowlerProducer = new Producer($connection, 'crud', 'fanout');
+// publish a message
 $bowlerProducer->publish($data);
 ```
 
@@ -140,21 +141,13 @@ queueName : The queue NAME
 ```
 
 ### Dead Lettering
-#### Producer
-Once a Producer is instantiated, if you wish to enable dead lettering you should:
-```php
-$producer = new Produer(...);
-
-$producer->configureDeadLettering($deadLetterQueueName, $deadLEtterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
-
-$producer->publish($body);
-```
-
-#### Consumer
+Since dead lettering is solely the responsability of the consumer and part of it's queue configuration, the natural place to define one.
 Enabeling dead lettering on the consumer is done through the command line using the same command that run the consumer with the dedicated optional arguments, at least one of `--deadLetterQueueName` or `--deadLetterExchangeName` should be specified.
 ```php
 php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlx --deadLetterExchangeName=dlx --deadLetterExchangeType=direct --deadLetterRoutingKey=invalid --messageTTL=10000
 ```
+
+> If only one of the mentioned optional arguments are set, the second will default to the exact value as to the one you've just set. Leading to the same dlx and dlq name.
 
 ### Exception Handling
 Error Handling in Bowler is split into the application and queue domains.
@@ -170,11 +163,9 @@ To do so the default laravel exception handler normaly located in `app\Exception
 And obviously, implement its methods.
 
 ### Important Notes
-1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges and queues declaration matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\DeclarationMismatchException` is thrown.
+1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\DeclarationMismatchException` is thrown.
 
-2- The reason behind queue declaration is happening on both the producer's and cosumer's side, is that for our use case, we could not afford to loose any published messages. And since publishing messages to an exchange with no bound queues will disregard them, we though it pertinent to declare queues on the producer side as well. We are aware that this might cause an anti-pattern, now that the producer is aware of the consumer. This may or may not remain as is.
-
-3- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
+2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
 ## TODO
 * Expressive queue declaration.

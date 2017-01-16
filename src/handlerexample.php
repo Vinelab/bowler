@@ -2,4 +2,4 @@
 
 Registrator::queue('books', 'BooksHandler', ['type' => 'fanout']);
 
-Registrator::queue('books', 'App\Messaging\BooksHandler');
+Registrator::queue('books', 'App\Messaging\Handlers\BooksHandler');

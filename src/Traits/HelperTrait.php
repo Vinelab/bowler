@@ -15,7 +15,7 @@ trait HelperTrait
     private function compileParameters()
     {
         $params = [
-                'queueName' => $this->queueName,
+                'queueName' => property_exists($this, 'queueName') ? $this->queueName : null,
                 'exchangeName' => $this->exchangeName,
                 'exchangeType' => $this->exchangeType,
                 'passive' => $this->passive,
