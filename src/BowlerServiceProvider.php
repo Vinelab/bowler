@@ -26,7 +26,7 @@ class BowlerServiceProvider extends ServiceProvider
         $rbmqPort = config('queue.connections.rabbitmq.port');
         $rbmqUsername = config('queue.connections.rabbitmq.username');
         $rbmqPassword = config('queue.connections.rabbitmq.password');
-        $this->app->bind(Connection::class, function () use($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword){
+        $this->app->bind(Connection::class, function () use ($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword) {
             return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword);
         });
 

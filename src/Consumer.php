@@ -2,7 +2,6 @@
 
 namespace Vinelab\Bowler;
 
-use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
@@ -92,7 +91,7 @@ class Consumer
     private $deliveryMode;
 
     /**
-     * The arguments that should be added to the `queue_declare` statement for dead lettering
+     * The arguments that should be added to the `queue_declare` statement for dead lettering.
      *
      * @var array
      */
@@ -100,14 +99,14 @@ class Consumer
 
     /**
      * @param Vinelab\Bowler\Connection $connection
-     * @param string                $queueName
-     * @param string                $exchangeName
-     * @param string                $exchangeType
-     * @param array                 $bindingKeys
-     * @param bool                  $passive
-     * @param bool                  $durable
-     * @param bool                  $autoDelete
-     * @param int                   $deliveryMode
+     * @param string                    $queueName
+     * @param string                    $exchangeName
+     * @param string                    $exchangeType
+     * @param array                     $bindingKeys
+     * @param bool                      $passive
+     * @param bool                      $durable
+     * @param bool                      $autoDelete
+     * @param int                       $deliveryMode
      */
     public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
@@ -125,7 +124,7 @@ class Consumer
     /**
      * consume a message from a specified exchange.
      *
-     * @param string $handlerClass
+     * @param string                                          $handlerClass
      * @param Vinelab\Bowler\Contracts\BowlerExceptionHandler $exceptionHandler
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
@@ -139,7 +138,7 @@ class Consumer
             throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(),  $this->arguments);
         }
 
-        if(!empty($this->bindingKeys)) {
+        if (!empty($this->bindingKeys)) {
             foreach ($this->bindingKeys as $bindingKey) {
                 $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
             }
@@ -147,11 +146,11 @@ class Consumer
             $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
-        echo " [*] Listening to Queue: ", $this->queueName, " To exit press CTRL+C", "\n";
+        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
 
-        $handler = new $handlerClass;
+        $handler = new $handlerClass();
 
-        if(method_exists($handler, 'setConsumer')) {
+        if (method_exists($handler, 'setConsumer')) {
             $handler->setConsumer($this);
         }
 
@@ -159,11 +158,11 @@ class Consumer
             try {
                 $handler->handle($msg);
                 $this->ackMessage($msg);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $exceptionHandler->reportQueue($e, $msg);
                 $exceptionHandler->renderQueue($e, $msg);
 
-                if(method_exists($handler, 'handleError')) {
+                if (method_exists($handler, 'handleError')) {
                     $handler->handleError($e, $msg);
                 }
             }
@@ -191,8 +190,8 @@ class Consumer
      * Negatively acknowledge a messasge.
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool  $multiple
-     * @param bool  $requeue
+     * @param bool                           $multiple
+     * @param bool                           $requeue
      */
     public function nackMessage($msg, $multiple = false, $requeue = false)
     {
@@ -203,7 +202,7 @@ class Consumer
      * Reject a messasge.
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool $requeue
+     * @param bool                           $requeue
      */
     public function rejectMessage($msg, $requeue = false)
     {

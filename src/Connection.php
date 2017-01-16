@@ -6,11 +6,9 @@ define('__ROOT__', dirname(dirname(dirname(__FILE__))));
 //require_once(__ROOT__.'/vendor/autoload.php');
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
-use Illuminate\Support\Facades\Config;
 
 /**
- * Connection
+ * Connection.
  *
  * @author Ali Issa <ali@vinelab.com>
  * @author Kinane Domloje <kinane@vinelab.com>
@@ -18,23 +16,24 @@ use Illuminate\Support\Facades\Config;
 class Connection
 {
     /**
-     * $connection var
+     * $connection var.
+     *
      * @var string
      */
-	private $connection;
+    private $connection;
 
     /**
-     * $channel var
+     * $channel var.
+     *
      * @var string
      */
     private $channel;
 
     /**
-     *
-     * @param string  $host the ip of the rabbitmq server, default: localhost
-     * @param int     $port. default: 5672
-     * @param string  $username, default: guest
-     * @param string  $password, default: guest
+     * @param string $host      the ip of the rabbitmq server, default: localhost
+     * @param int    $port.     default: 5672
+     * @param string $username, default: guest
+     * @param string $password, default: guest
      */
     public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
     {
@@ -45,12 +44,12 @@ class Connection
 
     public function getConnection()
     {
-    	return $this->connection;
+        return $this->connection;
     }
 
-	public function getChannel()
+    public function getChannel()
     {
-    	return $this->channel;
+        return $this->channel;
     }
 
     public function __destruct()

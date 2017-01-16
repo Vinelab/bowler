@@ -10,9 +10,7 @@ class HandlerGenerator
     protected $srcDirectoryName = 'src';
 
     /**
-     * Generate App\Messaging\queues.php and App\Messaging\Handlers\*MessageHandler.php
-     *
-     * @return void
+     * Generate App\Messaging\queues.php and App\Messaging\Handlers\*MessageHandler.php.
      */
     public function generate($queue, $handler)
     {
@@ -31,12 +29,12 @@ class HandlerGenerator
         $handlerContent = str_replace(['{{handler}}', '{{namespace}}'], [$handler, $handlerNamespace], $handlerContent);
 
         // Create Handlers directory if it doesn't exist
-        if(!is_dir($handlerPath)) {
+        if (!is_dir($handlerPath)) {
             mkdir($handlerPath, 0777, true);
         }
 
         // Remove <?php string if file already exist
-        if(file_exists($queuePath)) {
+        if (file_exists($queuePath)) {
             $queueContent = str_replace('<?php', '', $queueContent);
         }
 
@@ -48,7 +46,7 @@ class HandlerGenerator
     }
 
     /**
-     * Find queue absolute path
+     * Find queue absolute path.
      */
     public function findQueuePath()
     {
@@ -56,7 +54,7 @@ class HandlerGenerator
     }
 
     /**
-     * Find handler absolute path
+     * Find handler absolute path.
      */
     public function findHandlerPath()
     {
@@ -64,7 +62,7 @@ class HandlerGenerator
     }
 
     /**
-     * Find handler relative path
+     * Find handler relative path.
      */
     public function findHandlerNamespace()
     {
@@ -74,7 +72,7 @@ class HandlerGenerator
     }
 
     /**
-     * Find queue stub absolute path
+     * Find queue stub absolute path.
      */
     public function getQueueStub()
     {
@@ -82,7 +80,7 @@ class HandlerGenerator
     }
 
     /**
-     * Find handler stub absolute path
+     * Find handler stub absolute path.
      */
     public function getHandlerStub()
     {
@@ -109,7 +107,6 @@ class HandlerGenerator
 
         throw new Exception('App namespace not set in composer.json');
     }
-
 
     /**
      * Get the source directory name.
