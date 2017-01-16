@@ -27,7 +27,7 @@ In order to configure rabbitmq host, port, username and password, add the follow
         ],
 ```
 
-And add `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
+And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
 
 ### Producer
 
@@ -35,10 +35,12 @@ And add `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in 
 // initialize a Bowler object with the rabbitmq server ip and port
 $connection = new Bowler\Connection();
 // initialize a Producer object with a connection, exchange name and type
-$bowlerProducer = new Producer($connection, 'crud', 'fanout');
+$bowlerProducer = new Producer($connection, 'reporting_exchange', 'direct', 'warning', false, true, false, 2);
 // publish a message
 $bowlerProducer->publish($data);
 ```
+
+> You need to make sure the exchange setup here matches the consumer's, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
 
 ### Consumer
 
@@ -55,6 +57,8 @@ You can do so either:
 //this is an example handler class
 
 namespace App\Messaging\Handlers;
+
+use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 
 class AuthorHandler {
 
@@ -73,6 +77,11 @@ class AuthorHandler {
             $this->consumer->ackMessage($msg);
         } elseif($e instanceof WhatElseException) {
             $this->consumer->nackMessage($msg);
+        } elseif($e instanceof DeclarationMismatchException) {
+            // This can help you delete the existing queue, which allows the consumer to recreate the queue by overriding the current setup on the next consumed message.
+            // Its a way to programatically handle such situations, but should be used with caution since you will loose all the queued messages.
+            // Moreover, the producer will need to be instantiated with the new setup. Which put this use case at question!
+            $this->consumer->deleteQueue(true, true);
         }
     }
 
@@ -83,7 +92,7 @@ class AuthorHandler {
 }
 ```
 
-> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. You these wisely and take advantage of the `unused` and `empty` parameters.
+> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters.
 
 If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
 
@@ -103,9 +112,27 @@ public function handle($msg)
 
 Registrator::queue('books', 'App\Messaging\Handlers\BookHandler');
 
-Registrator::queue('crud', 'App\Messaging\Handlers\AuthorHandler');
+Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
+                                                        'exchangeName' => 'main_exchange',
+                                                        'exchangeType'=> 'direct',
+                                                        'bindingKeys' => [
+                                                            'warning',
+                                                            'notification'
+                                                        ],
+                                                        'pasive' => false,
+                                                        'durable' => true,
+                                                        'autoDelete' => false,
+                                                        'deliveryMode' => 2,
+                                                        'deadLetterQueueName' => 'dlx_queue',
+                                                        'deadLetterExchangeName' => 'dlx',
+                                                        'deadLetterExchangeName' => 'warning',
+                                                        'deadLetterRoutingKey' => 'warning',
+                                                        'messageTTL' => null
+                                                    ]);
 
 ```
+
+Use the options array to setup your queues and exchanges. All of these are optional, defaults will apply to any parameters that are not specified here. The descriptions and defaults of these parameters are provided later in this document.
 
 ##### Console
 - Register a handler for a specific queue with `php artisan bowler:handler analytics_queue analytics_data_exchange`.
@@ -126,18 +153,18 @@ The previous command:
 ```php
 bowler:consume
 queueName : The queue NAME
---N|exchangeName= : The exchange NAME. Defaults to queueName
---T|exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
---K|bindingKeys=* : The consumer\'s BINDING KEYS (array)
---p|passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
---d|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1
---D|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
---M|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2
---deadLetterQueueName= : The dead letter queue NAME. Defaults to deadLetterExchangeName
---deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName
---deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
---deadLetterRoutingKey= : The dead letter ROUTING KEY
---messageTtl= : If set, specifies how long, in milliseconds, before a message is declared dead letter
+--N|exchangeName : The exchange NAME. Defaults to queueName
+--T|exchangeType : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
+--K|bindingKeys : The consumer\'s BINDING KEYS array
+--p|passive : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
+--d|durable : Mark exchange and queue as DURABLE. Defaults to 1
+--D|autoDelete : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
+--M|deliveryMode : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2
+--deadLetterQueueName : The dead letter queue NAME. Defaults to deadLetterExchangeName
+--deadLetterExchangeName : The dead letter exchange NAME. Defaults to deadLetterQueueName
+--deadLetterExchangeType : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
+--deadLetterRoutingKey : The dead letter ROUTING KEY
+--messageTtl : If set, specifies how long, in milliseconds, before a message is declared dead letter
 ```
 
 ### Dead Lettering
@@ -163,7 +190,7 @@ To do so the default laravel exception handler normaly located in `app\Exception
 And obviously, implement its methods.
 
 ### Important Notes
-1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\DeclarationMismatchException` is thrown.
+1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
 
 2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
@@ -171,3 +198,4 @@ And obviously, implement its methods.
 * Expressive queue declaration.
 * Provide default pub/sub and dlx implementations.
 * Provide a way to programatically handle configuration exceptions.
+* Write tests.
