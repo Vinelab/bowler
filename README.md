@@ -134,6 +134,8 @@ Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
 
 Use the options array to setup your queues and exchanges. All of these are optional, defaults will apply to any parameters that are not specified here. The descriptions and defaults of these parameters are provided later in this document.
 
+These parameters overrides any set from the command line.
+
 ##### Console
 - Register a handler for a specific queue with `php artisan bowler:handler analytics_queue analytics_data_exchange`.
 
