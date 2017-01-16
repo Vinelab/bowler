@@ -4,7 +4,6 @@ namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Traits\HelperTrait;
-use Vinelab\Bowler\Traits\DeadLetteringTrait;
 use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 
 /**
@@ -15,7 +14,6 @@ use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 class Producer
 {
     use HelperTrait;
-    use DeadLetteringTrait;
 
 	/**
 	 * The main class of the package where we define the channel and the connection
@@ -23,13 +21,6 @@ class Producer
 	 * @var Vinelab\Bowler\Connection
 	 */
 	private $connection;
-
-	/**
-     * The name of the queue bound to the exchange where the producer sends its messages.
-     *
-     * @var string
-     */
-    private $queueName;
 
 	/**
 	 * The name of the exchange where the producer sends its messages to
@@ -95,9 +86,7 @@ class Producer
     private $arguments = [];
 
 	/**
-	 *
 	 * @param Vinelab\Bowler\Connection  $connection
-	 * @param string  	$queueName
 	 * @param string  	$exchangeName
 	 * @param string  	$exchangeType
 	 * @param string 	$routingKey
@@ -105,19 +94,12 @@ class Producer
 	 * @param boolean 	$durable
 	 * @param boolean 	$autoDelete
 	 * @param integer 	$deliveryMode
-     *
-     * @todo add a `criticalDelivery` param that allow the user to decide whether the producer should declare and bind the queue, or not.
 	 */
-	public function __construct(Connection $connection, $queueName, $exchangeType = 'fanout', $exchangeName = null, $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+	public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
 	{
 		$this->connection = $connection;
-		$this->queueName = $queueName;
+        $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
-        if(!$exchangeName) {
-            $this->exchangeName = $queueName;
-        } else {
-            $this->exchangeName = $exchangeName;
-        }
 		$this->routingKey = $routingKey;
 		$this->passive = $passive;
 		$this->durable = $durable;
@@ -138,10 +120,6 @@ class Producer
 
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-
-            // The exchange corresponding queue is declared here because we cannot afford loosing any messages if there were no consumers already running. By doing this we make sure that there always be a queue bound to this exchange. This results in an anti-pattern where the producer knows about the consumer identity.
-            // If loosing some messasges while the consumer is up and runing is no issue, we could disregard the queue decralation and binding to this exchange, and leave as the consumer's responsability.
-            $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
         } catch (\Exception $e) {
             throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(), $this->arguments
                     );
@@ -149,7 +127,6 @@ class Producer
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        $channel->queue_bind($this->queueName, $this->exchangeName, $this->routingKey);
         $channel->basic_publish($msg, $this->exchangeName, $this->routingKey);
 
         echo " [x] Data Package Sent to ", $this->exchangeName, " Exchange!", "\n";
