@@ -83,7 +83,7 @@ class ConsumeCommand extends Command
               // If options are set in Registrator:queue(string $queueName,string $Handler, array $options).
               if (!empty($handler->options)) {
                   // Use whatever the user has set/provided, to override our defaults.
-                  $extract($handler->options);
+                  extract($handler->options);
               }
 
                 $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
