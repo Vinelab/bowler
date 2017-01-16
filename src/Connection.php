@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
  * Connection
  *
  * @author Ali Issa <ali@vinelab.com>
+ * @author Kinane Domloje <kinane@vinelab.com>
  */
 class Connection
 {
@@ -31,14 +32,14 @@ class Connection
     /**
      *
      * @param string  $host the ip of the rabbitmq server, default: localhost
-     * @param integer $port. default: 5672
+     * @param int     $port. default: 5672
      * @param string  $username, default: guest
      * @param string  $password, default: guest
      */
     public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
     {
+        $this->connection = new AMQPStreamConnection($host, $port, $username, $password);
 
-        $this->connection = new AMQPStreamConnection(Config::get('queue.connections.rabbitmq.host', $host), Config::get('queue.connections.rabbitmq.port', $port), Config::get('queue.connections.rabbitmq.username', $username), Config::get('queue.connections.rabbitmq.password', $password));
         $this->channel = $this->connection->channel();
     }
 

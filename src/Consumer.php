@@ -3,6 +3,10 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\Traits\AdminTrait;
+use Vinelab\Bowler\Traits\HelperTrait;
+use Vinelab\Bowler\Traits\DeadLetteringTrait;
+use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
@@ -13,19 +17,37 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
  */
 class Consumer
 {
+    use AdminTrait;
+    use HelperTrait;
+    use DeadLetteringTrait;
+
     /**
-     * the main class of the package where we define the channel and the connection.
+     * The main class of the package where we define the channel and the connection.
      *
      * @var Vinelab\Bowler\Connection
      */
     private $connection;
 
     /**
-     * the name of the exchange where the producer sends its messages to.
+     * The name of the queue bound to the exchange where the producer sends its messages.
+     *
+     * @var string
+     */
+    private $queueName;
+
+    /**
+     * The name of the exchange where the producer sends its messages to.
      *
      * @var string
      */
     private $exchangeName;
+
+    /**
+     * The binding keys used by the exchange to route messages to bounded queues.
+     *
+     * @var string
+     */
+    private $bindingKeys;
 
     /**
      * type of exchange:
@@ -69,22 +91,31 @@ class Consumer
      */
     private $deliveryMode;
 
-    private $msgProcessor;
+    /**
+     * The arguments that should be added to the `queue_declare` statement for dead lettering
+     *
+     * @var array
+     */
+    private $arguments = [];
 
     /**
      * @param Vinelab\Bowler\Connection $connection
+     * @param string                $queueName
      * @param string                $exchangeName
      * @param string                $exchangeType
+     * @param array                 $bindingKeys
      * @param bool                  $passive
      * @param bool                  $durable
      * @param bool                  $autoDelete
      * @param int                   $deliveryMode
      */
-    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->connection = $connection;
+        $this->queueName = $queueName;
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
+        $this->bindingKeys = $bindingKeys;
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
@@ -94,15 +125,29 @@ class Consumer
     /**
      * consume a message from a specified exchange.
      *
-     * @param string $data
+     * @param string $handlerClass
+     * @param Vinelab\Bowler\Contracts\BowlerExceptionHandler $exceptionHandler
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
-        $this->connection->getChannel()->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
-        list($queue_name) = $this->connection->getChannel()->queue_declare($this->exchangeName, $this->passive, $this->durable, false, $this->autoDelete);
-        $this->connection->getChannel()->queue_bind($queue_name, $this->exchangeName);
+        $channel = $this->connection->getChannel();
 
-        echo ' [*] Listening to Queue: ' . $this->exchangeName . ' To exit press CTRL+C', "\n";
+        try {
+            $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
+            $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
+        } catch (\Exception $e) {
+            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(),  $this->arguments);
+        }
+
+        if(!empty($this->bindingKeys)) {
+            foreach ($this->bindingKeys as $bindingKey) {
+                $channel->queue_bind($this->queueName, $this->exchangeName, $bindingKey);
+            }
+        } else {
+            $channel->queue_bind($this->queueName, $this->exchangeName);
+        }
+
+        echo " [*] Listening to Queue: ", $this->queueName, " To exit press CTRL+C", "\n";
 
         $handler = new $handlerClass;
 
@@ -124,31 +169,44 @@ class Consumer
             }
         };
 
-        $this->connection->getChannel()->basic_qos(null, 1, null);
-        $this->connection->getChannel()->basic_consume($queue_name, '', false, false, false, false, $callback);
+        $channel->basic_qos(null, 1, null);
+        $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
 
-        while (count($this->connection->getChannel()->callbacks)) {
-            $this->connection->getChannel()->wait();
+        while (count($channel->callbacks)) {
+            $channel->wait();
         }
     }
 
     /**
-     * acknowledge a messasge.
+     * Acknowledge a messasge.
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
      */
     public function ackMessage($msg)
     {
-        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
     }
 
     /**
-     * reject a messasge.
+     * Negatively acknowledge a messasge.
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param bool  $multiple
+     * @param bool  $requeue
      */
-    public function rejectMessage($msg)
+    public function nackMessage($msg, $multiple = false, $requeue = false)
     {
-        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
+        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
+    }
+
+    /**
+     * Reject a messasge.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param bool $requeue
+     */
+    public function rejectMessage($msg, $requeue = false)
+    {
+        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
     }
 }
