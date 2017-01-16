@@ -24,7 +24,7 @@ trait HelperTrait
                 'deliveryMode' => $this->deliveryMode
             ];
 
-        property_exists($this, 'routingKeys') ? ($params['routingKeys'] = $this->routingKeys) : ($params['bindingKeys'] = $this->bindingKeys);
+        property_exists($this, 'routingKey') ? ($params['routingKey'] = $this->routingKey) : ($params['bindingKeys'] = $this->bindingKeys);
 
         return $params;
     }
