@@ -125,7 +125,7 @@ Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
                                                         'deliveryMode' => 2,
                                                         'deadLetterQueueName' => 'dlx_queue',
                                                         'deadLetterExchangeName' => 'dlx',
-                                                        'deadLetterExchangeName' => 'warning',
+                                                        'deadLetterExchangeType' => 'direct',
                                                         'deadLetterRoutingKey' => 'warning',
                                                         'messageTTL' => null
                                                     ]);
