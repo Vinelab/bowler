@@ -10,9 +10,9 @@ class HandlerGenerator
     protected $srcDirectoryName = 'src';
 
     /**
-     * Generate App\Messaging\queues.php and App\Messaging\Handlers\*MessageHandler.php.
+     * Generate App\Messaging\queues.php and App\Messaging\Handlers\*Handler.php.
      */
-    public function generate($queue, $handler)
+    public function generate($queue, $handler, $type)
     {
         $queuePath = $this->findQueuePath();
 
@@ -20,10 +20,28 @@ class HandlerGenerator
 
         $handlerNamespace = $this->findHandlerNamespace();
 
+        $this->registerHandler($queue, $handler, $queuePath, $handlerNamespace, $type);
+
+        $this->generateHandler($handler, $handlerPath, $handlerNamespace);
+    }
+
+    private function registerHandler($queue, $handler, $queuePath, $handlerNamespace, $type)
+    {
         // Get queue stub content and replace variables with values
         $queueContent = file_get_contents($this->getQueueStub());
-        $queueContent = str_replace(['{{queue}}', '{{handler}}'], ["'".$queue."'", "'".$handlerNamespace.'\\'.$handler."'"], $queueContent);
+        $queueContent = str_replace(['{{type}}', '{{queue}}', '{{handler}}'], [$type, "'".$queue."'", "'".$handlerNamespace.'\\'.$handler."'"], $queueContent);
 
+        // Remove `<?php` string if file already exist
+        if (file_exists($queuePath)) {
+            $queueContent = str_replace('<?php', '', $queueContent);
+        }
+
+        // Create or Append to file if it doesn't exist
+        file_put_contents($queuePath, $queueContent, FILE_APPEND);
+    }
+
+    private function generateHandler($handler, $handlerPath, $handlerNamespace)
+    {
         // Get handler stub content and replace variables with values
         $handlerContent = file_get_contents($this->getHandlerStub());
         $handlerContent = str_replace(['{{handler}}', '{{namespace}}'], [$handler, $handlerNamespace], $handlerContent);
@@ -33,14 +51,6 @@ class HandlerGenerator
             mkdir($handlerPath, 0777, true);
         }
 
-        // Remove <?php string if file already exist
-        if (file_exists($queuePath)) {
-            $queueContent = str_replace('<?php', '', $queueContent);
-        }
-
-        // Create or Append to file if it doesn't exist
-        file_put_contents($queuePath, $queueContent, FILE_APPEND);
-
         // Create Handler
         file_put_contents($handlerPath.$handler.'.php', $handlerContent);
     }
@@ -48,7 +58,7 @@ class HandlerGenerator
     /**
      * Find queue absolute path.
      */
-    public function findQueuePath()
+    private function findQueuePath()
     {
         return app_path().'/Messaging/queues.php';
     }
@@ -56,7 +66,7 @@ class HandlerGenerator
     /**
      * Find handler absolute path.
      */
-    public function findHandlerPath()
+    private function findHandlerPath()
     {
         return app_path().'/Messaging/Handlers/';
     }
@@ -64,7 +74,7 @@ class HandlerGenerator
     /**
      * Find handler relative path.
      */
-    public function findHandlerNamespace()
+    private function findHandlerNamespace()
     {
         $rootNamespace = $this->findRootNamespace();
 
@@ -74,7 +84,7 @@ class HandlerGenerator
     /**
      * Find queue stub absolute path.
      */
-    public function getQueueStub()
+    private function getQueueStub()
     {
         return __DIR__.'/stubs/queue.stub';
     }
@@ -82,7 +92,7 @@ class HandlerGenerator
     /**
      * Find handler stub absolute path.
      */
-    public function getHandlerStub()
+    private function getHandlerStub()
     {
         return __DIR__.'/stubs/handler.stub';
     }
@@ -94,7 +104,7 @@ class HandlerGenerator
      *
      * @throws \Exception
      */
-    public function findRootNamespace()
+    private function findRootNamespace()
     {
         // read composer.json file contents to determine the namespace
         $composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
@@ -114,7 +124,7 @@ class HandlerGenerator
      *
      * @return string
      */
-    public function getSourceDirectoryName()
+    private function getSourceDirectoryName()
     {
         if (file_exists(base_path().'/'.$this->srcDirectoryName)) {
             return $this->srcDirectoryName;
