@@ -4,11 +4,17 @@ A Laravel package that implements the AMQP protocol using the rabbitmq server ea
 It gives you the complete freedom to:
 
 1- Customize message publishing.
+
 2- Customize message consumption.
+
 3- Customize message dead lettering.
+
 4- Handle application errors and deal with the corresponding message accordingly.
+
 5- Provide an expressive consumer queue setup or handle setup from command line.
+
 6- Generate, queue specific, message handlers from the command line.
+
 7- Limited admin functionalities.
 
 These will facilitate drastically the way you use Rabbitmq and broaden its functionality.
