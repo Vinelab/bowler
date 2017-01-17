@@ -1,7 +1,7 @@
 # Bowler
-A Laravel package that implements the AMQP protocol using the rabbitmq server easily and efficiently.
+A Laravel package that implements the AMQP protocol using the [Rabbitmq Server](https://www.rabbitmq.com) easily and efficiently. Built on top of the [php-amqplib](https://github.com/php-amqplib/php-amqplib/tree/master/PhpAmqpLib), with the aim of providing a simple abstraction layer to work with.
 
-It gives you the complete freedom to:
+Bowler allows you to:
 
 1- Customize message publishing.
 
@@ -11,13 +11,15 @@ It gives you the complete freedom to:
 
 4- Handle application errors and deal with the corresponding message accordingly.
 
-5- Provide an expressive consumer queue setup or handle setup from command line.
+5- Provide an expressive consumer queue setup.
 
 6- Generate, queue specific, message handlers from the command line.
 
 7- Limited admin functionalities.
 
-These will facilitate drastically the way you use Rabbitmq and broaden its functionality.
+These features will facilitate drastically the way you use Rabbitmq and broaden its functionality. This package do not intend to take over the user's responsability of designing the messaging queues schema.
+
+Tools like the Rabbitmq [Management](https://www.rabbitmq.com/management.html) plugin, will certainly help you monitor the service activity and visualize the setup.
 
 ## Installation
 
@@ -50,11 +52,13 @@ And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvide
 ### Producer
 
 ```php
-// initialize a Bowler object with the rabbitmq server ip and port
+// Initialize a Bowler object with the rabbitmq server ip and port
 $connection = new Bowler\Connection();
-// initialize a Producer object with a connection, exchange name and type
+
+// Initialize a Producer object with a connection, exchange name and type
 $bowlerProducer = new Producer($connection, 'reporting_exchange', 'direct', 'warning', false, true, false, 2);
-// publish a message
+
+// Publish a message
 $bowlerProducer->publish($data);
 ```
 
@@ -72,7 +76,7 @@ You can do so either:
 - Create your handlers classes to handle the messages received:
 
 ```php
-//this is an example handler class
+//This is an example handler class
 
 namespace App\Messaging\Handlers;
 
