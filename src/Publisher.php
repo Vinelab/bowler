@@ -18,6 +18,6 @@ class Publisher extends Producer
      */
     public function __construct(Connection $connection, $routingKey)
     {
-        parent::construct($connection, 'pub-sub', 'direct', $routingKey)
+        parent::__construct($connection, 'pub-sub', 'direct', $routingKey);
     }
 }
