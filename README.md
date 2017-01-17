@@ -1,5 +1,5 @@
 # Bowler
-A Laravel package that implements the AMQP protocol using the [Rabbitmq Server](https://www.rabbitmq.com) easily and efficiently. Built on top of the [php-amqplib](https://github.com/php-amqplib/php-amqplib/tree/master/PhpAmqpLib), with the aim of providing a simple abstraction layer to work with.
+A Laravel package that implements the AMQP protocol using the *[Rabbitmq Server](https://www.rabbitmq.com)* easily and efficiently. Built on top of the *[php-amqplib](https://github.com/php-amqplib/php-amqplib/tree/master/PhpAmqpLib)*, with the aim of providing a simple abstraction layer to work with.
 
 Bowler allows you to:
 
@@ -13,7 +13,7 @@ Bowler allows you to:
 
 These features will facilitate drastically the way you use Rabbitmq and broaden its functionality. This package do not intend to take over the user's responsability of designing the messaging queues schema.
 
-Tools like the Rabbitmq [Management](https://www.rabbitmq.com/management.html) plugin, will certainly help you monitor the server's activity and visualize the setup.
+Tools like the Rabbitmq *[Management](https://www.rabbitmq.com/management.html)* plugin, will certainly help you monitor the server's activity and visualize the setup.
 
 ## Installation
 
@@ -184,6 +184,47 @@ queueName : The queue NAME
 --deadLetterRoutingKey : The dead letter ROUTING KEY
 --messageTtl : If set, specifies how long, in milliseconds, before a message is declared dead letter
 ```
+
+### Publish/Subscribe
+Bowler provide a default Pub/Sub implementation, where the user doesn't need to care about nothing more than:
+
+1. Publish the Message
+
+```php
+// Initialize a Bowler object with the rabbitmq server ip and port
+$connection = new Bowler\Connection();
+
+// Initialize a Pubisher object with a connection and a routingKey
+$bowlerPublisher = new Publisher($connection, 'warning');
+
+// Publish the message
+$bowlerPublisher->publish($data);
+```
+
+As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publishers holds the default Pub/Sub **exchange** setup.
+
+3. Register the queue and generate it's message handler
+From the command line use the `bowler:subscribe` command.
+
+`php artisan bowler:subscribe reporting ReportingMessage --expressive`
+
+Using the `--expressive` or `-E` option will make the queue name reflect that it is used for Pub/Sub. Results in `reporting-pub-sub` as the generated queue name; otherwise the queue name you provided will be used.
+
+Add the `bindingKeys` array parameter to registered queue in `queues.php` like so:
+
+```php
+Registrator::subscribe('reportin-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
+```
+
+4. Handle messages
+Like we've seen [earlier](##### Manually).
+
+5. Run the queue
+From the command line use the `bowler:consume` command.
+
+`php artisan bowler:consume reporting-pub-sub`
+
+> The Pub/Sub implementation is meant to be used as-is. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
 
 ### Dead Lettering
 Since dead lettering is solely the responsability of the consumer and part of it's queue configuration, the natural place to define one.
