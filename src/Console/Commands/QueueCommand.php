@@ -8,8 +8,10 @@ use Vinelab\Bowler\Generators\HandlerGenerator;
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
  */
-class HandlerCommand extends Command
+class QueueCommand extends Command
 {
+    const TYPE = 'queue';
+
     public function __construct()
     {
         parent::__construct();
@@ -20,14 +22,16 @@ class HandlerCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bowler:handler {queue} {handler}';
+    protected $signature = 'bowler:queue
+                            {queueName : The queue NAME}
+                            {handler : The handler class NAME}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'add queue and generate the corresponding message handler';
+    protected $description = "Register a queue and generate it's message handler";
 
     /**
      * Run the command.
@@ -36,11 +40,11 @@ class HandlerCommand extends Command
     {
         $handlerGenerator = new HandlerGenerator();
 
-        $queue = $this->argument('queue');
+        $queue = $this->argument('queueName'); // ??
         $handler = studly_case(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
 
         try {
-            $handlerGenerator->generate($queue, $handler);
+            $handlerGenerator->generate($queue, $handler, self::TYPE); // ??
 
             $this->info(
                 'Queue '.$queue.' added successfully.'.
