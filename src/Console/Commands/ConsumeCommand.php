@@ -17,11 +17,9 @@ class ConsumeCommand extends Command
 {
     protected $registerQueues;
 
-    public function __construct(RegisterQueues $registerQueues)
+    public function __construct()
     {
         parent::__construct();
-
-        $this->registerQueues = $registerQueues;
     }
 
     /**
@@ -49,7 +47,7 @@ class ConsumeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Register a consumer to its queue';
+    protected $description = 'Run a consumer queue';
 
     /**
      * Run the command.
