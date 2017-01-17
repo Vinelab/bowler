@@ -153,7 +153,7 @@ Use the options array to setup your queues and exchanges. All of these are optio
 These parameters overrides any set from the command line.
 
 ##### Console
-- Register a handler for a specific queue with `php artisan bowler:handler analytics_queue analytics_data_exchange`.
+- Register a handler for a specific queue with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
 
 The previous command:
 
