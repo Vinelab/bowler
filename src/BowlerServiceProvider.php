@@ -5,6 +5,7 @@ namespace Vinelab\Bowler;
 use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Console\Commands\QueueCommand;
 use Vinelab\Bowler\Console\Commands\ConsumeCommand;
+use Vinelab\Bowler\Console\Commands\SubscribeCommand;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -39,6 +40,7 @@ class BowlerServiceProvider extends ServiceProvider
         $commands = [
             QueueCommand::class,
             ConsumeCommand::class,
+            SubscribeCommand::class,
         ];
         $this->commands($commands);
     }
