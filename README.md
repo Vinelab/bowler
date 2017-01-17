@@ -3,23 +3,17 @@ A Laravel package that implements the AMQP protocol using the [Rabbitmq Server](
 
 Bowler allows you to:
 
-1- Customize message publishing.
-
-2- Customize message consumption.
-
-3- Customize message dead lettering.
-
-4- Handle application errors and deal with the corresponding message accordingly.
-
-5- Provide an expressive consumer queue setup.
-
-6- Generate, queue specific, message handlers from the command line.
-
-7- Limited admin functionalities.
+* Customize message publishing.
+* Customize message consumption.
+* Customize message dead lettering.
+* Handle application errors and deal with the corresponding message accordingly.
+* Provide an expressive consumer queue setup.
+* Generate, queue specific, message handlers from the command line.
+* Limited admin functionalities.
 
 These features will facilitate drastically the way you use Rabbitmq and broaden its functionality. This package do not intend to take over the user's responsability of designing the messaging queues schema.
 
-Tools like the Rabbitmq [Management](https://www.rabbitmq.com/management.html) plugin, will certainly help you monitor the service activity and visualize the setup.
+Tools like the Rabbitmq [Management](https://www.rabbitmq.com/management.html) plugin, will certainly help you monitor the server's activity and visualize the setup.
 
 ## Installation
 
