@@ -72,7 +72,7 @@ class ConsumeCommand extends Command
         $deadLetterExchangeName = ($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : (($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : null);
         $deadLetterExchangeType = $this->option('deadLetterExchangeType');
         $deadLetterRoutingKey = $this->option('deadLetterRoutingKey');
-        $messageTTL = (int) $this->option('messageTTL');
+        $messageTTL = ($ttl = $this->option('messageTTL')) ? (int) $ttl : null;
 
         require app_path().'/Messaging/queues.php';
         $handlers = Registrator::getHandlers();
