@@ -1,5 +1,16 @@
 # Bowler
-A package that makes AMQP protocol implementation using rabbitmq server easy and straightforward.
+A Laravel package that implements the AMQP protocol using the rabbitmq server easaly and efficiently.
+
+It gives you the complete freedom to:
+1- Customize message publishing.
+2- Customize message consumption.
+3- Customize message dead lettering.
+4- Handle application errors and deal with the corresponding message accordingly.
+5- Provide an expressive consumer queue setup or handle setup from command line.
+6- Generate, queue specific, message handlers from the command line.
+7- Limited admin functionalities.
+
+These will facilitate drastically the way you use Rabbitmq and broaden its functionality.
 
 ## Installation
 
@@ -176,7 +187,7 @@ Enabeling dead lettering on the consumer is done through the command line using 
 php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlx --deadLetterExchangeName=dlx --deadLetterExchangeType=direct --deadLetterRoutingKey=invalid --messageTTL=10000
 ```
 
-> If only one of the mentioned optional arguments are set, the second will default to the exact value as to the one you've just set. Leading to the same dlx and dlq name.
+> If only one of the mentioned optional arguments are set, the second will default to the exact value as to the one you've just set. Leading to the same `dlx` and `dlq` name.
 
 ### Exception Handling
 Error Handling in Bowler is split into the application and queue domains.
