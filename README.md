@@ -2,6 +2,7 @@
 A Laravel package that implements the AMQP protocol using the rabbitmq server easaly and efficiently.
 
 It gives you the complete freedom to:
+
 1- Customize message publishing.
 2- Customize message consumption.
 3- Customize message dead lettering.
