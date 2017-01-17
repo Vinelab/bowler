@@ -23,7 +23,7 @@ trait DeadLetteringTrait
         $channel = $this->connection->getChannel();
 
         try {
-            $channel->exchange_declare($deadLetterExchangeName, $deadLetterExchangeType, $this->passive, $this->durable, false, $this->autoDelete);
+            $channel->exchange_declare($deadLetterExchangeName, $deadLetterExchangeType, $this->passive, $this->durable, $this->autoDelete);
 
             $channel->queue_declare($deadLetterQueueName, $this->passive, $this->durable, false, $this->autoDelete);
         } catch (\Exception $e) {
@@ -38,7 +38,7 @@ trait DeadLetteringTrait
                             $this->arguments);
         }
 
-        $channel->queue_bind($deadLetterQueueName, $deadLetterExchangeName);
+        $channel->queue_bind($deadLetterQueueName, $deadLetterExchangeName, $deadLetterRoutingKey);
 
         $this->compileArguments($deadLetterExchangeName, $deadLetterRoutingKey, $messageTTL);
     }
