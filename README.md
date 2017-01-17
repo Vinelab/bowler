@@ -171,13 +171,13 @@ The previous command:
 ```php
 bowler:consume
 queueName : The queue NAME
---exchangeName : The exchange NAME. Defaults to queueName
---exchangeType : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
---bindingKeys : The consumer\'s BINDING KEYS array
---passive : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
---durable : Mark exchange and queue as DURABLE. Defaults to 1
---autoDelete : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
---deliveryMode : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2
+--N|exchangeName : The exchange NAME. Defaults to queueName
+--T|exchangeType : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
+--K|bindingKeys : The consumer\'s BINDING KEYS array
+--p|passive : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
+--d|durable : Mark exchange and queue as DURABLE. Defaults to 1
+--D|autoDelete : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
+--M|deliveryMode : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2
 --deadLetterQueueName : The dead letter queue NAME. Defaults to deadLetterExchangeName
 --deadLetterExchangeName : The dead letter exchange NAME. Defaults to deadLetterQueueName
 --deadLetterExchangeType : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
