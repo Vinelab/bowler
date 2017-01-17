@@ -188,7 +188,7 @@ queueName : The queue NAME
 ### Publish/Subscribe
 Bowler provide a default Pub/Sub implementation, where the user doesn't need to care about nothing more than:
 
-#### 1 Publish the Message
+#### 1. Publish the Message
 
 ```php
 // Initialize a Bowler object with the rabbitmq server ip and port
@@ -203,7 +203,7 @@ $bowlerPublisher->publish($data);
 
 As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publishers holds the default Pub/Sub **exchange** setup.
 
-#### 2 Register the queue and generate it's message handler
+#### 2. Register the queue and generate it's message handler
 From the command line use the `bowler:subscribe` command.
 
 `php artisan bowler:subscribe reporting ReportingMessage --expressive`
@@ -216,10 +216,10 @@ Add the `bindingKeys` array parameter to registered queue in `queues.php` like s
 Registrator::subscribe('reportin-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
 ```
 
-#### 3 Handle messages
+#### 3. Handle messages
 Like we've seen [earlier](##### Manually).
 
-#### 4 Run the queue
+#### 4. Run the queue
 From the command line use the `bowler:consume` command.
 
 `php artisan bowler:consume reporting-pub-sub`
@@ -254,7 +254,5 @@ And obviously, implement its methods.
 2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
 ## TODO
-* Expressive queue declaration.
-* Provide default pub/sub and dlx implementations.
 * Provide a way to programatically handle configuration exceptions.
 * Write tests.
