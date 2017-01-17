@@ -56,7 +56,7 @@ trait DeadLetteringTrait
         $this->arguments['x-dead-letter-exchange'] = ['S', $deadLetterExchangeName];
 
         if ($deadLetterRoutingKey) {
-            $this->Arguments['x-dead-letter-routing-key'] = ['S', $deadLetterRoutingKey];
+            $this->arguments['x-dead-letter-routing-key'] = ['S', $deadLetterRoutingKey];
         }
 
         if ($messageTTL) {
