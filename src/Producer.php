@@ -20,21 +20,21 @@ class Producer
      *
      * @var Vinelab\Bowler\Connection
      */
-    private $connection;
+    protected $connection;
 
     /**
      * The name of the exchange where the producer sends its messages to.
      *
      * @var string
      */
-    private $exchangeName;
+    protected $exchangeName;
 
     /**
      * The routing key used by the exchange to route messages to bounded queues.
      *
      * @var string
      */
-    private $routingKey;
+    protected $routingKey;
 
     /**
      * type of exchange:
@@ -48,35 +48,35 @@ class Producer
      *
      * @var string
      */
-    private $exchangeType;
+    protected $exchangeType;
 
     /**
      * If set, the server will reply with Declare-Ok if the exchange already exists with the same name, and raise an error if not. The client can use this to check whether an exchange exists without modifying the server state.
      *
      * @var bool
      */
-    private $passive;
+    protected $passive;
 
     /**
      * If set when creating a new exchange, the exchange will be marked as durable. Durable exchanges remain active when a server restarts. Non-durable exchanges (transient exchanges) are purged if/when a server restarts.
      *
      * @var bool
      */
-    private $durable;
+    protected $durable;
 
     /**
      * If set, the exchange is deleted when all queues have finished using it.
      *
      * @var bool
      */
-    private $autoDelete;
+    protected $autoDelete;
 
     /**
      * Non-persistent (1) or persistent (2).
      *
      * @var [type]
      */
-    private $deliveryMode;
+    protected $deliveryMode;
 
     /**
      * The arguments that should be added to the `queue_declare` statement for dead lettering.
