@@ -2,11 +2,7 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
-use Vinelab\Bowler\Consumer;
-use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
-use Vinelab\Bowler\RegisterQueues;
-use Vinelab\Bowler\Facades\Registrator;
 use Vinelab\Bowler\Generators\HandlerGenerator;
 
 /**
@@ -35,8 +31,6 @@ class HandlerCommand extends Command
 
     /**
      * Run the command.
-     *
-     * @return void.
      */
     public function handle()
     {

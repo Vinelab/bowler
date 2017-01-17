@@ -22,6 +22,10 @@
 		"php-amqplib/php-amqplib": "v2.6.1"
 	},
 
+    "require-dev": {
+        "friendsofphp/php-cs-fixer":"^1.12"
+    },
+
 	"autoload": {
         "psr-4": {
             "Vinelab\\Bowler\\": "src/"

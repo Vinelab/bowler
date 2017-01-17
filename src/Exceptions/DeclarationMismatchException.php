@@ -24,7 +24,7 @@ class DeclarationMismatchException extends Exception
     public function __construct($message, $code, $file, $line, $trace, $previous, $traceAsString, $parameters = [], $arguments = [])
     {
         $this->message = $message;
-        $this->code= $code;
+        $this->code = $code;
         $this->file = $file;
         $this->line = $line;
         $this->trace = $trace;

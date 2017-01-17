@@ -6,13 +6,30 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit560cc2e5bfc86ab670b85e164a333f6b
 {
+    public static $files = array (
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'V' => 
         array (
             'Vinelab\\Bowler\\' => 15,
         ),
+        'S' => 
+        array (
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Component\\Stopwatch\\' => 28,
+            'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Component\\Finder\\' => 25,
+            'Symfony\\Component\\Filesystem\\' => 29,
+            'Symfony\\Component\\EventDispatcher\\' => 34,
+            'Symfony\\Component\\Debug\\' => 24,
+            'Symfony\\Component\\Console\\' => 26,
+            'Symfony\\CS\\' => 11,
+        ),
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
             'PhpAmqpLib\\' => 11,
         ),
     );
@@ -22,10 +39,61 @@ class ComposerStaticInit560cc2e5bfc86ab670b85e164a333f6b
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
+        'Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Component\\Stopwatch\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/stopwatch',
+        ),
+        'Symfony\\Component\\Process\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/process',
+        ),
+        'Symfony\\Component\\Finder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
+        'Symfony\\Component\\Filesystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/filesystem',
+        ),
+        'Symfony\\Component\\EventDispatcher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
+        ),
+        'Symfony\\Component\\Debug\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/debug',
+        ),
+        'Symfony\\Component\\Console\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/console',
+        ),
+        'Symfony\\CS\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/Symfony/CS',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
         'PhpAmqpLib\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-amqplib/php-amqplib/PhpAmqpLib',
         ),
+    );
+
+    public static $classMap = array (
+        'SebastianBergmann\\Diff\\Chunk' => __DIR__ . '/..' . '/sebastian/diff/src/Chunk.php',
+        'SebastianBergmann\\Diff\\Diff' => __DIR__ . '/..' . '/sebastian/diff/src/Diff.php',
+        'SebastianBergmann\\Diff\\Differ' => __DIR__ . '/..' . '/sebastian/diff/src/Differ.php',
+        'SebastianBergmann\\Diff\\LCS\\LongestCommonSubsequence' => __DIR__ . '/..' . '/sebastian/diff/src/LCS/LongestCommonSubsequence.php',
+        'SebastianBergmann\\Diff\\LCS\\MemoryEfficientImplementation' => __DIR__ . '/..' . '/sebastian/diff/src/LCS/MemoryEfficientLongestCommonSubsequenceImplementation.php',
+        'SebastianBergmann\\Diff\\LCS\\TimeEfficientImplementation' => __DIR__ . '/..' . '/sebastian/diff/src/LCS/TimeEfficientLongestCommonSubsequenceImplementation.php',
+        'SebastianBergmann\\Diff\\Line' => __DIR__ . '/..' . '/sebastian/diff/src/Line.php',
+        'SebastianBergmann\\Diff\\Parser' => __DIR__ . '/..' . '/sebastian/diff/src/Parser.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
@@ -33,6 +101,7 @@ class ComposerStaticInit560cc2e5bfc86ab670b85e164a333f6b
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit560cc2e5bfc86ab670b85e164a333f6b::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit560cc2e5bfc86ab670b85e164a333f6b::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit560cc2e5bfc86ab670b85e164a333f6b::$classMap;
 
         }, null, ClassLoader::class);
     }

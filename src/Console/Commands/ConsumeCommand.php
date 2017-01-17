@@ -53,13 +53,12 @@ class ConsumeCommand extends Command
 
     /**
      * Run the command.
-     *
-     * @return void.
      */
     public function handle()
     {
         $queueName = $this->argument('queueName');
 
+        // Options
         $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName; // If the exchange name has not been set, use the queue name
         $exchangeType = $this->option('exchangeType');
         $bindingKeys = (array) $this->option('bindingKeys');
@@ -73,20 +72,26 @@ class ConsumeCommand extends Command
         $deadLetterExchangeName = ($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : (($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : null);
         $deadLetterExchangeType = $this->option('deadLetterExchangeType');
         $deadLetterRoutingKey = $this->option('deadLetterRoutingKey');
-        $messageTTL = (int) $this->option('messageTTL');
+        $messageTTL = ($ttl = $this->option('messageTTL')) ? (int) $ttl : null;
 
-        require(app_path().'/Messaging/queues.php');
+        require app_path().'/Messaging/queues.php';
         $handlers = Registrator::getHandlers();
 
         foreach ($handlers as $handler) {
-          if ($handler->queueName == $queueName) {
-            $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
-            if($deadLetterQueueName) {
-                $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
-            }
-            $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
-          }
-        }
+            if ($handler->queueName == $queueName) {
 
+              // If options are set in Registrator:queue(string $queueName,string $Handler, array $options).
+              if (!empty($handler->options)) {
+                  // Use whatever the user has set/provided, to override our defaults.
+                  extract($handler->options);
+              }
+
+                $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
+                if ($deadLetterQueueName) {
+                    $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
+                }
+                $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
+            }
+        }
     }
 }
