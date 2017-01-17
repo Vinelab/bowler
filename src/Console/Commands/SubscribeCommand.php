@@ -38,7 +38,7 @@ class SubscribeCommand extends Command
 
         $queue = $this->argument('queueName');
 
-        if($this->option('expressive') || $this->option('E')) {
+        if($this->option('expressive')) {
             $queue = $queue.'-pub-sub';
         }
 
