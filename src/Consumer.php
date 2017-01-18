@@ -120,7 +120,12 @@ class Consumer
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
         // Instantiate Handler
-        $handler = new $handlerClass();
+        $queueHandler = new $handlerClass();
+
+        // Set consumer in the queueHandler, to allow user to perform action on queue.
+        if (method_exists($queueHandler, 'setConsumer')) {
+            $queueHandler->setConsumer($this);
+        }
 
         // Get connection channel
         $channel = $this->connection->getChannel();
@@ -144,13 +149,6 @@ class Consumer
             $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
-        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
-
-        // Set consumer in the handler, to allow user to perform action on queue.
-        if (method_exists($handler, 'setConsumer')) {
-            $handler->setConsumer($this);
-        }
-
         $callback = function ($msg) use ($handler, $exceptionHandler) {
             try {
                 $handler->handle($msg);
@@ -167,6 +165,8 @@ class Consumer
 
         $channel->basic_qos(null, 1, null);
         $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
+
+        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
 
         while (count($channel->callbacks)) {
             $channel->wait();
