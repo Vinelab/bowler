@@ -6,9 +6,9 @@ Bowler allows you to:
 * Customize message publishing.
 * Customize message consumption.
 * Customize message dead lettering.
-* Handle application errors and deal with the corresponding message accordingly.
+* Handle application errors and deal with the corresponding messages accordingly.
 * Provide an expressive consumer queue setup.
-* Generate, queue specific, message handlers from the command line.
+* Register a queue and generate it's message handler from the command line.
 * Limited admin functionalities.
 
 These features will facilitate drastically the way you use Rabbitmq and broaden its functionality. This package do not intend to take over the user's responsability of designing the messaging queues schema.
@@ -49,7 +49,7 @@ And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvide
 // Initialize a Bowler object with the rabbitmq server ip and port
 $connection = new Bowler\Connection();
 
-// Initialize a Producer object with a connection, exchange name and type
+// Initialize a Producer object with a connection, exchange name, exchange type, routing key, passive, durable, auto delete and delivery mode
 $bowlerProducer = new Producer($connection, 'reporting_exchange', 'direct', 'warning', false, true, false, 2);
 
 // Publish a message
@@ -74,8 +74,6 @@ You can do so either:
 
 namespace App\Messaging\Handlers;
 
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
-
 class AuthorHandler {
 
     private $consumer;
@@ -93,11 +91,6 @@ class AuthorHandler {
             $this->consumer->ackMessage($msg);
         } elseif($e instanceof WhatElseException) {
             $this->consumer->nackMessage($msg);
-        } elseif($e instanceof DeclarationMismatchException) {
-            // This can help you delete the existing queue, which allows the consumer to recreate the queue by overriding the current setup on the next consumed message.
-            // Its a way to programatically handle such situations, but should be used with caution since you will loose all the queued messages.
-            // Moreover, the producer will need to be instantiated with the new setup. Which put this use case at question!
-            $this->consumer->deleteQueue(true, true);
         }
     }
 
@@ -117,12 +110,14 @@ public function handle($msg)
 {
     switch ($msg->delivery_info['routing_key']) {
         case 'key 1': //do something
+            break;
         case 'key 2': //do something else
+            break;
     }
 }
 ```
 
-- Add all your handlers inside the queues.php file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under App\Messaging directory:
+- Register your queues and handlers inside the `queues.php` file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under App\Messaging directory:
 
 ```php
 
@@ -150,10 +145,10 @@ Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
 
 Use the options array to setup your queues and exchanges. All of these are optional, defaults will apply to any parameters that are not specified here. The descriptions and defaults of these parameters are provided later in this document.
 
-These parameters overrides any set from the command line.
+These parameters overrides any that is set from the command line.
 
 ##### Console
-- Register a handler for a specific queue with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
+- Register queues and handlers with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
 
 The previous command:
 
@@ -164,7 +159,7 @@ The previous command:
 2. Create the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handler` directory.
 
 - Now in order to listen to any queue, run the following command from your console:
-`php artisan bowler:consume`, you will be asked to specify queue name (the queue name is the first parameter passed to `Registrator::queue`).
+`php artisan bowler:consume`, you need to specify the queue name and any other optional parameter, if applicable to your case.
 
 `bowler:consume` complete arguments list description:
 
@@ -182,11 +177,11 @@ queueName : The queue NAME
 --deadLetterExchangeName : The dead letter exchange NAME. Defaults to deadLetterQueueName
 --deadLetterExchangeType : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
 --deadLetterRoutingKey : The dead letter ROUTING KEY
---messageTtl : If set, specifies how long, in milliseconds, before a message is declared dead letter
+--messageTTL : If set, specifies how long, in milliseconds, before a message is declared dead letter
 ```
 
 ### Publish/Subscribe
-Bowler provide a default Pub/Sub implementation, where the user doesn't need to care about nothing more than:
+Bowler provide a default Pub/Sub implementation, where the user doesn't need to care about the setup.
 
 #### 1. Publish the Message
 
@@ -210,7 +205,7 @@ From the command line use the `bowler:subscribe` command.
 
 Using the `--expressive` or `-E` option will make the queue name reflect that it is used for Pub/Sub. Results in `reporting-pub-sub` as the generated queue name; otherwise the queue name you provided will be used.
 
-Add the `bindingKeys` array parameter to registered queue in `queues.php` like so:
+Add the `bindingKeys` array parameter to the registered queue in `queues.php` like so:
 
 ```php
 Registrator::subscribe('reportin-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
@@ -227,19 +222,23 @@ From the command line use the `bowler:consume` command.
 > The Pub/Sub implementation is meant to be used as-is. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
 
 ### Dead Lettering
-Since dead lettering is solely the responsability of the consumer and part of it's queue configuration, the natural place to define one.
-Enabeling dead lettering on the consumer is done through the command line using the same command that run the consumer with the dedicated optional arguments, at least one of `--deadLetterQueueName` or `--deadLetterExchangeName` should be specified.
+Dead lettering is solely the responsability of the consumer and part of it's queue configuration.
+Enabeling dead lettering on the consumer is done through the command line using the same command that run the consumer with the dedicated optional arguments. At least one of the `--deadLetterQueueName` or `--deadLetterExchangeName` options should be specified.
 ```php
-php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlx --deadLetterExchangeName=dlx --deadLetterExchangeType=direct --deadLetterRoutingKey=invalid --messageTTL=10000
+php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlq --deadLetterExchangeName=dlx --deadLetterExchangeType=direct --deadLetterRoutingKey=invalid --messageTTL=10000
 ```
 
-> If only one of the mentioned optional arguments are set, the second will default to the exact value as to the one you've just set. Leading to the same `dlx` and `dlq` name.
+> If only one of the mentioned optional parameters are set, the second will default to it. Leading to the same `dlx` and `dlq` name.
 
 ### Exception Handling
-Error Handling in Bowler is split into the application and queue domains.
-* `ExceptionHandler::renderQueue($e, $msg)` allows you to render error as you wish. While providing the exception and the que message itsef for maximum flexibility.
+Error Handling in Bowler is split into application and messaging domains.
+* `ExceptionHandler::renderQueue($e, $msg)` allows you to render errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
 
-* `Handler::handleError($e, $msg)` allows you to perfom action of the messaging queue itself. Whether to acknowledge or reject a message is up to you.
+* `Handler::handleError($e, $msg)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
+
+It is not recommended to alter the Rabbitmq setup in reponse to an application error,  e.g. For an `InvalidInputException` to delete the queue!
+
+Altering the Rabbitmq setup is not justified unless triggered by a Bowler configuration error e.g. `DeclarationMismatchException`.
 
 ### Exception Reporting
 
@@ -248,11 +247,14 @@ Bowler supports application level error reporting.
 To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`.
 And obviously, implement its methods.
 
+`ExceptionHandler::reportQueue($e, $msg)`
+
 ### Important Notes
 1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
 
 2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
 ## TODO
+* Improve Bowler Exception handling.
 * Provide a way to programatically handle configuration exceptions.
 * Write tests.
