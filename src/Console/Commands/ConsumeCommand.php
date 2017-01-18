@@ -35,7 +35,6 @@ class ConsumeCommand extends Command
                             {--p|passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
                             {--d|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
                             {--D|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
-                            {--M|deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}
                             {--deadLetterQueueName= : The dead letter queue NAME. Defaults to deadLetterExchangeName}
                             {--deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName}
                             {--deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
@@ -63,7 +62,6 @@ class ConsumeCommand extends Command
         $passive = (bool) $this->option('passive');
         $durable = (bool) $this->option('durable');
         $autoDelete = (bool) $this->option('autoDelete');
-        $deliveryMode = (int) $this->option('deliveryMode');
 
         // Dead Lettering
         $deadLetterQueueName = ($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : (($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : null);
@@ -84,7 +82,7 @@ class ConsumeCommand extends Command
                   extract($handler->options);
               }
 
-              $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
+              $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete);
               if ($deadLetterQueueName) {
                   $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
               }

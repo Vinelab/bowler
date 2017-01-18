@@ -83,13 +83,6 @@ class Consumer
     private $autoDelete;
 
     /**
-     * Non-persistent (1) or persistent (2).
-     *
-     * @var [type]
-     */
-    private $deliveryMode;
-
-    /**
      * The arguments that should be added to the `queue_declare` statement for dead lettering.
      *
      * @var array
@@ -105,9 +98,8 @@ class Consumer
      * @param bool                      $passive
      * @param bool                      $durable
      * @param bool                      $autoDelete
-     * @param int                       $deliveryMode
      */
-    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false)
     {
         $this->connection = $connection;
         $this->queueName = $queueName;
@@ -117,7 +109,6 @@ class Consumer
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
-        $this->deliveryMode = $deliveryMode;
     }
 
     /**
