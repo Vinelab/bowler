@@ -136,9 +136,14 @@ class Consumer
         } catch (\Exception $e) {
             $e = $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
 
-            if (method_exists($handler, 'handleError')) {
-                $handler->handleError($e, null);
+            if (method_exists($queueHandler, 'handleError')) {
+                $queueHandler->handleError($e, null);
             }
+
+            // Throw exception regardless of whatever handling has been done, limits the user's valid actions to only be able to throw an exception.
+            // Leaving it completely up to the user to decide what to do in cases like setup exception, is a lot of responsability.
+            // For now we'll throw the exception anyway, as if the user did not have the option of handling it.
+            throw $e;
         }
 
         if (!empty($this->bindingKeys)) {
@@ -149,16 +154,16 @@ class Consumer
             $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
-        $callback = function ($msg) use ($handler, $exceptionHandler) {
+        $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
             try {
-                $handler->handle($msg);
+                $queueHandler->handle($msg);
                 $this->ackMessage($msg);
             } catch (\Exception $e) {
-                $exceptionHandler->reportQueue($e, $msg);
-                $exceptionHandler->renderQueue($e, $msg);
+                $exceptionHandler->reportError($e, $msg);
+                $exceptionHandler->renderError($e, $msg);
 
-                if (method_exists($handler, 'handleError')) {
-                    $handler->handleError($e, $msg);
+                if (method_exists($queueHandler, 'handleError')) {
+                    $queueHandler->handleError($e, $msg);
                 }
             }
         };
