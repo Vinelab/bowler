@@ -55,11 +55,11 @@ class Handler
 
     public function reportError($e, $msg)
     {
-        $this->exceptionHandler->reportError($e, $msg);
+        $this->exceptionHandler->reportQueue($e, $msg);
     }
 
     public function renderError($e, $msg)
     {
-        $this->exceptionHandler->renderError($e, $msg);
+        $this->exceptionHandler->renderQueue($e, $msg);
     }
 }
