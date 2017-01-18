@@ -1,6 +1,6 @@
 <?php
 
-namespace Vinalab\Bowler\Exceptions;
+namespace Vinelab\Bowler\Exceptions;
 
 use Vinelab\Bowler\Exceptions\InvalidSetupException;
 use Vinelab\Bowler\Exceptions\BowlerGeneralException;
