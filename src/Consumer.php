@@ -5,8 +5,7 @@ namespace Vinelab\Bowler;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use Vinelab\Bowler\Exceptions\Handler as ExceptionHandler;
 
 /**
  * Bowler Consumer.
@@ -129,13 +128,21 @@ class Consumer
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
+        // Instantiate Handler
+        $handler = new $handlerClass();
+
+        // Get connection channel
         $channel = $this->connection->getChannel();
 
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
             $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
         } catch (\Exception $e) {
-            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(),  $this->arguments);
+            $e = $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
+
+            if (method_exists($handler, 'handleError')) {
+                $handler->handleError($e, null);
+            }
         }
 
         if (!empty($this->bindingKeys)) {
@@ -148,8 +155,7 @@ class Consumer
 
         echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
 
-        $handler = new $handlerClass();
-
+        // Set consumer in the handler, to allow user to perform action on queue.
         if (method_exists($handler, 'setConsumer')) {
             $handler->setConsumer($this);
         }

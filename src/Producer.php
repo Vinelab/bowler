@@ -4,7 +4,7 @@ namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Traits\HelperTrait;
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
+use Vinelab\Bowler\Exceptions\Handler as ExceptionHandler;
 
 /**
  * Bowler Producer.
@@ -119,8 +119,7 @@ class Producer
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         } catch (\Exception $e) {
-            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(), $this->arguments
-                    );
+            ExceptionHandler::handleServerException($e, $this->compileParameters());
         }
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);

@@ -7,7 +7,7 @@ use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
 use Vinelab\Bowler\RegisterQueues;
 use Vinelab\Bowler\Facades\Registrator;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use Vinelab\Bowler\Exceptions\Handler as ExceptionHandler;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -84,11 +84,11 @@ class ConsumeCommand extends Command
                   extract($handler->options);
               }
 
-                $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
-                if ($deadLetterQueueName) {
-                    $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
-                }
-                $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
+              $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
+              if ($deadLetterQueueName) {
+                  $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
+              }
+              $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
             }
         }
     }
