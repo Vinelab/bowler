@@ -21,7 +21,6 @@ trait HelperTrait
                 'passive' => $this->passive,
                 'durable' => $this->durable,
                 'autoDelete' => $this->autoDelete,
-                'deliveryMode' => $this->deliveryMode,
             ];
 
         property_exists($this, 'routingKey') ? ($params['routingKey'] = $this->routingKey) : ($params['bindingKeys'] = $this->bindingKeys);
