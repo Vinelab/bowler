@@ -40,11 +40,11 @@ class QueueCommand extends Command
     {
         $handlerGenerator = new HandlerGenerator();
 
-        $queue = $this->argument('queueName'); // ??
+        $queue = $this->argument('queueName');
         $handler = studly_case(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
 
         try {
-            $handlerGenerator->generate($queue, $handler, self::TYPE); // ??
+            $handlerGenerator->generate($queue, $handler, self::TYPE);
 
             $this->info(
                 'Queue '.$queue.' added successfully.'.
