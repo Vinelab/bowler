@@ -58,6 +58,8 @@ $bowlerProducer->publish($data);
 
 > You need to make sure the exchange setup here matches the consumer's, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
 
+> If you mistakenly set an undefined value, setting up the exchange, e.g. $exchangeType='noneExistingType' a `Vinelab\Bowler\Exceptions\InvalidSetupException` is thrown.
+
 ### Consumer
 
 Add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array in `config/app`.
@@ -246,6 +248,8 @@ To do so the default laravel exception handler normaly located in `app\Exception
 And obviously, implement its methods.
 
 `ExceptionHandler::reportQueue($e, $msg)`
+
+Both error handling and reporting will have `null` values for the `msg` parameters whenever the error is a server side error. If the corresponding exception is not handled by Bowler a `Vinelab\Bowler\Exceptions\BowlerGeneralException` will be thrown.
 
 ### Important Notes
 1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
