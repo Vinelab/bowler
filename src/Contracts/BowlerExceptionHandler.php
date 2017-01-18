@@ -10,7 +10,7 @@ use PhpAmqpLib\Message\AMQPMessage as Message;
  */
 interface BowlerExceptionHandler
 {
-    public function reportQueue(Exception $e, Message $msg);
+    public function reportQueue(Exception $e, Message $msg = null);
 
-    public function renderQueue(Exception $e, Message $msg);
+    public function renderQueue(Exception $e, Message $msg = null);
 }
