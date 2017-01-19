@@ -19,7 +19,7 @@ class BowlerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('vinelab.bowler.registrator', function ($app) {
-            return new RegisterQueues($app->make('Vinelab\Bowler\Connection'));
+            return new RegisterQueues();
         });
 
         // Bind connection to env configuration
