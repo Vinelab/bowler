@@ -21,10 +21,11 @@ trait HelperTrait
                 'passive' => $this->passive,
                 'durable' => $this->durable,
                 'autoDelete' => $this->autoDelete,
+                'deliveryMode' => property_exists($this, 'deliveryMode') ? $this->deliveryMode : null,
             ];
 
         property_exists($this, 'routingKey') ? ($params['routingKey'] = $this->routingKey) : ($params['bindingKeys'] = $this->bindingKeys);
 
-        return $params;
+        return array_filter($params);
     }
 }
