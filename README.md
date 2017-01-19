@@ -103,7 +103,7 @@ class AuthorHandler {
 }
 ```
 
-> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters.
+> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
 
 If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
 
@@ -230,26 +230,25 @@ php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlq --deadL
 
 > If only one of the mentioned optional parameters are set, the second will default to it. Leading to the same `dlx` and `dlq` name.
 
-### Exception Handling
-Error Handling in Bowler is split into application and messaging domains.
+### Error Handling
+Error Handling in Bowler is split into application and server domains.
 * `ExceptionHandler::renderQueue($e, $msg)` allows you to render errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
 
 * `Handler::handleError($e, $msg)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
 
-It is not recommended to alter the Rabbitmq setup in reponse to an application error,  e.g. For an `InvalidInputException` to delete the queue!
+It is not recommended to alter the Rabbitmq setup in reponse to an application exception, e.g. For an `InvalidInputException` to purge the queue! In nay case, if deemed necessary for the use case, it should be used with caution since you will loose all the queued messages.
 
-Altering the Rabbitmq setup is not justified unless triggered by a Bowler configuration error e.g. `DeclarationMismatchException`.
+Server exceptions will be thrown.
 
-### Exception Reporting
+### Error Reporting
 
 Bowler supports application level error reporting.
 
-To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`.
-And obviously, implement its methods.
+To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`. And obviously, implement its methods.
 
 `ExceptionHandler::reportQueue($e, $msg)`
 
-Both error handling and reporting will have `null` values for the `msg` parameters whenever the error is a server side error. If the corresponding exception is not handled by Bowler a `Vinelab\Bowler\Exceptions\BowlerGeneralException` will be thrown.
+Server errors not covered by Bowler will be thrown as `Vinelab\Bowler\Exceptions\BowlerGeneralException`.
 
 ### Important Notes
 1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
@@ -257,6 +256,4 @@ Both error handling and reporting will have `null` values for the `msg` paramete
 2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
 ## TODO
-* Improve Bowler Exception handling.
-* Provide a way to programatically handle configuration exceptions.
 * Write tests.
