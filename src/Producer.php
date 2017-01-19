@@ -120,7 +120,7 @@ class Producer
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         } catch (\Exception $e) {
-            throw (new BowlerExceptionHandler(app(ExceptionHandler::class)))->handleServerException($e, $this->compileParameters());
+            (new BowlerExceptionHandler(app(ExceptionHandler::class)))->handleServerException($e, $this->compileParameters());
         }
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);

@@ -47,19 +47,16 @@ class Handler
             $e = new BowlerGeneralException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters, $arguments);
         }
 
-        $this->reportError($e);
-        $this->renderError($e);
-
-        return $e;
+        throw $e;
     }
 
     /**
      * Report error to the app's exceptions Handler
      *
      * @param \Exception $e
-     * @param mix PhpAmqpLib\Message\AMQPMessage | null $msg
+     * @param mix PhpAmqpLib\Message\AMQPMessage $msg
      */
-    public function reportError($e, $msg = null)
+    public function reportError($e, $msg)
     {
         $this->exceptionHandler->reportQueue($e, $msg);
     }
@@ -68,9 +65,9 @@ class Handler
      * Render error from the app's exceptions Handler
      *
      * @param \Exception $e
-     * @param mix PhpAmqpLib\Message\AMQPMessage | null $msg
+     * @param mix PhpAmqpLib\Message\AMQPMessage $msg
      */
-    public function renderError($e, $msg = null)
+    public function renderError($e, $msg)
     {
         $this->exceptionHandler->renderQueue($e, $msg);
     }

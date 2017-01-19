@@ -119,14 +119,6 @@ class Consumer
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
-        // Instantiate Handler
-        $queueHandler = new $handlerClass();
-
-        // Set consumer in the queueHandler, to allow user to perform action on queue.
-        if (method_exists($queueHandler, 'setConsumer')) {
-            $queueHandler->setConsumer($this);
-        }
-
         // Get connection channel
         $channel = $this->connection->getChannel();
 
@@ -134,16 +126,7 @@ class Consumer
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
             $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
         } catch (\Exception $e) {
-            $e = $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
-
-            if (method_exists($queueHandler, 'handleError')) {
-                $queueHandler->handleError($e, null);
-            }
-
-            // Throw exception regardless of whatever handling has been done, limits the user's valid actions to only be able to throw an exception.
-            // Leaving it completely up to the user to decide what to do in cases like setup exception, is a lot of responsability.
-            // For now we'll throw the exception anyway, as if the user did not have the option of handling it.
-            throw $e;
+            $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
         }
 
         if (!empty($this->bindingKeys)) {
@@ -152,6 +135,14 @@ class Consumer
             }
         } else {
             $channel->queue_bind($this->queueName, $this->exchangeName);
+        }
+
+        // Instantiate Handler
+        $queueHandler = new $handlerClass();
+
+        // Set consumer in the queueHandler, to allow user to perform action on queue.
+        if (method_exists($queueHandler, 'setConsumer')) {
+            $queueHandler->setConsumer($this);
         }
 
         $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
