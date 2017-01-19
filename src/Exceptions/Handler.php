@@ -2,11 +2,8 @@
 
 namespace Vinelab\Bowler\Exceptions;
 
-use Vinelab\Bowler\Exceptions\InvalidSetupException;
-use Vinelab\Bowler\Exceptions\BowlerGeneralException;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
@@ -15,7 +12,7 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 class Handler
 {
     /**
-     * The BowlerExceptionHandler contract bound app's exception handler
+     * The BowlerExceptionHandler contract bound app's exception handler.
      */
     private $exceptionHandler;
 
@@ -25,11 +22,11 @@ class Handler
     }
 
     /**
-     * Map php-mqplib exceptions to Bowler's
+     * Map php-mqplib exceptions to Bowler's.
      *
-     * @param \Exception    $e
-     * @param array         $parameters
-     * @param array         $arguments
+     * @param \Exception $e
+     * @param array      $parameters
+     * @param array      $arguments
      *
      * @return mix
      */
@@ -37,13 +34,9 @@ class Handler
     {
         if ($e instanceof AMQPProtocolChannelException) {
             $e = new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters,  $arguments);
-        }
-
-        elseif ($e instanceof AMQPProtocolConnectionException) {
+        } elseif ($e instanceof AMQPProtocolConnectionException) {
             $e = new InvalidSetupException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters, $arguments);
-        }
-
-        else {
+        } else {
             $e = new BowlerGeneralException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters, $arguments);
         }
 
@@ -51,9 +44,9 @@ class Handler
     }
 
     /**
-     * Report error to the app's exceptions Handler
+     * Report error to the app's exceptions Handler.
      *
-     * @param \Exception $e
+     * @param \Exception                         $e
      * @param mix PhpAmqpLib\Message\AMQPMessage $msg
      */
     public function reportError($e, $msg)
@@ -62,9 +55,9 @@ class Handler
     }
 
     /**
-     * Render error from the app's exceptions Handler
+     * Render error from the app's exceptions Handler.
      *
-     * @param \Exception $e
+     * @param \Exception                         $e
      * @param mix PhpAmqpLib\Message\AMQPMessage $msg
      */
     public function renderError($e, $msg)

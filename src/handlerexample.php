@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Queue
+ * Queue.
  *
  * @param string queue name
  * @param string handler class name
  */
 Registrator::queue('authors', 'App\Messaging\Handlers\AuthorHandler');
 
-/**
+/*
  * Queue
  *
  * @param string queue name
@@ -17,10 +17,10 @@ Registrator::queue('authors', 'App\Messaging\Handlers\AuthorHandler');
  */
 Registrator::queue('books', 'App\Messaging\Handlers\BooksHandler', [
                                                         'exchangeName' => 'main_exchange',
-                                                        'exchangeType'=> 'direct',
+                                                        'exchangeType' => 'direct',
                                                         'bindingKeys' => [
                                                             'warning',
-                                                            'notification'
+                                                            'notification',
                                                         ],
                                                         'pasive' => false,
                                                         'durable' => true,
@@ -30,10 +30,10 @@ Registrator::queue('books', 'App\Messaging\Handlers\BooksHandler', [
                                                         'deadLetterExchangeName' => 'dlx',
                                                         'deadLetterExchangeType' => 'direct',
                                                         'deadLetterRoutingKey' => 'warning',
-                                                        'messageTTL' => null
+                                                        'messageTTL' => null,
                                                     ]);
 
-/**
+/*
  * Subscribe
  *
  * @param string queue name
