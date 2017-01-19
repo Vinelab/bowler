@@ -11,7 +11,7 @@ class RegisterQueues
     private $handlers = [];
 
     /**
-     * Registrator::queue
+     * Registrator::queue.
      *
      * @param string $queue
      * @param string $className
@@ -29,7 +29,7 @@ class RegisterQueues
 
     /**
      * Registrator::subscribe
-     * Default out-of-box Publisher/Subscriber setup
+     * Default out-of-box Publisher/Subscriber setup.
      *
      * @param string $queue
      * @param string $className
@@ -41,12 +41,12 @@ class RegisterQueues
         // We only need the bindingKeys to be enable key based pub/sub
         $options = array_filter([
                         'exchangeName' => 'pub-sub',
-                        'exchangeType'=> 'direct',
+                        'exchangeType' => 'direct',
                         'bindingKeys' => $bindingKeys,
                         'pasive' => false,
                         'durable' => true,
                         'autoDelete' => false,
-                        'deliveryMode' => 2
+                        'deliveryMode' => 2,
                     ]);
 
         $this->queue($queue, $className, $options);

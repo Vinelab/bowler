@@ -58,6 +58,8 @@ $bowlerProducer->publish($data);
 
 > You need to make sure the exchange setup here matches the consumer's, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
 
+> If you mistakenly set an undefined value, setting up the exchange, e.g. $exchangeType='noneExistingType' a `Vinelab\Bowler\Exceptions\InvalidSetupException` is thrown.
+
 ### Consumer
 
 Add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array in `config/app`.
@@ -101,7 +103,7 @@ class AuthorHandler {
 }
 ```
 
-> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters.
+> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
 
 If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
 
@@ -133,7 +135,6 @@ Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
                                                         'pasive' => false,
                                                         'durable' => true,
                                                         'autoDelete' => false,
-                                                        'deliveryMode' => 2,
                                                         'deadLetterQueueName' => 'dlx_queue',
                                                         'deadLetterExchangeName' => 'dlx',
                                                         'deadLetterExchangeType' => 'direct',
@@ -172,7 +173,6 @@ queueName : The queue NAME
 --p|passive : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
 --d|durable : Mark exchange and queue as DURABLE. Defaults to 1
 --D|autoDelete : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
---M|deliveryMode : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2
 --deadLetterQueueName : The dead letter queue NAME. Defaults to deadLetterExchangeName
 --deadLetterExchangeName : The dead letter exchange NAME. Defaults to deadLetterQueueName
 --deadLetterExchangeType : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
@@ -230,24 +230,25 @@ php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlq --deadL
 
 > If only one of the mentioned optional parameters are set, the second will default to it. Leading to the same `dlx` and `dlq` name.
 
-### Exception Handling
-Error Handling in Bowler is split into application and messaging domains.
+### Error Handling
+Error Handling in Bowler is split into application and server domains.
 * `ExceptionHandler::renderQueue($e, $msg)` allows you to render errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
 
 * `Handler::handleError($e, $msg)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
 
-It is not recommended to alter the Rabbitmq setup in reponse to an application error,  e.g. For an `InvalidInputException` to delete the queue!
+It is not recommended to alter the Rabbitmq setup in reponse to an application exception, e.g. For an `InvalidInputException` to purge the queue! In nay case, if deemed necessary for the use case, it should be used with caution since you will loose all the queued messages.
 
-Altering the Rabbitmq setup is not justified unless triggered by a Bowler configuration error e.g. `DeclarationMismatchException`.
+Server exceptions will be thrown.
 
-### Exception Reporting
+### Error Reporting
 
 Bowler supports application level error reporting.
 
-To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`.
-And obviously, implement its methods.
+To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`. And obviously, implement its methods.
 
 `ExceptionHandler::reportQueue($e, $msg)`
+
+Server errors not covered by Bowler will be thrown as `Vinelab\Bowler\Exceptions\BowlerGeneralException`.
 
 ### Important Notes
 1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
@@ -255,6 +256,4 @@ And obviously, implement its methods.
 2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
 ## TODO
-* Improve Bowler Exception handling.
-* Provide a way to programatically handle configuration exceptions.
 * Write tests.

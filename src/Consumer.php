@@ -5,8 +5,7 @@ namespace Vinelab\Bowler;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use Vinelab\Bowler\Exceptions\Handler as ExceptionHandler;
 
 /**
  * Bowler Consumer.
@@ -84,13 +83,6 @@ class Consumer
     private $autoDelete;
 
     /**
-     * Non-persistent (1) or persistent (2).
-     *
-     * @var [type]
-     */
-    private $deliveryMode;
-
-    /**
      * The arguments that should be added to the `queue_declare` statement for dead lettering.
      *
      * @var array
@@ -106,9 +98,8 @@ class Consumer
      * @param bool                      $passive
      * @param bool                      $durable
      * @param bool                      $autoDelete
-     * @param int                       $deliveryMode
      */
-    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false)
     {
         $this->connection = $connection;
         $this->queueName = $queueName;
@@ -118,7 +109,6 @@ class Consumer
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
-        $this->deliveryMode = $deliveryMode;
     }
 
     /**
@@ -129,13 +119,14 @@ class Consumer
      */
     public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
     {
+        // Get connection channel
         $channel = $this->connection->getChannel();
 
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
             $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
         } catch (\Exception $e) {
-            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(),  $this->arguments);
+            $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
         }
 
         if (!empty($this->bindingKeys)) {
@@ -146,30 +137,32 @@ class Consumer
             $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
-        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
+        // Instantiate Handler
+        $queueHandler = new $handlerClass();
 
-        $handler = new $handlerClass();
-
-        if (method_exists($handler, 'setConsumer')) {
-            $handler->setConsumer($this);
+        // Set consumer in the queueHandler, to allow user to perform action on queue.
+        if (method_exists($queueHandler, 'setConsumer')) {
+            $queueHandler->setConsumer($this);
         }
 
-        $callback = function ($msg) use ($handler, $exceptionHandler) {
+        $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
             try {
-                $handler->handle($msg);
+                $queueHandler->handle($msg);
                 $this->ackMessage($msg);
             } catch (\Exception $e) {
-                $exceptionHandler->reportQueue($e, $msg);
-                $exceptionHandler->renderQueue($e, $msg);
+                $exceptionHandler->reportError($e, $msg);
+                $exceptionHandler->renderError($e, $msg);
 
-                if (method_exists($handler, 'handleError')) {
-                    $handler->handleError($e, $msg);
+                if (method_exists($queueHandler, 'handleError')) {
+                    $queueHandler->handleError($e, $msg);
                 }
             }
         };
 
         $channel->basic_qos(null, 1, null);
         $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
+
+        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
 
         while (count($channel->callbacks)) {
             $channel->wait();
