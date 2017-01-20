@@ -7,6 +7,8 @@ class {{handler}}
     /**
      * Handle message.
      *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     *
      * @return void
      */
     public function handle($msg)
@@ -17,18 +19,13 @@ class {{handler}}
     /**
      * Handle error
      *
-     * @return void
-     */
-    public function handleError($e, $msg)
-    {
-        //
-    }
-
-    /**
-     * Set the handler consumer
+     * @param \Exception                    $e
+     * @param Vinelab\Bowler\MessageBroker  $broker
      *
      * @return void
      */
+    public function handleError($e, $broker)
     {
+        //
     }
 }
