@@ -54,14 +54,5 @@ class Handler
         $this->exceptionHandler->reportQueue($e, $msg);
     }
 
-    /**
-     * Render error from the app's exceptions Handler.
-     *
-     * @param \Exception                         $e
-     * @param mix PhpAmqpLib\Message\AMQPMessage $msg
-     */
-    public function renderError($e, $msg)
-    {
-        $this->exceptionHandler->renderQueue($e, $msg);
     }
 }

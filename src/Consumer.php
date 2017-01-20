@@ -152,7 +152,6 @@ class Consumer
                 $this->ackMessage($msg);
             } catch (\Exception $e) {
                 $exceptionHandler->reportError($e, $msg);
-                $exceptionHandler->renderError($e, $msg);
 
                 if (method_exists($queueHandler, 'handleError')) {
                     $queueHandler->handleError($e, $msg);
