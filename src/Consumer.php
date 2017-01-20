@@ -114,8 +114,8 @@ class Consumer
     /**
      * consume a message from a specified exchange.
      *
-     * @param string                                          $handlerClass
-     * @param Vinelab\Bowler\Contracts\BowlerExceptionHandler $exceptionHandler
+     * @param string                            $handlerClass
+     * @param Vinelab\Bowler\Exceptions\Handler $exceptionHandler
      */
     public function listenToQueue($handlerClass, BowlerExceptionHandler $exceptionHandler)
     {
