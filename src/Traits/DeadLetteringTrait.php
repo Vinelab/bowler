@@ -27,14 +27,7 @@ trait DeadLetteringTrait
 
             $channel->queue_declare($deadLetterQueueName, $this->passive, $this->durable, false, $this->autoDelete);
         } catch (\Exception $e) {
-            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(),
-                            [
-                                'deadLetterQueueName' => $deadLetterQueueName,
-                                'deadLetterExchangeName' => $deadLetterExchangeName,
-                                'deadLetterExchangeEype' => $deadLetterExchangeType,
-                                'deadLetterRoutingKey' => $deadLetterRoutingKey,
-                                'messageTTL' => $messageTTL,
-                            ],
+            app(BowlerExceptionHandler::class)->handleServerException($e, compact($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL),
                             $this->arguments);
         }
 
