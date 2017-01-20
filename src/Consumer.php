@@ -5,6 +5,7 @@ namespace Vinelab\Bowler;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
+use PhpAmqpLib\Message\AMQPMessage as Message;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
@@ -174,7 +175,7 @@ class Consumer
      *
      * @param PhpAmqpLib\Message\AMQPMessage $msg
      */
-    public function ackMessage($msg)
+    public function ackMessage(Message $msg)
     {
         $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
     }
@@ -186,7 +187,7 @@ class Consumer
      * @param bool                           $multiple
      * @param bool                           $requeue
      */
-    public function nackMessage($msg, $multiple = false, $requeue = false)
+    public function nackMessage(Message $msg, $multiple = false, $requeue = false)
     {
         $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
     }
@@ -197,7 +198,7 @@ class Consumer
      * @param PhpAmqpLib\Message\AMQPMessage $msg
      * @param bool                           $requeue
      */
-    public function rejectMessage($msg, $requeue = false)
+    public function rejectMessage(Message $msg, $requeue = false)
     {
         $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
     }
