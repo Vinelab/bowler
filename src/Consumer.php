@@ -5,7 +5,7 @@ namespace Vinelab\Bowler;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
-use Vinelab\Bowler\Exceptions\Handler as ExceptionHandler;
+use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
  * Bowler Consumer.
@@ -117,7 +117,7 @@ class Consumer
      * @param string                                          $handlerClass
      * @param Vinelab\Bowler\Contracts\BowlerExceptionHandler $exceptionHandler
      */
-    public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
+    public function listenToQueue($handlerClass, BowlerExceptionHandler $exceptionHandler)
     {
         // Get connection channel
         $channel = $this->connection->getChannel();
