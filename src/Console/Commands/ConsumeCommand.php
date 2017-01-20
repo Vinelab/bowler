@@ -7,7 +7,6 @@ use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
 use Vinelab\Bowler\Facades\Registrator;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -86,7 +85,7 @@ class ConsumeCommand extends Command
                 if ($deadLetterQueueName) {
                     $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
                 }
-                $bowlerConsumer->listenToQueue($handler->className, new BowlerExceptionHandler(app(ExceptionHandler::class)));
+                $bowlerConsumer->listenToQueue($handler->className, app(BowlerExceptionHandler::class));
             }
         }
     }
