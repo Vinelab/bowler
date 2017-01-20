@@ -2,10 +2,10 @@
 
 namespace Vinelab\Bowler;
 
+use Vinelab\Bowler\MessageBroker;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
-use PhpAmqpLib\Message\AMQPMessage as Message;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
@@ -142,14 +142,16 @@ class Consumer
         $queueHandler = new $handlerClass();
 
         $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
+            $broker = new MessageBroker($msg);
+
             try {
                 $queueHandler->handle($msg);
-                $this->ackMessage($msg);
+                $broker->ackMessage($msg);
             } catch (\Exception $e) {
                 $exceptionHandler->reportError($e, $msg);
 
                 if (method_exists($queueHandler, 'handleError')) {
-                    $queueHandler->handleError($e, $msg);
+                    $queueHandler->handleError($e, $broker);
                 }
             }
         };
@@ -162,38 +164,5 @@ class Consumer
         while (count($channel->callbacks)) {
             $channel->wait();
         }
-    }
-
-    /**
-     * Acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     */
-    public function ackMessage(Message $msg)
-    {
-        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
-    }
-
-    /**
-     * Negatively acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool                           $multiple
-     * @param bool                           $requeue
-     */
-    public function nackMessage(Message $msg, $multiple = false, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
-    }
-
-    /**
-     * Reject a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool                           $requeue
-     */
-    public function rejectMessage(Message $msg, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
     }
 }
