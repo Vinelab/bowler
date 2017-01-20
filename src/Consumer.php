@@ -141,11 +141,6 @@ class Consumer
         // Instantiate Handler
         $queueHandler = new $handlerClass();
 
-        // Set consumer in the queueHandler, to allow user to perform action on queue.
-        if (method_exists($queueHandler, 'setConsumer')) {
-            $queueHandler->setConsumer($this);
-        }
-
         $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
             try {
                 $queueHandler->handle($msg);

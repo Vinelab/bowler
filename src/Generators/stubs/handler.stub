@@ -5,11 +5,6 @@ namespace {{namespace}};
 class {{handler}}
 {
     /**
-     * Consumer of queue.
-     */
-    private $consumer;
-
-    /**
      * Handle message.
      *
      * @return void
@@ -34,8 +29,6 @@ class {{handler}}
      *
      * @return void
      */
-    public function setConsumer($consumer)
     {
-        $this->consumer = $consumer;
     }
 }
