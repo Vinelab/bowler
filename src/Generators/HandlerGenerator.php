@@ -32,7 +32,7 @@ class HandlerGenerator
         $queueContent = str_replace(['{{type}}', '{{queue}}', '{{handler}}'], [$type, "'".$queue."'", "'".$handlerNamespace.'\\'.$handler."'"], $queueContent);
 
         // Remove `<?php` string if file already exist
-        if (file_exists($queuePath)) {
+        if (file_exists($queuePath) && !empty(file_get_contents($queuePath))) {
             $queueContent = str_replace('<?php', '', $queueContent);
         }
 
