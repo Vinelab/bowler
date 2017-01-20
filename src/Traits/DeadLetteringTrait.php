@@ -2,7 +2,7 @@
 
 namespace Vinelab\Bowler\Traits;
 
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
+use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
