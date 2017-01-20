@@ -43,7 +43,7 @@ class RegisterQueues
                         'exchangeName' => 'pub-sub',
                         'exchangeType' => 'direct',
                         'bindingKeys' => $bindingKeys,
-                        'pasive' => false,
+                        'passive' => false,
                         'durable' => true,
                         'autoDelete' => false,
                         'deliveryMode' => 2,
