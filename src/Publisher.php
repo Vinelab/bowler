@@ -14,8 +14,13 @@ class Publisher extends Producer
      * @param Vinelab\Bowler\Connection $connection
      * @param string                    $routingKey
      */
-    public function __construct(Connection $connection, $routingKey)
+    public function __construct(Connection $connection)
     {
-        parent::__construct($connection, 'pub-sub', 'direct', $routingKey);
+        parent::__construct($connection);
+    }
+
+    public function setRoutingKey($routingKey)
+    {
+        $this->setup('pub-sub', 'direct', $routingKey);
     }
 }

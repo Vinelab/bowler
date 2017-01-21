@@ -216,11 +216,16 @@ Bowler provide a default Pub/Sub implementation, where the user doesn't need to 
 $connection = new Bowler\Connection();
 
 // Initialize a Pubisher object with a connection and a routingKey
-$bowlerPublisher = new Publisher($connection, 'warning');
+$bowlerPublisher = new Publisher($connection);
+
+// Set the message routing key
+$bowlerPublisher->setRoutingKey('warning');
 
 // Publish the message
 $bowlerPublisher->publish($data);
 ```
+
+> Or inject the Publisher as seen [here](### Producer).
 
 As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publishers holds the default Pub/Sub **exchange** setup.
 
