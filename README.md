@@ -49,11 +49,37 @@ And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvide
 // Initialize a Bowler object with the rabbitmq server ip and port
 $connection = new Bowler\Connection();
 
-// Initialize a Producer object with a connection, exchange name, exchange type, routing key, passive, durable, auto delete and delivery mode
-$bowlerProducer = new Producer($connection, 'reporting_exchange', 'direct', 'warning', false, true, false, 2);
+// Initialize a Producer object with a connection
+$bowlerProducer = new Producer($connection);
+
+// Setup the producer's exchange name, exchange type, routing key, passive, durable, auto delete and delivery mode
+$bowlerProducer->setup('reporting_exchange', 'direct', 'warning', false, true, false, 2);
 
 // Publish a message
 $bowlerProducer->publish($data);
+```
+
+or Inject the producer and let the IOC resolve the connection:
+
+```php
+use Vinelab\Bowler\Producer;
+
+class DoSomethingJob extends Job
+{
+    protected $data;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    public function handle(Producer $producer)
+    {
+        $producer->setup('reporting_exchange');
+
+        $producer->publish(json_encode($this->data));
+    }
+}
 ```
 
 > You need to make sure the exchange setup here matches the consumer's, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
