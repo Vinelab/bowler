@@ -239,7 +239,7 @@ Using the `--expressive` or `-E` option will make the queue name reflect that it
 Add the `bindingKeys` array parameter to the registered queue in `queues.php` like so:
 
 ```php
-Registrator::subscribe('reportin-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
+Registrator::subscribe('reporting-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
 ```
 
 #### 3. Handle messages
