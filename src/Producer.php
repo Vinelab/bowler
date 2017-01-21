@@ -84,20 +84,15 @@ class Producer
      * @var array
      */
     private $arguments = [];
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
-     * @param Vinelab\Bowler\Connection $connection
-     * @param string                    $exchangeName
-     * @param string                    $exchangeType
-     * @param string                    $routingKey
-     * @param bool                      $passive
-     * @param bool                      $durable
-     * @param bool                      $autoDelete
-     * @param int                       $deliveryMode
      */
     public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
-        $this->connection = $connection;
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
         $this->routingKey = $routingKey;
