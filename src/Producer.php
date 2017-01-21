@@ -79,6 +79,7 @@ class Producer
     protected $deliveryMode;
 
     /**
+     * @param Vinelab\Bowler\Connection $connection
      */
     public function __construct(Connection $connection)
     {
@@ -86,8 +87,17 @@ class Producer
     }
 
     /**
+     * Setup Producer.
+     *
+     * @param string    $exchangeName
+     * @param string    $exchangeType
+     * @param string    $routingKey
+     * @param bool      $passive
+     * @param bool      $durable
+     * @param bool      $autoDelete
+     * @param int       $deliveryMode
      */
-    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function setup($exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
