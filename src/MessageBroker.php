@@ -6,7 +6,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * The message broker gives the user a set functionalities to perform action on queue.
- * It wrapps the PhpAmqpLib\Message\AMQPMessage $msg and add
+ * It wrapps the PhpAmqpLib\Message\AMQPMessage $msg and add.
  *
  * @author Kinane Domloje <kinane@vinelab.com>
  */
@@ -45,8 +45,8 @@ class MessageBroker
     /**
      * Negatively acknowledge a message.
      *
-     * @param bool  $multiple
-     * @param bool  $requeue
+     * @param bool $multiple
+     * @param bool $requeue
      */
     public function nackMessage($multiple = false, $requeue = false)
     {
@@ -56,7 +56,7 @@ class MessageBroker
     /**
      * Reject a message.
      *
-     * @param bool  $requeue
+     * @param bool $requeue
      */
     public function rejectMessage($requeue = false)
     {

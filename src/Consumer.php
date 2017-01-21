@@ -2,7 +2,6 @@
 
 namespace Vinelab\Bowler;
 
-use Vinelab\Bowler\MessageBroker;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;

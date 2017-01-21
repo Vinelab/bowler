@@ -89,13 +89,13 @@ class Producer
     /**
      * Setup Producer.
      *
-     * @param string    $exchangeName
-     * @param string    $exchangeType
-     * @param string    $routingKey
-     * @param bool      $passive
-     * @param bool      $durable
-     * @param bool      $autoDelete
-     * @param int       $deliveryMode
+     * @param string $exchangeName
+     * @param string $exchangeType
+     * @param string $routingKey
+     * @param bool   $passive
+     * @param bool   $durable
+     * @param bool   $autoDelete
+     * @param int    $deliveryMode
      */
     public function setup($exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {

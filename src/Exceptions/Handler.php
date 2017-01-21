@@ -51,7 +51,7 @@ class Handler
      */
     public function reportError($e, $msg)
     {
-        if(method_exists($this->exceptionHandler, 'reportQueue')) {
+        if (method_exists($this->exceptionHandler, 'reportQueue')) {
             $this->exceptionHandler->reportQueue($e, $msg);
         }
     }
