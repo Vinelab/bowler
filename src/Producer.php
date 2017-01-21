@@ -79,11 +79,7 @@ class Producer
     protected $deliveryMode;
 
     /**
-     * The arguments that should be added to the `queue_declare` statement for dead lettering.
-     *
-     * @var array
      */
-    private $arguments = [];
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
