@@ -256,6 +256,21 @@ From the command line use the `bowler:consume` command.
 
 > The Pub/Sub implementation is meant to be used as-is. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
 
+### Testing
+Bind your Producer/Publisher to a mock, to restrict it from actually publishing messages to an exchange.
+
+Use `Vinelab\Bowler\Publisher` in `App\Tests\TestCase`;
+
+Add the following to `App\Tests\TestCase::createApplication()`:
+
+```php
+$app->bind(Publisher::class, function () {
+    return $this->createMock(Publisher::class);
+});
+````
+
+Since Publisher extends Producer, you should partialy mock Publisher in your tests.
+
 ### Dead Lettering
 Dead lettering is solely the responsability of the consumer and part of it's queue configuration.
 Enabeling dead lettering on the consumer is done through the command line using the same command that run the consumer with the dedicated optional arguments. At least one of the `--deadLetterQueueName` or `--deadLetterExchangeName` options should be specified.
