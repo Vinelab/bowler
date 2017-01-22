@@ -210,6 +210,7 @@ queueName : The queue NAME
 Bowler provide a default Pub/Sub implementation, where the user doesn't need to care about the setup.
 
 #### 1. Publish the Message
+In your Producer:
 
 ```php
 // Initialize a Bowler object with the rabbitmq server ip and port
@@ -227,10 +228,13 @@ $bowlerPublisher->publish($data);
 
 > Or inject the Publisher as seen [here](### Producer).
 
-As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publishers holds the default Pub/Sub **exchange** setup.
+As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publisher is a Producer specification, it holds the default Pub/Sub **exchange** setup. Mocking the Publisher should be made partial for testing.
 
-#### 2. Register the queue and generate it's message handler
-From the command line use the `bowler:subscribe` command.
+#### 2. Consume the Message
+In your Consumer:
+
+##### i. Register the queue and generate it's message handler
+In your Consumer; from the command line use the `bowler:subscribe` command.
 
 `php artisan bowler:subscribe reporting ReportingMessage --expressive`
 
@@ -242,10 +246,10 @@ Add the `bindingKeys` array parameter to the registered queue in `queues.php` li
 Registrator::subscribe('reporting-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
 ```
 
-#### 3. Handle messages
+##### ii. Handle messages
 Like we've seen [earlier](##### Manually).
 
-#### 4. Run the queue
+##### iii. Run the queue
 From the command line use the `bowler:consume` command.
 
 `php artisan bowler:consume reporting-pub-sub`
