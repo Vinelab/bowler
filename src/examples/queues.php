@@ -40,4 +40,4 @@ Registrator::queue('books', 'App\Messaging\Handlers\BooksHandler', [
  * @param string handler class name
  * @param array  binding keys
  */
-Registrator::subscribe('reporting', 'App\Messaging\Handlers\BooksHandler', ['error']);
+Registrator::subscribe('reporting', 'App\Messaging\Handlers\BooksHandler', ['error', null]);
