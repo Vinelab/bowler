@@ -6,6 +6,7 @@ use Vinelab\Bowler\Consumer;
 use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
 use Vinelab\Bowler\Facades\Registrator;
+use Vinelab\Bowler\Exceptions\UnregisteredQueueException;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
@@ -88,5 +89,7 @@ class ConsumeCommand extends Command
                 $bowlerConsumer->listenToQueue($handler->className, app(BowlerExceptionHandler::class));
             }
         }
+
+        throw new UnregisteredQueueException('No registered queue found with name '.$queueName.'.');
     }
 }
