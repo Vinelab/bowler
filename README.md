@@ -221,7 +221,7 @@ $bowlerPublisher->publish($data, 'warning');
 
 > Or inject the Publisher as seen [here](### Producer).
 
-As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publisher is a Producer specification, it holds the default Pub/Sub **exchange** setup. Mocking the Publisher should be made partial for testing.
+As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publisher is a Producer specification, it holds the default Pub/Sub **exchange** setup.
 
 #### 2. Consume the Message
 In your Consumer:
@@ -263,8 +263,6 @@ $app->bind(Publisher::class, function () {
     return $this->createMock(Publisher::class);
 });
 ````
-
-Since Publisher extends Producer, you should partialy mock `Vinelab\Bowler\Publisher` in your tests.
 
 ### Dead Lettering
 Dead lettering is solely the responsability of the consumer and part of it's queue configuration.
