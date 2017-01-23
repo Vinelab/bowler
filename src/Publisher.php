@@ -9,18 +9,24 @@ class Publisher extends Producer
 {
     /**
      * Part of the out-of-the-box Pub/Sub implementation
-     * Default exchange name is `pub-sub` of type `direct`.
+     * Set the default exchange named `pub-sub` of type `direct`.
      *
      * @param Vinelab\Bowler\Connection $connection
-     * @param string                    $routingKey
      */
     public function __construct(Connection $connection)
     {
         parent::__construct($connection);
+
+        $this->setup('pub-sub', 'direct');
     }
 
+    /**
+     *  Specify the Message routingKey
+     *
+     * @param string    $routingKey
+     */
     public function setRoutingKey($routingKey)
     {
-        $this->setup('pub-sub', 'direct', $routingKey);
+        $this->routingKey = $routingKey;
     }
 }
