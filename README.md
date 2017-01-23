@@ -90,7 +90,7 @@ class DoSomethingJob extends Job
 
 Add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array in `config/app`.
 
-Configuring the consumer can be done bothe manually or from the command line:
+Configuring the consumer can be done both manually or from the command line:
 
 ##### Manually
 1. Register your queues and handlers inside the `queues.php` file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under `App\Messaging` directory:
