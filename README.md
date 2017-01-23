@@ -279,7 +279,7 @@ php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlq --deadL
 ### Error Handling
 Error Handling in Bowler is limited to application exceptions.
 
-* `Handler::handleError($e, $broker)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
+`Handler::handleError($e, $broker)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
 
 It is not recommended to alter the Rabbitmq setup in reponse to an application exception, e.g. For an `InvalidInputException` to purge the queue! In nay case, if deemed necessary for the use case, it should be used with caution since you will loose all the queued messages.
 
