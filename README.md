@@ -52,11 +52,11 @@ $connection = new Vinelab\Bowler\Connection();
 // Initialize a Producer object with a connection
 $bowlerProducer = new Vinelab\Bowler\Producer($connection);
 
-// Setup the producer's exchange name and other optional parameters: exchange type, routing key, passive, durable, auto delete and delivery mode
-$bowlerProducer->setup('reporting_exchange', 'direct', 'warning', false, true, false, 2);
+// Setup the producer's exchange name and other optional parameters: exchange type, passive, durable, auto delete and delivery mode
+$bowlerProducer->setup('reporting_exchange', 'direct', false, true, false, 2);
 
-// Publish a message
-$bowlerProducer->publish($data);
+// Publish a message with a specific routingKey
+$bowlerProducer->publish($data, 'warning');
 ```
 
 or Inject the producer and let the IOC resolve the connection:
@@ -215,11 +215,8 @@ $connection = new Bowler\Connection();
 // Initialize a Pubisher object with a connection and a routingKey
 $bowlerPublisher = new Publisher($connection);
 
-// Set the message routing key
-$bowlerPublisher->setRoutingKey('warning');
-
-// Publish the message
-$bowlerPublisher->publish($data);
+// Publish the message and set its routingKey
+$bowlerPublisher->publish($data, 'warning');
 ```
 
 > Or inject the Publisher as seen [here](### Producer).
@@ -253,7 +250,9 @@ From the command line use the `bowler:consume` command.
 > The Pub/Sub implementation is meant to be used as-is. It is possible to Publish a message to all consumers, by setting the routingKey to `null` when publishing the message, and by adding `null` to the consumer's bindingKeys array. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
 
 ### Testing
-Bind your Producer/Publisher to a mock, to restrict it from actually publishing messages to an exchange.
+If you would like to silence the Producer/Publisher to restrict it from actually publishing messages to an exchange, bind it to a mock.
+
+Globally:
 
 Use `Vinelab\Bowler\Publisher` in `App\Tests\TestCase`;
 
@@ -265,7 +264,7 @@ $app->bind(Publisher::class, function () {
 });
 ````
 
-Since Publisher extends Producer, you should partialy mock Publisher in your tests.
+Since Publisher extends Producer, you should partialy mock `Vinelab\Bowler\Publisher` in your tests.
 
 ### Dead Lettering
 Dead lettering is solely the responsability of the consumer and part of it's queue configuration.

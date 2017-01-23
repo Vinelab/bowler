@@ -19,14 +19,4 @@ class Publisher extends Producer
 
         $this->setup('pub-sub', 'direct');
     }
-
-    /**
-     *  Specify the Message routingKey
-     *
-     * @param string    $routingKey
-     */
-    public function setRoutingKey($routingKey)
-    {
-        $this->routingKey = $routingKey;
-    }
 }

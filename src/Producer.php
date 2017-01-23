@@ -30,13 +30,6 @@ class Producer
     protected $exchangeName;
 
     /**
-     * The routing key used by the exchange to route messages to bounded queues.
-     *
-     * @var string
-     */
-    protected $routingKey;
-
-    /**
      * type of exchange:
      * fanout: routes messages to all of the queues that are bound to it and the routing key is ignored.
      *
@@ -91,17 +84,15 @@ class Producer
      *
      * @param string $exchangeName
      * @param string $exchangeType
-     * @param string $routingKey
      * @param bool   $passive
      * @param bool   $durable
      * @param bool   $autoDelete
      * @param int    $deliveryMode
      */
-    public function setup($exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function setup($exchangeName, $exchangeType = 'fanout', $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
-        $this->routingKey = $routingKey;
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
@@ -112,8 +103,9 @@ class Producer
      * Publish a message to a specified exchange.
      *
      * @param string $data
+     * @param string $routingKey    The routing key used by the exchange to route messages to bounded queues.
      */
-    public function publish($data)
+    public function publish($data, $routingKey = null)
     {
         $channel = $this->connection->getChannel();
 
@@ -125,7 +117,7 @@ class Producer
 
         $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        $channel->basic_publish($msg, $this->exchangeName, $this->routingKey);
+        $channel->basic_publish($msg, $this->exchangeName, $routingKey);
 
         echo ' [x] Data Package Sent to ', $this->exchangeName, ' Exchange!', "\n";
     }
