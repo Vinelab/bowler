@@ -5,7 +5,7 @@ namespace Vinelab\Bowler\Traits;
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
  */
-trait HelperTrait
+trait CompileParametersTrait
 {
     /**
      * Compiles the parameters passed to the constructor.

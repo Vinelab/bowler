@@ -3,7 +3,7 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
-use Vinelab\Bowler\Traits\HelperTrait;
+use Vinelab\Bowler\Traits\CompileParametersTrait;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
@@ -13,7 +13,7 @@ use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
  */
 class Producer
 {
-    use HelperTrait;
+    use CompileParametersTrait;
 
     /**
      * The main class of the package where we define the channel and the connection.

@@ -3,8 +3,8 @@
 namespace Vinelab\Bowler;
 
 use Vinelab\Bowler\Traits\AdminTrait;
-use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
+use Vinelab\Bowler\Traits\CompileParametersTrait;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
@@ -16,8 +16,8 @@ use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 class Consumer
 {
     use AdminTrait;
-    use HelperTrait;
     use DeadLetteringTrait;
+    use CompileParametersTrait;
 
     /**
      * The main class of the package where we define the channel and the connection.
