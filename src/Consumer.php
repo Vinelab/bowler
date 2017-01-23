@@ -138,7 +138,7 @@ class Consumer
         }
 
         // Instantiate Handler
-        $queueHandler = app($handlerClass::class);
+        $queueHandler = app($handlerClass);
 
         $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
             $broker = new MessageBroker($msg);
