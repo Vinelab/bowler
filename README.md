@@ -95,64 +95,64 @@ Configuring the consumer can be done both manually or from the command line:
 ##### Manually
 1. Register your queues and handlers inside the `queues.php` file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under `App\Messaging` directory:
 
-```php
+    ```php
 
-Registrator::queue('books', 'App\Messaging\Handlers\BookHandler');
+    Registrator::queue('books', 'App\Messaging\Handlers\BookHandler');
 
-Registrator::queue('reporting', 'App\Messaging\Handlers\ErrorReportingHandler', [
-                                                        'exchangeName' => 'main_exchange',
-                                                        'exchangeType'=> 'direct',
-                                                        'bindingKeys' => [
-                                                            'warning',
-                                                            'notification'
-                                                        ],
-                                                        'pasive' => false,
-                                                        'durable' => true,
-                                                        'autoDelete' => false,
-                                                        'deadLetterQueueName' => 'dlx_queue',
-                                                        'deadLetterExchangeName' => 'dlx',
-                                                        'deadLetterExchangeType' => 'direct',
-                                                        'deadLetterRoutingKey' => 'warning',
-                                                        'messageTTL' => null
-                                                    ]);
+    Registrator::queue('reporting', 'App\Messaging\Handlers\ErrorReportingHandler', [
+                                                            'exchangeName' => 'main_exchange',
+                                                            'exchangeType'=> 'direct',
+                                                            'bindingKeys' => [
+                                                                'warning',
+                                                                'notification'
+                                                            ],
+                                                            'pasive' => false,
+                                                            'durable' => true,
+                                                            'autoDelete' => false,
+                                                            'deadLetterQueueName' => 'dlx_queue',
+                                                            'deadLetterExchangeName' => 'dlx',
+                                                            'deadLetterExchangeType' => 'direct',
+                                                            'deadLetterRoutingKey' => 'warning',
+                                                            'messageTTL' => null
+                                                        ]);
 
-```
+    ```
 
-Use the options array to setup your queues and exchanges. All of these are optional, defaults will apply to any parameters that are not specified here. The descriptions and defaults of these parameters are provided later in this document.
+    Use the options array to setup your queues and exchanges. All of these are optional, defaults will apply to any parameters that are not specified here. The descriptions and defaults of these parameters are provided later in this document.
 
 2. Create your handlers classes to handle the received messages:
 
-```php
-//This is an example handler class
+    ```php
+    //This is an example handler class
 
-namespace App\Messaging\Handlers;
+    namespace App\Messaging\Handlers;
 
-class AuthorHandler {
+    class AuthorHandler {
 
-	public function handle($msg)
-	{
-		echo "Author: ".$msg->body;
-	}
+    	public function handle($msg)
+    	{
+    		echo "Author: ".$msg->body;
+    	}
 
-    public function handleError($e, $broker)
-    {
-        if($e instanceof InvalidInputException) {
-            $broker->rejectMessage();
-        } elseif($e instanceof WhatEverException) {
-            $broker->ackMessage();
-        } elseif($e instanceof WhatElseException) {
-            $broker->nackMessage();
-        } else {
-            $msg = $borker->getMessage();
-            if($msg->body) {
-                //
+        public function handleError($e, $broker)
+        {
+            if($e instanceof InvalidInputException) {
+                $broker->rejectMessage();
+            } elseif($e instanceof WhatEverException) {
+                $broker->ackMessage();
+            } elseif($e instanceof WhatElseException) {
+                $broker->nackMessage();
+            } else {
+                $msg = $borker->getMessage();
+                if($msg->body) {
+                    //
+                }
             }
         }
     }
-}
-```
+    ```
 
-> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
+    > Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
 
 ##### Console
 Register queues and handlers with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
@@ -161,11 +161,11 @@ The previous command:
 
 1. Adds `Registrator::queue('analytics_queue', 'App\Messaging\Handlers\AnalyticsDataHandler');` to `App\Messaging\queues.php`.
 
-> If no exchange name is provided the queue name will be used as default.
+    > If no exchange name is provided the queue name will be used as default.
 
-The options array, if specified overrides any of the parameters set from the command line.
+    The options array, if specified overrides any of the parameters set from the command line.
 
-2. Create the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handlers` directory.
+2. Creates the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handlers` directory.
 
 Now in order to listen to any queue, run the following command from your console:
 `php artisan bowler:consume analytics_queue`. You need to specify the queue name and any other optional parameter, if applicable to your case.
