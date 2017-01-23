@@ -22,7 +22,7 @@ class QueueCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bowler:queue
+    protected $signature = 'bowler:make:queue
                             {queueName : The queue NAME}
                             {handler : The handler class NAME}';
 
@@ -60,7 +60,7 @@ class QueueCommand extends Command
     public function getArguments()
     {
         return [
-            ['queue', InputArgument::REQUIRED, 'The queue\'s name.'],
+            ['queueName', InputArgument::REQUIRED, 'The queue\'s name.'],
             ['handler', InputArgument::REQUIRED, 'The handler assigned to queue.'],
         ];
     }

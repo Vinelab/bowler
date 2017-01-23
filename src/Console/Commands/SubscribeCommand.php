@@ -17,7 +17,7 @@ class SubscribeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bowler:subscribe
+    protected $signature = 'bowler:make:subscriber
                             {queueName : The queue NAME}
                             {handler : The handler class NAME}
                             {--E|expressive : If set, the queue name will explicitly express that it is a pub/sub queue}';
