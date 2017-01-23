@@ -9,27 +9,16 @@ use Exception;
  */
 class BowlerGeneralException extends Exception
 {
-    protected $message;
-    protected $code;
-    protected $file;
-    protected $line;
-    protected $trace;
-    protected $previous;
-    protected $traceAsString;
+    // Parameters used in the setup
     protected $parameters;
 
     // Dead lettering arguments
     protected $arguments;
 
-    public function __construct($message, $code, $file, $line, $trace, $previous, $traceAsString, $parameters = [], $arguments = [])
+    public function __construct($e, $parameters = [], $arguments = [])
     {
-        $this->message = $message;
-        $this->code = $code;
-        $this->file = $file;
-        $this->line = $line;
-        $this->trace = $trace;
-        $this->previous = $previous;
-        $this->traceAsString = $traceAsString;
+        parent::__construct($e);
+
         $this->parameters = $parameters;
         $this->arguments = $arguments;
     }

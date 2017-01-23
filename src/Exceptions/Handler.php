@@ -33,11 +33,11 @@ class Handler
     public function handleServerException(\Exception $e, $parameters = [], $arguments = [])
     {
         if ($e instanceof AMQPProtocolChannelException) {
-            $e = new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters,  $arguments);
+            $e = new DeclarationMismatchException($e, $parameters,  $arguments);
         } elseif ($e instanceof AMQPProtocolConnectionException) {
-            $e = new InvalidSetupException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters, $arguments);
+            $e = new InvalidSetupException($e, $parameters, $arguments);
         } else {
-            $e = new BowlerGeneralException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $parameters, $arguments);
+            $e = new BowlerGeneralException($e, $parameters, $arguments);
         }
 
         throw $e;
