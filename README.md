@@ -46,13 +46,13 @@ And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvide
 ### Producer
 
 ```php
-// Initialize a Bowler object with the rabbitmq server ip and port
-$connection = new Bowler\Connection();
+// Initialize a Bowler Connection
+$connection = new Vinelab\Bowler\Connection();
 
 // Initialize a Producer object with a connection
-$bowlerProducer = new Producer($connection);
+$bowlerProducer = new Vinelab\Bowler\Producer($connection);
 
-// Setup the producer's exchange name, exchange type, routing key, passive, durable, auto delete and delivery mode
+// Setup the producer's exchange name and other optional parameters: exchange type, routing key, passive, durable, auto delete and delivery mode
 $bowlerProducer->setup('reporting_exchange', 'direct', 'warning', false, true, false, 2);
 
 // Publish a message
@@ -90,68 +90,16 @@ class DoSomethingJob extends Job
 
 Add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array in `config/app`.
 
-Create a handler where you can handle the received messages and bind the handler to its corresponding queue.
-
-You can do so either:
+Configuring the consumer can be done bothe manually or from the command line:
 
 ##### Manually
-- Create your handlers classes to handle the messages received:
-
-```php
-//This is an example handler class
-
-namespace App\Messaging\Handlers;
-
-class AuthorHandler {
-
-    private $consumer;
-
-	public function handle($msg)
-	{
-		echo "Author: ".$msg->body;
-	}
-
-    public function handleError($e, $msg)
-    {
-        if($e instanceof InvalidInputException) {
-            $this->consumer->rejectMessage($msg);
-        } elseif($e instanceof WhatEverException) {
-            $this->consumer->ackMessage($msg);
-        } elseif($e instanceof WhatElseException) {
-            $this->consumer->nackMessage($msg);
-        }
-    }
-
-    public function setConsumer($consumer)
-    {
-        $this->consumer = $consumer;
-    }
-}
-```
-
-> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
-
-If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
-
-```php
-public function handle($msg)
-{
-    switch ($msg->delivery_info['routing_key']) {
-        case 'key 1': //do something
-            break;
-        case 'key 2': //do something else
-            break;
-    }
-}
-```
-
-- Register your queues and handlers inside the `queues.php` file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under App\Messaging directory:
+1. Register your queues and handlers inside the `queues.php` file (think about the queues file as the routes file from Laravel), note that the `queues.php` file should be under `App\Messaging` directory:
 
 ```php
 
 Registrator::queue('books', 'App\Messaging\Handlers\BookHandler');
 
-Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
+Registrator::queue('reporting', 'App\Messaging\Handlers\ErrorReportingHandler', [
                                                         'exchangeName' => 'main_exchange',
                                                         'exchangeType'=> 'direct',
                                                         'bindingKeys' => [
@@ -172,38 +120,86 @@ Registrator::queue('reporting', 'App\Messaging\Handlers\AuthorHandler', [
 
 Use the options array to setup your queues and exchanges. All of these are optional, defaults will apply to any parameters that are not specified here. The descriptions and defaults of these parameters are provided later in this document.
 
-These parameters overrides any that is set from the command line.
+2. Create your handlers classes to handle the received messages:
+
+```php
+//This is an example handler class
+
+namespace App\Messaging\Handlers;
+
+class AuthorHandler {
+
+	public function handle($msg)
+	{
+		echo "Author: ".$msg->body;
+	}
+
+    public function handleError($e, $broker)
+    {
+        if($e instanceof InvalidInputException) {
+            $broker->rejectMessage();
+        } elseif($e instanceof WhatEverException) {
+            $broker->ackMessage();
+        } elseif($e instanceof WhatElseException) {
+            $broker->nackMessage();
+        } else {
+            $msg = $borker->getMessage();
+            if($msg->body) {
+                //
+            }
+        }
+    }
+}
+```
+
+> Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
 
 ##### Console
-- Register queues and handlers with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
+Register queues and handlers with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
 
 The previous command:
 
 1. Adds `Registrator::queue('analytics_queue', 'App\Messaging\Handlers\AnalyticsDataHandler');` to `App\Messaging\queues.php`.
 
-> If no exchange name is provided the queue name will be used for both.
+> If no exchange name is provided the queue name will be used as default.
 
-2. Create the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handler` directory.
+The options array, if specified overrides any of the parameters set from the command line.
 
-- Now in order to listen to any queue, run the following command from your console:
-`php artisan bowler:consume`, you need to specify the queue name and any other optional parameter, if applicable to your case.
+2. Create the `App\Messaging\Handlers\AnalyticsDataHandler.php` in `App\Messaging\Handlers` directory.
+
+Now in order to listen to any queue, run the following command from your console:
+`php artisan bowler:consume analytics_queue`. You need to specify the queue name and any other optional parameter, if applicable to your case.
 
 `bowler:consume` complete arguments list description:
 
 ```php
 bowler:consume
 queueName : The queue NAME
---N|exchangeName : The exchange NAME. Defaults to queueName
---T|exchangeType : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
---K|bindingKeys : The consumer\'s BINDING KEYS array
---p|passive : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0
---d|durable : Mark exchange and queue as DURABLE. Defaults to 1
---D|autoDelete : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0
---deadLetterQueueName : The dead letter queue NAME. Defaults to deadLetterExchangeName
---deadLetterExchangeName : The dead letter exchange NAME. Defaults to deadLetterQueueName
---deadLetterExchangeType : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout
---deadLetterRoutingKey : The dead letter ROUTING KEY
---messageTTL : If set, specifies how long, in milliseconds, before a message is declared dead letter
+--N|exchangeName : The exchange NAME. Defaults to queueName.
+--T|exchangeType : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout.
+--K|bindingKeys : The consumer\'s BINDING KEYS array.
+--p|passive : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0.
+--d|durable : Mark exchange and queue as DURABLE. Defaults to 1.
+--D|autoDelete : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0.
+--deadLetterQueueName : The dead letter queue NAME. Defaults to deadLetterExchangeName.
+--deadLetterExchangeName : The dead letter exchange NAME. Defaults to deadLetterQueueName.
+--deadLetterExchangeType : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout.
+--deadLetterRoutingKey : The dead letter ROUTING KEY.
+--messageTTL : If set, specifies how long, in milliseconds, before a message is declared dead letter.
+```
+
+If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
+
+```php
+public function handle($msg)
+{
+    switch ($msg->delivery_info['routing_key']) {
+        case 'key 1': //do something
+            break;
+        case 'key 2': //do something else
+            break;
+    }
+}
 ```
 
 ### Publish/Subscribe
@@ -254,7 +250,7 @@ From the command line use the `bowler:consume` command.
 
 `php artisan bowler:consume reporting-pub-sub`
 
-> The Pub/Sub implementation is meant to be used as-is. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
+> The Pub/Sub implementation is meant to be used as-is. It is possible to Publish a message to all consumers, by setting the routingKey to `null` when publishing the message, and by adding `null` to the consumer's bindingKeys array. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
 
 ### Testing
 Bind your Producer/Publisher to a mock, to restrict it from actually publishing messages to an exchange.
