@@ -277,29 +277,26 @@ php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlq --deadL
 > If only one of the mentioned optional parameters are set, the second will default to it. Leading to the same `dlx` and `dlq` name.
 
 ### Error Handling
-Error Handling in Bowler is split into application and server domains.
-* `ExceptionHandler::renderQueue($e, $msg)` allows you to render errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
+Error Handling in Bowler is limited to application exceptions.
 
-* `Handler::handleError($e, $msg)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
+* `Handler::handleError($e, $broker)` allows you to perfom action on the queue. Whether to acknowledge or reject a message is up to you.
 
 It is not recommended to alter the Rabbitmq setup in reponse to an application exception, e.g. For an `InvalidInputException` to purge the queue! In nay case, if deemed necessary for the use case, it should be used with caution since you will loose all the queued messages.
 
-Server exceptions will be thrown.
+While server exceptions will be thrown. Server errors not wrapped by Bowler will be thrown as `Vinelab\Bowler\Exceptions\BowlerGeneralException`.
 
 ### Error Reporting
 
 Bowler supports application level error reporting.
 
-To do so the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`. And obviously, implement its methods.
+To do so, the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`. And obviously, implement its methods.
 
-`ExceptionHandler::reportQueue($e, $msg)`
-
-Server errors not covered by Bowler will be thrown as `Vinelab\Bowler\Exceptions\BowlerGeneralException`.
+`ExceptionHandler::reportQueue($e, $msg)` allows you to report errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
 
 ### Important Notes
-1- It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
+1. It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
 
-2- The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
+2. The use of nameless exchanges and queues is not supported in this package. Can be reconsidered later.
 
 ## TODO
 * Write tests.
