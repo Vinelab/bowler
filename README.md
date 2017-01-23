@@ -55,8 +55,8 @@ $bowlerProducer = new Vinelab\Bowler\Producer($connection);
 // Setup the producer's exchange name and other optional parameters: exchange type, passive, durable, auto delete and delivery mode
 $bowlerProducer->setup('reporting_exchange', 'direct', false, true, false, 2);
 
-// Publish a message with a specific routingKey
-$bowlerProducer->publish($data, 'warning');
+// Send a message with a specific routingKey
+$bowlerProducer->send($data, 'warning');
 ```
 
 or Inject the producer and let the IOC resolve the connection:
@@ -77,7 +77,7 @@ class DoSomethingJob extends Job
     {
         $producer->setup('reporting_exchange');
 
-        $producer->publish(json_encode($this->data));
+        $producer->send(json_encode($this->data));
     }
 }
 ```
@@ -97,7 +97,7 @@ Configuring the consumer can be done both manually or from the command line:
 
     ```php
 
-    Registrator::queue('books', 'App\Messaging\Handlers\BookHandler');
+    Registrator::queue('books', 'App\Messaging\Handlers\BookHandler', []);
 
     Registrator::queue('reporting', 'App\Messaging\Handlers\ErrorReportingHandler', [
                                                             'exchangeName' => 'main_exchange',
@@ -188,6 +188,8 @@ queueName : The queue NAME
 --messageTTL : If set, specifies how long, in milliseconds, before a message is declared dead letter.
 ```
 
+> Consuming a none registered queue will throw `Vinelab\Bowler\Exceptions\UnregisteredQueueException`.
+
 If you wish to handle a message based on the routing key it was published with, you can use a switch case in the handler's `handle` method, like so:
 
 ```php
@@ -216,10 +218,10 @@ $connection = new Bowler\Connection();
 $bowlerPublisher = new Publisher($connection);
 
 // Publish the message and set its routingKey
-$bowlerPublisher->publish($data, 'warning');
+$bowlerPublisher->publish('warning', $data);
 ```
 
-> Or inject the Publisher as seen [here](### Producer).
+> Or inject the Publisher similarly to what we've seen [here](### Producer).
 
 As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publisher is a Producer specification, it holds the default Pub/Sub **exchange** setup.
 
@@ -247,10 +249,10 @@ From the command line use the `bowler:consume` command.
 
 `php artisan bowler:consume reporting-pub-sub`
 
-> The Pub/Sub implementation is meant to be used as-is. It is possible to Publish a message to all consumers, by setting the routingKey to `null` when publishing the message, and by adding `null` to the consumer's bindingKeys array. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
+> The Pub/Sub implementation is meant to be used as-is. It is possible to Publish a message to all consumers, by setting the routingKey to `null` when publishing the message, and by adding `null` to the consumer's bindingKeys array when setting up the queue. If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
 
 ### Testing
-If you would like to silence the Producer/Publisher to restrict it from actually publishing messages to an exchange, bind it to a mock.
+If you would like to silence the Producer/Publisher to restrict it from actually sending/publishing messages to an exchange, bind it to a mock.
 
 Globally:
 
