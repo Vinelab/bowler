@@ -100,12 +100,12 @@ class Producer
     }
 
     /**
-     * Publish a message to a specified exchange.
+     * Send a message to a specified exchange.
      *
      * @param string $data
      * @param string $routingKey    The routing key used by the exchange to route messages to bounded queues.
      */
-    public function publish($data, $routingKey = null)
+    public function send($data = null, $routingKey = null)
     {
         $channel = $this->connection->getChannel();
 
