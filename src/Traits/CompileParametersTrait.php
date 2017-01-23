@@ -24,8 +24,6 @@ trait CompileParametersTrait
                 'deliveryMode' => property_exists($this, 'deliveryMode') ? $this->deliveryMode : null,
             ];
 
-        property_exists($this, 'routingKey') ? ($params['routingKey'] = $this->routingKey) : ($params['bindingKeys'] = $this->bindingKeys);
-
         return array_filter($params);
     }
 }
