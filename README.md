@@ -46,6 +46,7 @@ In order to configure rabbitmq host, port, username and password, add the follow
 And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
 
 ### Producer
+In order to be able to send a message, a producer instance needs to be created and an exchange needs to be set up.
 
 ```php
 // Initialize a Bowler Connection
@@ -91,6 +92,8 @@ class DoSomethingJob extends Job
 ### Consumer
 
 Add `'Registrator' => Vinelab\Bowler\Facades\Registrator::class,` to the aliases array in `config/app`.
+
+In order to consume a message an exchange and a queue needs to be set up and a message handler needs to be created.
 
 Configuring the consumer can be done both manually or from the command line:
 
@@ -307,3 +310,4 @@ To do so, the default laravel exception handler normaly located in `app\Exceptio
 
 ## TODO
 * Write tests.
+* Become framework agnostic.
