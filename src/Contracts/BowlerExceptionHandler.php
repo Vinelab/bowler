@@ -3,12 +3,12 @@
 namespace Vinelab\Bowler\Contracts;
 
 use Exception;
-use PhpAmqpLib\Message\AMQPMessage as Message;
+use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
  */
 interface BowlerExceptionHandler
 {
-    public function reportQueue(Exception $e, Message $msg);
+    public function reportQueue(Exception $e, AMQPMessage $message);
 }

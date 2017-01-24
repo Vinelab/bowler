@@ -115,9 +115,9 @@ class Producer
             app(BowlerExceptionHandler::class)->handleServerException($e, $this->compileParameters());
         }
 
-        $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
+        $message = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        $channel->basic_publish($msg, $this->exchangeName, $routingKey);
+        $channel->basic_publish($message, $this->exchangeName, $routingKey);
 
         echo ' [x] Data Package Sent to ', $this->exchangeName, ' Exchange!', "\n";
     }

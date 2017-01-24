@@ -47,12 +47,12 @@ class Handler
      * Report error to the app's exceptions Handler.
      *
      * @param \Exception                         $e
-     * @param mix PhpAmqpLib\Message\AMQPMessage $msg
+     * @param mix PhpAmqpLib\Message\AMQPMessage $message
      */
-    public function reportError($e, $msg)
+    public function reportError($e, $message)
     {
         if (method_exists($this->exceptionHandler, 'reportQueue')) {
-            $this->exceptionHandler->reportQueue($e, $msg);
+            $this->exceptionHandler->reportQueue($e, $message);
         }
     }
 }

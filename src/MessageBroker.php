@@ -6,7 +6,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * The message broker gives the user a set functionalities to perform action on queue.
- * It wrapps the PhpAmqpLib\Message\AMQPMessage $msg and add.
+ * It wrapps the PhpAmqpLib\Message\AMQPMessage.
  *
  * @author Kinane Domloje <kinane@vinelab.com>
  */

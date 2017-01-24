@@ -140,14 +140,14 @@ class Consumer
         // Instantiate Handler
         $queueHandler = app($handlerClass);
 
-        $callback = function ($msg) use ($queueHandler, $exceptionHandler) {
-            $broker = new MessageBroker($msg);
+        $callback = function ($message) use ($queueHandler, $exceptionHandler) {
+            $broker = new MessageBroker($message);
 
             try {
-                $queueHandler->handle($msg);
-                $broker->ackMessage($msg);
+                $queueHandler->handle($message);
+                $broker->ackMessage($message);
             } catch (\Exception $e) {
-                $exceptionHandler->reportError($e, $msg);
+                $exceptionHandler->reportError($e, $message);
 
                 if (method_exists($queueHandler, 'handleError')) {
                     $queueHandler->handleError($e, $broker);
