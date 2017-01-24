@@ -155,7 +155,7 @@ Configuring the consumer can be done both manually or from the command line:
     > Similarly to the above, additional functionality is also provided to the consumer's handler like `deleteExchange`, `purgeQueue` and `deleteQueue`. Use these wisely and take advantage of the `unused` and `empty` parameters. Keep in mind that is not recommended that an application exception be handled by manipulating the server's setup.
 
 ##### Console
-Register queues and handlers with `php artisan bowler:queue analytics_queue analytics_data_exchange`.
+Register queues and handlers with `php artisan bowler:make:queue analytics_queue analytics_data_exchange`.
 
 The previous command:
 
@@ -231,14 +231,14 @@ In your Consumer:
 ##### i. Register the queue and generate it's message handler
 In your Consumer; from the command line use the `bowler:subscribe` command.
 
-`php artisan bowler:subscribe reporting ReportingMessage --expressive`
+`php artisan bowler:make:subscriber reporting ReportingMessage --expressive`
 
 Using the `--expressive` or `-E` option will make the queue name reflect that it is used for Pub/Sub. Results in `reporting-pub-sub` as the generated queue name; otherwise the queue name you provided will be used.
 
 Add the `bindingKeys` array parameter to the registered queue in `queues.php` like so:
 
 ```php
-Registrator::subscribe('reporting-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
+Registrator::subscriber('reporting-pub-sub', 'App\Messaging\Handlers\ReportingMessageHandler', ['warning']);
 ```
 
 ##### ii. Handle messages
