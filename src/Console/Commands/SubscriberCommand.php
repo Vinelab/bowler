@@ -8,9 +8,9 @@ use Vinelab\Bowler\Generators\HandlerGenerator;
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
  */
-class SubscribeCommand extends Command
+class SubscriberCommand extends Command
 {
-    const TYPE = 'subscribe';
+    const TYPE = 'subscriber';
 
     /**
      * The console command name.
