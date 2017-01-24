@@ -17,11 +17,11 @@ class MessageBroker
      *
      * @var PhpAmqpLib\Message\AMQPMessage
      */
-    protected $msg;
+    protected $message;
 
-    public function __construct(AMQPMessage $msg)
+    public function __construct(AMQPMessage $message)
     {
-        $this->msg = $msg;
+        $this->message = $message;
     }
 
     /**
@@ -39,7 +39,7 @@ class MessageBroker
      */
     public function ackMessage()
     {
-        $this->msg->delivery_info['channel']->basic_ack($this->msg->delivery_info['delivery_tag'], 0);
+        $this->message->delivery_info['channel']->basic_ack($this->message->delivery_info['delivery_tag'], 0);
     }
 
     /**
@@ -50,7 +50,7 @@ class MessageBroker
      */
     public function nackMessage($multiple = false, $requeue = false)
     {
-        $this->msg->delivery_info['channel']->basic_nack($this->msg->delivery_info['delivery_tag'], $multiple, $requeue);
+        $this->message->delivery_info['channel']->basic_nack($this->message->delivery_info['delivery_tag'], $multiple, $requeue);
     }
 
     /**
@@ -60,6 +60,6 @@ class MessageBroker
      */
     public function rejectMessage($requeue = false)
     {
-        $this->msg->delivery_info['channel']->basic_reject($this->msg->delivery_info['delivery_tag'], $requeue);
+        $this->message->delivery_info['channel']->basic_reject($this->message->delivery_info['delivery_tag'], $requeue);
     }
 }
