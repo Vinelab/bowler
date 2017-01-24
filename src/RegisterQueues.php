@@ -28,14 +28,14 @@ class RegisterQueues
     }
 
     /**
-     * Registrator::subscribe
+     * Registrator::subscriber.
      * Default out-of-box Publisher/Subscriber setup.
      *
      * @param string $queue
      * @param string $className
      * @param array  $bindingKeys
      */
-    public function subscribe($queue, $className, array $bindingKeys)
+    public function subscriber($queue, $className, array $bindingKeys)
     {
         // Default pub/sub setup
         // We only need the bindingKeys to be enable key based pub/sub
@@ -46,7 +46,6 @@ class RegisterQueues
                         'passive' => false,
                         'durable' => true,
                         'autoDelete' => false,
-                        'deliveryMode' => 2,
                     ]);
 
         $this->queue($queue, $className, $options);
