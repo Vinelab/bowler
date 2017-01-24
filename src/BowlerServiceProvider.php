@@ -3,8 +3,9 @@
 namespace Vinelab\Bowler;
 
 use Illuminate\Support\ServiceProvider;
+use Vinelab\Bowler\Console\Commands\QueueCommand;
 use Vinelab\Bowler\Console\Commands\ConsumeCommand;
-use Vinelab\Bowler\Console\Commands\HandlerCommand;
+use Vinelab\Bowler\Console\Commands\SubscriberCommand;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -18,7 +19,7 @@ class BowlerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('vinelab.bowler.registrator', function ($app) {
-            return new RegisterQueues($app->make('Vinelab\Bowler\Connection'));
+            return new RegisterQueues();
         });
 
         // Bind connection to env configuration
@@ -37,8 +38,9 @@ class BowlerServiceProvider extends ServiceProvider
 
         //register command
         $commands = [
+            QueueCommand::class,
             ConsumeCommand::class,
-            HandlerCommand::class,
+            SubscriberCommand::class,
         ];
         $this->commands($commands);
     }

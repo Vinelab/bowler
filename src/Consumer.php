@@ -3,10 +3,9 @@
 namespace Vinelab\Bowler;
 
 use Vinelab\Bowler\Traits\AdminTrait;
-use Vinelab\Bowler\Traits\HelperTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use Vinelab\Bowler\Traits\CompileParametersTrait;
+use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
  * Bowler Consumer.
@@ -17,8 +16,8 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 class Consumer
 {
     use AdminTrait;
-    use HelperTrait;
     use DeadLetteringTrait;
+    use CompileParametersTrait;
 
     /**
      * The main class of the package where we define the channel and the connection.
@@ -84,13 +83,6 @@ class Consumer
     private $autoDelete;
 
     /**
-     * Non-persistent (1) or persistent (2).
-     *
-     * @var [type]
-     */
-    private $deliveryMode;
-
-    /**
      * The arguments that should be added to the `queue_declare` statement for dead lettering.
      *
      * @var array
@@ -106,9 +98,8 @@ class Consumer
      * @param bool                      $passive
      * @param bool                      $durable
      * @param bool                      $autoDelete
-     * @param int                       $deliveryMode
      */
-    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false)
     {
         $this->connection = $connection;
         $this->queueName = $queueName;
@@ -118,24 +109,24 @@ class Consumer
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
-        $this->deliveryMode = $deliveryMode;
     }
 
     /**
      * consume a message from a specified exchange.
      *
-     * @param string                                          $handlerClass
-     * @param Vinelab\Bowler\Contracts\BowlerExceptionHandler $exceptionHandler
+     * @param string                            $handlerClass
+     * @param Vinelab\Bowler\Exceptions\Handler $exceptionHandler
      */
-    public function listenToQueue($handlerClass, ExceptionHandler $exceptionHandler)
+    public function listenToQueue($handlerClass, BowlerExceptionHandler $exceptionHandler)
     {
+        // Get connection channel
         $channel = $this->connection->getChannel();
 
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
             $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
         } catch (\Exception $e) {
-            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(),  $this->arguments);
+            $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
         }
 
         if (!empty($this->bindingKeys)) {
@@ -146,24 +137,20 @@ class Consumer
             $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
-        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
+        // Instantiate Handler
+        $queueHandler = app($handlerClass);
 
-        $handler = new $handlerClass();
+        $callback = function ($message) use ($queueHandler, $exceptionHandler) {
+            $broker = new MessageBroker($message);
 
-        if (method_exists($handler, 'setConsumer')) {
-            $handler->setConsumer($this);
-        }
-
-        $callback = function ($msg) use ($handler, $exceptionHandler) {
             try {
-                $handler->handle($msg);
-                $this->ackMessage($msg);
+                $queueHandler->handle($message);
+                $broker->ackMessage($message);
             } catch (\Exception $e) {
-                $exceptionHandler->reportQueue($e, $msg);
-                $exceptionHandler->renderQueue($e, $msg);
+                $exceptionHandler->reportError($e, $message);
 
-                if (method_exists($handler, 'handleError')) {
-                    $handler->handleError($e, $msg);
+                if (method_exists($queueHandler, 'handleError')) {
+                    $queueHandler->handleError($e, $broker);
                 }
             }
         };
@@ -171,41 +158,10 @@ class Consumer
         $channel->basic_qos(null, 1, null);
         $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
 
+        echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
+
         while (count($channel->callbacks)) {
             $channel->wait();
         }
-    }
-
-    /**
-     * Acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     */
-    public function ackMessage($msg)
-    {
-        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag'], 0);
-    }
-
-    /**
-     * Negatively acknowledge a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool                           $multiple
-     * @param bool                           $requeue
-     */
-    public function nackMessage($msg, $multiple = false, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], $multiple, $requeue);
-    }
-
-    /**
-     * Reject a messasge.
-     *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
-     * @param bool                           $requeue
-     */
-    public function rejectMessage($msg, $requeue = false)
-    {
-        $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], $requeue);
     }
 }

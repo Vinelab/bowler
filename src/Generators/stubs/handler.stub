@@ -5,12 +5,9 @@ namespace {{namespace}};
 class {{handler}}
 {
     /**
-     * Consumer of queue.
-     */
-    private $consumer;
-
-    /**
      * Handle message.
+     *
+     * @param PhpAmqpLib\Message\AMQPMessage $msg
      *
      * @return void
      */
@@ -22,20 +19,13 @@ class {{handler}}
     /**
      * Handle error
      *
-     * @return void
-     */
-    public function handleError($e, $msg)
-    {
-        //
-    }
-
-    /**
-     * Set the handler consumer
+     * @param \Exception                    $e
+     * @param Vinelab\Bowler\MessageBroker  $broker
      *
      * @return void
      */
-    public function setConsumer($consumer)
+    public function handleError($e, $broker)
     {
-        $this->consumer = $consumer;
+        //
     }
 }

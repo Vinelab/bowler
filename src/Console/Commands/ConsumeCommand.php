@@ -5,9 +5,9 @@ namespace Vinelab\Bowler\Console\Commands;
 use Vinelab\Bowler\Consumer;
 use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
-use Vinelab\Bowler\RegisterQueues;
 use Vinelab\Bowler\Facades\Registrator;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use Vinelab\Bowler\Exceptions\UnregisteredQueueException;
+use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -17,11 +17,9 @@ class ConsumeCommand extends Command
 {
     protected $registerQueues;
 
-    public function __construct(RegisterQueues $registerQueues)
+    public function __construct()
     {
         parent::__construct();
-
-        $this->registerQueues = $registerQueues;
     }
 
     /**
@@ -31,13 +29,12 @@ class ConsumeCommand extends Command
      */
     protected $signature = 'bowler:consume
                             {queueName : The queue NAME}
-                            {--exchangeName= : The exchange NAME. Defaults to queueName}
-                            {--exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
-                            {--bindingKeys=* : The consumer\'s BINDING KEYS (array)}
-                            {--passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
-                            {--durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
-                            {--autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
-                            {--deliveryMode=2 : The message DELIVERY MODE. Non-persistent 1 or persistent 2. Defaults to 2}
+                            {--N|exchangeName= : The exchange NAME. Defaults to queueName}
+                            {--T|exchangeType=fanout : The exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
+                            {--K|bindingKeys=* : The consumer\'s BINDING KEYS (array)}
+                            {--p|passive=0 : If set, the server will reply with Declare-Ok if the exchange and queue already exists with the same name, and raise an error if not. Defaults to 0}
+                            {--d|durable=1 : Mark exchange and queue as DURABLE. Defaults to 1}
+                            {--D|autoDelete=0 : Set exchange and queue to AUTO DELETE when all queues and consumers, respectively have finished using it. Defaults to 0}
                             {--deadLetterQueueName= : The dead letter queue NAME. Defaults to deadLetterExchangeName}
                             {--deadLetterExchangeName= : The dead letter exchange NAME. Defaults to deadLetterQueueName}
                             {--deadLetterExchangeType=fanout : The dead letter exchange TYPE. Supported exchanges: fanout, direct, topic. Defaults to fanout}
@@ -49,7 +46,7 @@ class ConsumeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Register a consumer to its queue';
+    protected $description = 'Run a consumer queue';
 
     /**
      * Run the command.
@@ -65,7 +62,6 @@ class ConsumeCommand extends Command
         $passive = (bool) $this->option('passive');
         $durable = (bool) $this->option('durable');
         $autoDelete = (bool) $this->option('autoDelete');
-        $deliveryMode = (int) $this->option('deliveryMode');
 
         // Dead Lettering
         $deadLetterQueueName = ($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : (($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : null);
@@ -86,12 +82,14 @@ class ConsumeCommand extends Command
                   extract($handler->options);
               }
 
-                $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete, $deliveryMode);
+                $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete);
                 if ($deadLetterQueueName) {
                     $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
                 }
-                $bowlerConsumer->listenToQueue($handler->className, app(ExceptionHandler::class));
+                $bowlerConsumer->listenToQueue($handler->className, app(BowlerExceptionHandler::class));
             }
         }
+
+        throw new UnregisteredQueueException('No registered queue found with name '.$queueName.'.');
     }
 }

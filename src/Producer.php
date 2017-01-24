@@ -3,8 +3,8 @@
 namespace Vinelab\Bowler;
 
 use PhpAmqpLib\Message\AMQPMessage;
-use Vinelab\Bowler\Traits\HelperTrait;
-use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
+use Vinelab\Bowler\Traits\CompileParametersTrait;
+use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
  * Bowler Producer.
@@ -13,28 +13,21 @@ use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
  */
 class Producer
 {
-    use HelperTrait;
+    use CompileParametersTrait;
 
     /**
      * The main class of the package where we define the channel and the connection.
      *
      * @var Vinelab\Bowler\Connection
      */
-    private $connection;
+    protected $connection;
 
     /**
      * The name of the exchange where the producer sends its messages to.
      *
      * @var string
      */
-    private $exchangeName;
-
-    /**
-     * The routing key used by the exchange to route messages to bounded queues.
-     *
-     * @var string
-     */
-    private $routingKey;
+    protected $exchangeName;
 
     /**
      * type of exchange:
@@ -48,59 +41,58 @@ class Producer
      *
      * @var string
      */
-    private $exchangeType;
+    protected $exchangeType;
 
     /**
      * If set, the server will reply with Declare-Ok if the exchange already exists with the same name, and raise an error if not. The client can use this to check whether an exchange exists without modifying the server state.
      *
      * @var bool
      */
-    private $passive;
+    protected $passive;
 
     /**
      * If set when creating a new exchange, the exchange will be marked as durable. Durable exchanges remain active when a server restarts. Non-durable exchanges (transient exchanges) are purged if/when a server restarts.
      *
      * @var bool
      */
-    private $durable;
+    protected $durable;
 
     /**
      * If set, the exchange is deleted when all queues have finished using it.
      *
      * @var bool
      */
-    private $autoDelete;
+    protected $autoDelete;
 
     /**
      * Non-persistent (1) or persistent (2).
      *
      * @var [type]
      */
-    private $deliveryMode;
-
-    /**
-     * The arguments that should be added to the `queue_declare` statement for dead lettering.
-     *
-     * @var array
-     */
-    private $arguments = [];
+    protected $deliveryMode;
 
     /**
      * @param Vinelab\Bowler\Connection $connection
-     * @param string                    $exchangeName
-     * @param string                    $exchangeType
-     * @param string                    $routingKey
-     * @param bool                      $passive
-     * @param bool                      $durable
-     * @param bool                      $autoDelete
-     * @param int                       $deliveryMode
      */
-    public function __construct(Connection $connection, $exchangeName, $exchangeType = 'fanout', $routingKey = null, $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
+    }
+
+    /**
+     * Setup Producer.
+     *
+     * @param string $exchangeName
+     * @param string $exchangeType
+     * @param bool   $passive
+     * @param bool   $durable
+     * @param bool   $autoDelete
+     * @param int    $deliveryMode
+     */
+    public function setup($exchangeName, $exchangeType = 'fanout', $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
+    {
         $this->exchangeName = $exchangeName;
         $this->exchangeType = $exchangeType;
-        $this->routingKey = $routingKey;
         $this->passive = $passive;
         $this->durable = $durable;
         $this->autoDelete = $autoDelete;
@@ -108,24 +100,24 @@ class Producer
     }
 
     /**
-     * Publish a message to a specified exchange.
+     * Send a message to a specified exchange.
      *
      * @param string $data
+     * @param string $routingKey    The routing key used by the exchange to route messages to bounded queues.
      */
-    public function publish($data)
+    public function send($data = null, $routingKey = null)
     {
         $channel = $this->connection->getChannel();
 
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
         } catch (\Exception $e) {
-            throw new DeclarationMismatchException($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine(), $e->getTrace(), $e->getPrevious(), $e->getTraceAsString(), $this->compileParameters(), $this->arguments
-                    );
+            app(BowlerExceptionHandler::class)->handleServerException($e, $this->compileParameters());
         }
 
-        $msg = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
+        $message = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        $channel->basic_publish($msg, $this->exchangeName, $this->routingKey);
+        $channel->basic_publish($message, $this->exchangeName, $routingKey);
 
         echo ' [x] Data Package Sent to ', $this->exchangeName, ' Exchange!', "\n";
     }
