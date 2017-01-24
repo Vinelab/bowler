@@ -38,10 +38,10 @@ class RegisterQueues
     public function subscriber($queue, $className, array $bindingKeys)
     {
         // Default pub/sub setup
-        // We only need the bindingKeys to be enable key based pub/sub
+        // We only need the bindingKeys to enable key based pub/sub
         $options = array_filter([
                         'exchangeName' => 'pub-sub',
-                        'exchangeType' => 'direct',
+                        'exchangeType' => 'topic',
                         'bindingKeys' => $bindingKeys,
                         'passive' => false,
                         'durable' => true,

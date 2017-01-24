@@ -9,7 +9,7 @@ class Publisher extends Producer
 {
     /**
      * Part of the out-of-the-box Pub/Sub implementation
-     * Set the default exchange named `pub-sub` of type `direct`.
+     * Set the default exchange named `pub-sub` of type `topic`.
      *
      * @param Vinelab\Bowler\Connection $connection
      */
@@ -17,7 +17,7 @@ class Publisher extends Producer
     {
         parent::__construct($connection);
 
-        $this->setup('pub-sub', 'direct');
+        $this->setup('pub-sub', 'topic');
     }
 
     /**
