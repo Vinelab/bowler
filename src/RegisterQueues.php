@@ -2,6 +2,8 @@
 
 namespace Vinelab\Bowler;
 
+use Vinelab\Bowler\Exceptions\InvalidSubscriberBindingException;
+
 /**
  * @author Ali Issa <ali@vinelab.com>
  * @author Kinane Domloje <kinane@vinelab.com>
@@ -37,6 +39,10 @@ class RegisterQueues
      */
     public function subscriber($queue, $className, array $bindingKeys)
     {
+        if(empty($bindingKeys)) {
+            throw new InvalidSubscriberBindingException('Missing bindingKeys for Subscriber queue: '. $queue.'.');
+        }
+
         // Default pub/sub setup
         // We only need the bindingKeys to enable key based pub/sub
         $options = array_filter([
