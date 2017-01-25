@@ -20,9 +20,11 @@ class HandlerGenerator
 
         $handlerNamespace = $this->findHandlerNamespace();
 
-        $this->registerHandler($queue, $handler, $queuePath, $handlerNamespace, $type);
-
+        // Create Messaging/Handlers directory and the Handler file
         $this->generateHandler($handler, $handlerPath, $handlerNamespace);
+
+        // Create the Messaging/queues.php
+        $this->registerHandler($queue, $handler, $queuePath, $handlerNamespace, $type);
     }
 
     private function registerHandler($queue, $handler, $queuePath, $handlerNamespace, $type)
