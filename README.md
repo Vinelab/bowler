@@ -212,6 +212,8 @@ public function handle($msg)
 ### Publish/Subscribe
 Bowler provide a default Pub/Sub implementation, where the user doesn't need to care about the setup.
 
+In short, publish with a `routingKey` and consume with matching `bindingKeys`.
+
 #### 1. Publish the Message
 In your Producer:
 
