@@ -145,7 +145,7 @@ class Consumer
 
             try {
                 $queueHandler->handle($message);
-                $broker->ackMessage($message);
+                $broker->ackMessage();
             } catch (\Exception $e) {
                 $exceptionHandler->reportError($e, $message);
 
