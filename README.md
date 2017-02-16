@@ -287,13 +287,15 @@ php artisan bowler:consume my_app_queue --deadLetterQueueName=my_app_dlq --deadL
 
 > If only one of the mentioned optional parameters are set, the second will default to it. Leading to the same `dlx` and `dlq` name.
 
+If you would like to avoid using Dead Lettering, you could leverage a striped down behaviour, by requeueing dead messages using `$broker->rejectMessage(true)` in the queue's `MessageHandler::handleError()`.
+
 ### Error Handling
 Error Handling in Bowler is limited to application exceptions.
 
 `Handler::handleError($e, $broker)` allows you to perfom action on the queue. Whether to acknowledge, nacknowledge or reject a message is up to you.
 
 It is not recommended to alter the Rabbitmq setup in reponse to an application exception, e.g. For an `InvalidInputException` to purge the queue!
-In nay case, if deemed necessary for the use case, it should be used with caution since you will loose all the queued messages or even worst your exchange.
+In nay case, if deemed necessary for the use case, it should be used with caution since you will loose all the queued messages or even worst, your exchange.
 
 While server exceptions will be thrown. Server errors not wrapped by Bowler will be thrown as `Vinelab\Bowler\Exceptions\BowlerGeneralException`.
 
