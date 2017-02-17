@@ -6,25 +6,24 @@ use App\Exceptions\WhatEverException;
 use App\Exceptions\WhatElseException;
 use App\Exceptions\InvalidInputException;
 
-class AuthorHandler
+class handler
 {
     public function handle($msg)
     {
-        echo "Author: ".$msg->body;
+        echo 'Author: '.$msg->body;
     }
 
     public function handleError($e, $broker)
     {
-        if($e instanceof InvalidInputException) {
+        if ($e instanceof InvalidInputException) {
             $broker->rejectMessage();
-        } elseif($e instanceof WhatEverException) {
+        } elseif ($e instanceof WhatEverException) {
             $broker->ackMessage();
-        } elseif($e instanceof WhatElseException) {
+        } elseif ($e instanceof WhatElseException) {
             $broker->nackMessage();
         } else {
             $msg = $borker->getMessage();
-            if($msg->body) {
-                //
+            if ($msg->body) {
             }
         }
     }

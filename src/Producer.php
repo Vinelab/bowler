@@ -103,7 +103,7 @@ class Producer
      * Send a message to a specified exchange.
      *
      * @param string $data
-     * @param string $routingKey    The routing key used by the exchange to route messages to bounded queues.
+     * @param string $routingKey The routing key used by the exchange to route messages to bounded queues
      */
     public function send($data = null, $routingKey = null)
     {

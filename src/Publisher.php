@@ -23,7 +23,7 @@ class Publisher extends Producer
     /**
      * Publish a message to the default Pub/Sub exchange.
      *
-     * @param string $routingKey    The routing key used by the exchange to route messages to bounded queues.
+     * @param string $routingKey The routing key used by the exchange to route messages to bounded queues
      * @param string $data
      */
     public function publish($routingKey, $data = null)

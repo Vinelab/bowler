@@ -39,8 +39,8 @@ class RegisterQueues
      */
     public function subscriber($queue, $className, array $bindingKeys)
     {
-        if(empty($bindingKeys)) {
-            throw new InvalidSubscriberBindingException('Missing bindingKeys for Subscriber queue: '. $queue.'.');
+        if (empty($bindingKeys)) {
+            throw new InvalidSubscriberBindingException('Missing bindingKeys for Subscriber queue: '.$queue.'.');
         }
 
         // Default pub/sub setup
