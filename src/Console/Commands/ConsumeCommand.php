@@ -86,7 +86,7 @@ class ConsumeCommand extends Command
                 if ($deadLetterQueueName) {
 
                     // If configured as options and deadLetterExchangeName is not specified, default to deadLetterQueueName.
-                    $deadLetterExchangeName = $deadLetterExchangeName ?? $deadLetterQueueName;
+                    $deadLetterExchangeName = isset($deadLetterExchangeName) ? $deadLetterExchangeName : $deadLetterQueueName;
 
                     $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
                 }
