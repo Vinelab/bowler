@@ -84,6 +84,10 @@ class ConsumeCommand extends Command
 
                 $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete);
                 if ($deadLetterQueueName) {
+
+                    // If configured as options and deadLetterExchangeName is not specified, default to deadLetterQueueName.
+                    $deadLetterExchangeName = $deadLetterExchangeName ?? $deadLetterQueueName;
+
                     $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
                 }
                 $bowlerConsumer->listenToQueue($handler->className, app(BowlerExceptionHandler::class));
