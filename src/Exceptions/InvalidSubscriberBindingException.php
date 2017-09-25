@@ -2,7 +2,7 @@
 
 namespace Vinelab\Bowler\Exceptions;
 
-use Vinelab\Bowler\Exception\BowlerGeneralException;
+use Vinelab\Bowler\Exceptions\BowlerGeneralException;
 
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
