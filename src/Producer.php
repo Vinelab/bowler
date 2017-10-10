@@ -10,6 +10,7 @@ use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
  * Bowler Producer.
  *
  * @author Ali Issa <ali@vinelab.com>
+ * @author Kinane Domloje <kinane@vinelab.com>
  */
 class Producer
 {

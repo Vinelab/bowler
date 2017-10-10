@@ -45,14 +45,14 @@ class RegisterQueues
 
         // Default pub/sub setup
         // We only need the bindingKeys to enable key based pub/sub
-        $options = array_filter([
+        $options = [
                         'exchangeName' => 'pub-sub',
                         'exchangeType' => 'topic',
                         'bindingKeys' => $bindingKeys,
                         'passive' => false,
                         'durable' => true,
                         'autoDelete' => false,
-                    ]);
+                    ];
 
         $this->queue($queue, $className, $options);
     }
