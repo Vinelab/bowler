@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Console\Commands\QueueCommand;
 use Vinelab\Bowler\Console\Commands\ConsumeCommand;
 use Vinelab\Bowler\Console\Commands\SubscriberCommand;
+use Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -41,6 +42,7 @@ class BowlerServiceProvider extends ServiceProvider
             QueueCommand::class,
             ConsumeCommand::class,
             SubscriberCommand::class,
+            ConsumerHealthCheckCommand::class,
         ];
         $this->commands($commands);
     }
