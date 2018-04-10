@@ -235,7 +235,7 @@ As you might have noted, here we instantiate a `Publisher` not a `Producer` obje
 #### 2. Consume the Message
 In your Consumer:
 
-##### i. Register the queue and generate it's message handler
+##### i. Register the queue and generate its message handler
 In your Consumer; from the command line use the `bowler:make:subscriber` command.
 
 `php artisan bowler:make:subscriber reporting ReportingMessage --expressive`
@@ -306,6 +306,17 @@ Bowler supports application level error reporting.
 To do so, the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`. And obviously, implement its method.
 
 `ExceptionHandler::reportQueue(Exception $e, AMQPMessage $msg)` allows you to report errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
+
+### Health Checks
+
+Based on [this Reliability Guide](https://www.rabbitmq.com/reliability.html), Bowler figured that it would be beneficial to provide
+a tool to check the health of connected consumers and is provided through the `bowler:healthcheck:consumer` command.
+
+```
+php artisan bowler:healthcheck:consumer {queue} [--consumers=1]
+```
+
+Will return exit code `0` for success and `1` for failure along with a message why.
 
 ### Important Notes
 1. It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
