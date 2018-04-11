@@ -64,12 +64,14 @@ class ConsumerHealthCheckCommand extends Command
 
             $this->info('Consumers healthy with '.$consumerCount.' live connections.');
         } catch (AMQPProtocolChannelException $e) {
-            if ($e->getCode() === 404) {
-                $this->error('Queue with name '.$queueName.' does not exist.');
-                return 1;
+            switch($e->getCode()) {
+                case 404:
+                    $this->error('Queue with name '.$queueName.' does not exist.');
+                    break;
+                default:
+                    $this->error('An unknown channel exception occurred.');
+                    break;
             }
-
-            $this->error('An unknown channel exception occurred');
 
             return 1;
         }

@@ -3,10 +3,11 @@
 namespace Vinelab\Bowler\Tests\Console\Commands;
 
 use Mockery as M;
-use Vinelab\Bowler\Connection;
-use Vinelab\Bowler\Tests\TestCase;
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand;
+use Vinelab\Bowler\Tests\TestCase;
 
 class ConsumerHealthCheckCommandTest extends TestCase
 {
@@ -25,6 +26,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $mConnection = M::mock(Connection::class);
         $mChannel = M::mock(AMQPChannel::class);
+        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 1]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
@@ -49,6 +51,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $mConnection = M::mock(Connection::class);
         $mChannel = M::mock(AMQPChannel::class);
+        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 1]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
@@ -73,6 +76,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $mConnection = M::mock(Connection::class);
         $mChannel = M::mock(AMQPChannel::class);
+        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 0]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
@@ -92,6 +96,19 @@ class ConsumerHealthCheckCommandTest extends TestCase
         $command->shouldReceive('error')->once()->with('Queue with name the-queue does not exist.');
 
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
+
+        $mConnection = M::mock(Connection::class);
+        $mChannel = M::mock(AMQPChannel::class);
+        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
+        $exception = new AMQPProtocolChannelException(404, "NOT_FOUND - no queue 'the-queue' in vhost '/'", [50, 10]);
+        $mChannel->shouldReceive('queue_declare')->once()
+            ->with('the-queue', true, false, false, false, [])
+            ->andThrow($exception);
+        $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
+
+        $this->app->bind(Connection::class, function() use($mConnection) {
+            return $mConnection;
+        });
 
         $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
 
