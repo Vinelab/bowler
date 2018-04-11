@@ -1,6 +1,8 @@
 # Bowler
 A Laravel package that implements the AMQP protocol using the *[Rabbitmq Server](https://www.rabbitmq.com)* easily and efficiently. Built on top of the *[php-amqplib](https://github.com/php-amqplib/php-amqplib/tree/master/PhpAmqpLib)*, with the aim of providing a simple abstraction layer to work with.
 
+[![Build Status](https://travis-ci.org/Vinelab/bowler.svg?branch=master)](https://travis-ci.org/Vinelab/bowler)
+
 Bowler allows you to:
 
 * Customize message publishing.
