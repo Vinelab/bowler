@@ -1,6 +1,8 @@
 # Bowler
 A Laravel package that implements the AMQP protocol using the *[Rabbitmq Server](https://www.rabbitmq.com)* easily and efficiently. Built on top of the *[php-amqplib](https://github.com/php-amqplib/php-amqplib/tree/master/PhpAmqpLib)*, with the aim of providing a simple abstraction layer to work with.
 
+[![Build Status](https://travis-ci.org/Vinelab/bowler.svg?branch=master)](https://travis-ci.org/Vinelab/bowler)
+
 Bowler allows you to:
 
 * Customize message publishing.
@@ -36,11 +38,11 @@ In order to configure rabbitmq host, port, username and password, add the follow
 
 ```php
 'rabbitmq' => [
-            'host' => 'host',
-            'port' => port,
-            'username' => 'username',
-            'password' => 'password',
-        ],
+    'host' => 'host',
+    'port' => port,
+    'username' => 'username',
+    'password' => 'password',
+],
 ```
 
 And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
@@ -235,7 +237,7 @@ As you might have noted, here we instantiate a `Publisher` not a `Producer` obje
 #### 2. Consume the Message
 In your Consumer:
 
-##### i. Register the queue and generate it's message handler
+##### i. Register the queue and generate its message handler
 In your Consumer; from the command line use the `bowler:make:subscriber` command.
 
 `php artisan bowler:make:subscriber reporting ReportingMessage --expressive`
@@ -306,6 +308,21 @@ Bowler supports application level error reporting.
 To do so, the default laravel exception handler normaly located in `app\Exceptions\Handler`, should implement `Vinelab\Bowler\Contracts\BowlerExceptionHandler`. And obviously, implement its method.
 
 `ExceptionHandler::reportQueue(Exception $e, AMQPMessage $msg)` allows you to report errors as you wish. While providing the exception and the queue message itsef for maximum flexibility.
+
+### Health Checks
+
+Based on [this Reliability Guide](https://www.rabbitmq.com/reliability.html), Bowler figured that it would be beneficial to provide
+a tool to check the health of connected consumers and is provided through the `bowler:healthcheck:consumer` command with the following signature:
+
+```
+bowler:healthcheck:consumer
+    {queueName : The queue name}
+    {--c|consumers=1 : The expected number of consumers to be connected to the queue specified by queueName}
+```
+
+Example: `php artisan bowler:healthcheck:consumer the-queue`
+
+Will return exit code `0` for success and `1` for failure along with a message why.
 
 ### Important Notes
 1. It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
