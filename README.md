@@ -36,11 +36,11 @@ In order to configure rabbitmq host, port, username and password, add the follow
 
 ```php
 'rabbitmq' => [
-            'host' => 'host',
-            'port' => port,
-            'username' => 'username',
-            'password' => 'password',
-        ],
+    'host' => 'host',
+    'port' => port,
+    'username' => 'username',
+    'password' => 'password',
+],
 ```
 
 And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
@@ -310,11 +310,15 @@ To do so, the default laravel exception handler normaly located in `app\Exceptio
 ### Health Checks
 
 Based on [this Reliability Guide](https://www.rabbitmq.com/reliability.html), Bowler figured that it would be beneficial to provide
-a tool to check the health of connected consumers and is provided through the `bowler:healthcheck:consumer` command.
+a tool to check the health of connected consumers and is provided through the `bowler:healthcheck:consumer` command with the following signature:
 
 ```
-php artisan bowler:healthcheck:consumer {queue} [--consumers=1]
+bowler:healthcheck:consumer
+    {queueName : The queue name}
+    {--c|consumers=1 : The expected number of consumers to be connected to the queue specified by queueName}
 ```
+
+Example: `php artisan bowler:healthcheck:consumer the-queue`
 
 Will return exit code `0` for success and `1` for failure along with a message why.
 
