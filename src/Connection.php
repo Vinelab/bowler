@@ -47,8 +47,8 @@ class Connection
             $login_method = 'AMQPLAIN',
             $login_response = null,
             $locale = 'en_US',
-            $connection_timeout = 3,
-            $read_write_timeout = 3,
+            $connection_timeout = 30,
+            $read_write_timeout = 30,
             $context = null,
             $keepalive = false,
             $heartbeat = 15
