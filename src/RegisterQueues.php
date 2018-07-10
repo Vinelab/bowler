@@ -37,7 +37,7 @@ class RegisterQueues
      * @param string $className
      * @param array  $bindingKeys
      */
-    public function subscriber($queue, $className, array $bindingKeys)
+    public function subscriber($queue, $className, array $bindingKeys, $exchangeName = 'pub-sub', $exchangeType = 'topic')
     {
         if (empty($bindingKeys)) {
             throw new InvalidSubscriberBindingException('Missing bindingKeys for Subscriber queue: '.$queue.'.');
@@ -46,13 +46,13 @@ class RegisterQueues
         // Default pub/sub setup
         // We only need the bindingKeys to enable key based pub/sub
         $options = [
-                        'exchangeName' => 'pub-sub',
-                        'exchangeType' => 'topic',
-                        'bindingKeys' => $bindingKeys,
-                        'passive' => false,
-                        'durable' => true,
-                        'autoDelete' => false,
-                    ];
+            'exchangeName' => $exchangeName,
+            'exchangeType' => $exchangeType,
+            'bindingKeys' => $bindingKeys,
+            'passive' => false,
+            'durable' => true,
+            'autoDelete' => false,
+        ];
 
         $this->queue($queue, $className, $options);
     }
