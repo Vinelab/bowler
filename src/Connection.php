@@ -37,7 +37,22 @@ class Connection
      */
     public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
     {
-        $this->connection = new AMQPStreamConnection($host, $port, $username, $password);
+        $this->connection = new AMQPStreamConnection(
+            $host,
+            $port,
+            $username,
+            $password,
+            $vhost = '/',
+            $insist = false,
+            $login_method = 'AMQPLAIN',
+            $login_response = null,
+            $locale = 'en_US',
+            $connection_timeout = 30,
+            $read_write_timeout = 30,
+            $context = null,
+            $keepalive = false,
+            $heartbeat = 15
+        );
 
         $this->channel = $this->connection->channel();
     }

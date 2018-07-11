@@ -216,8 +216,10 @@ Bowler provide a default Pub/Sub implementation, where the user doesn't need to 
 
 In short, publish with a `routingKey` and consume with matching `bindingKeys`.
 
+
 #### 1. Publish the Message
-In your Producer:
+
+#### In your Producer
 
 ```php
 // Initialize a Bowler object with the rabbitmq server ip and port
@@ -234,8 +236,14 @@ $bowlerPublisher->publish('warning', $data);
 
 As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publisher is a Producer specification, it holds the default Pub/Sub **exchange** setup.
 
+##### Signature
+```php
+publish($routingKey, $data = null);
+```
+
 #### 2. Consume the Message
-In your Consumer:
+
+#### In your Consumer
 
 ##### i. Register the queue and generate its message handler
 In your Consumer; from the command line use the `bowler:make:subscriber` command.
@@ -263,6 +271,45 @@ The Pub/Sub implementation is meant to be used as-is. It is possible to consume 
 > If no bindingKeys are provided a `Vinelab\Bowler\Exception\InvalidSubscriberBindingException` is thrown.
 
 If you would like to manually do the configuration, you can surely do so by setting up the Producer and Consumer as explained [earlier](## Usage).
+
+##### Signature
+```php
+Registrator::subscriber($queue, $className, array $bindingKeys, $exchangeName = 'pub-sub', $exchangeType = 'topic');
+```
+
+## Dispatch (Work Queue)
+Similar to Pub/Sub, except you may define your own exchange and messages will be distributed according to the least busy
+consumer (see [Work Queue - Fair Dispatch](https://www.rabbitmq.com/tutorials/tutorial-two-php.html)).
+
+#### 1. Dispatch the Message
+Dispatch messages on a specific exchange with a `routingKey` and consumer with matching `bindingKeys`.
+
+```php
+// Initialize a Bowler object with the rabbitmq server ip and port
+$connection = new Bowler\Connection();
+
+// Initialize a Dispatcher object with a connection
+$dispatcher = new Dispatcher($connection);
+
+// Publish the message and set its required exchange name and routingKey
+$dispatcher->dispatch('my-custom-exchange', 'warning', $data);
+```
+##### Signature
+```php
+dispatch($exchangeName, $routingKey, $data = null, $exchangeType = 'topic')
+```
+
+#### 2. Consume the Message
+Registering queue consumers is the same as Pub/Sub, except the exchange name in the registration needs to match.
+
+```php
+// catch all the cows in the "farm" exchange
+Registrator::subscriber('monitoring', 'App\Messaging\Handlers\MonitoringMessageHandler', [
+    '*.cow.*',
+], 'farm');
+```
+
+The above will catch all the messages in the `farm` exchange that match the routing key `*.cow.*`
 
 ### Testing
 If you would like to silence the Producer/Publisher to restrict it from actually sending/publishing messages to an exchange, bind it to a mock, locally in your test or globally.
