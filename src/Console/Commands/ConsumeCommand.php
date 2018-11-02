@@ -2,12 +2,13 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
-use Vinelab\Bowler\Consumer;
-use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
-use Vinelab\Bowler\Facades\Registrator;
-use Vinelab\Bowler\Exceptions\UnregisteredQueueException;
+use Vinelab\Bowler\Connection;
+use Vinelab\Bowler\Consumer;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
+use Vinelab\Bowler\Exceptions\UnregisteredQueueException;
+use Vinelab\Bowler\Facades\Registrator;
+use Vinelab\Bowler\RegisterQueues;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -17,9 +18,11 @@ class ConsumeCommand extends Command
 {
     protected $registerQueues;
 
-    public function __construct()
+    public function __construct(RegisterQueues $registrator)
     {
         parent::__construct();
+
+        $this->registrator = $registrator;
     }
 
     /**
@@ -70,8 +73,8 @@ class ConsumeCommand extends Command
         $deadLetterRoutingKey = $this->option('deadLetterRoutingKey');
         $messageTTL = ($ttl = $this->option('messageTTL')) ? (int) $ttl : null;
 
-        require app_path().'/Messaging/queues.php';
-        $handlers = Registrator::getHandlers();
+        $this->loadQueuesDefinitions();
+        $handlers = $this->registrator->getHandlers();
 
         foreach ($handlers as $handler) {
             if ($handler->queueName == $queueName) {
@@ -83,6 +86,7 @@ class ConsumeCommand extends Command
               }
 
                 $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete);
+
                 if ($deadLetterQueueName) {
 
                     // If configured as options and deadLetterExchangeName is not specified, default to deadLetterQueueName.
@@ -90,10 +94,22 @@ class ConsumeCommand extends Command
 
                     $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
                 }
+
                 $bowlerConsumer->listenToQueue($handler->className, app(BowlerExceptionHandler::class));
             }
         }
 
         throw new UnregisteredQueueException('No registered queue found with name '.$queueName.'.');
+    }
+
+    public function loadQueuesDefinitions()
+    {
+        $path = app_path().'/Messaging/queues.php';
+
+        if (!file_exists($path)) {
+            return $this->error('Queues definitions file not found. Please create it at '.$path);
+        }
+
+        require $path;
     }
 }

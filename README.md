@@ -358,13 +358,13 @@ To do so, the default laravel exception handler normaly located in `app\Exceptio
 
 ### Health Checks
 
+**IMPORTANT: Management plugin is required to be installed in order to perform health checks.**
+
 Based on [this Reliability Guide](https://www.rabbitmq.com/reliability.html), Bowler figured that it would be beneficial to provide
 a tool to check the health of connected consumers and is provided through the `bowler:healthcheck:consumer` command with the following signature:
 
 ```
-bowler:healthcheck:consumer
-    {queueName : The queue name}
-    {--c|consumers=1 : The expected number of consumers to be connected to the queue specified by queueName}
+bowler:healthcheck:consumer {queueName : The queue name}
 ```
 
 Example: `php artisan bowler:healthcheck:consumer the-queue`

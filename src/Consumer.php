@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 use Vinelab\Bowler\Traits\AdminTrait;
+use Vinelab\Bowler\Traits\ConsumerTagTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
 use Vinelab\Bowler\Traits\CompileParametersTrait;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
@@ -16,6 +17,7 @@ use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 class Consumer
 {
     use AdminTrait;
+    use ConsumerTagTrait;
     use DeadLetteringTrait;
     use CompileParametersTrait;
 
@@ -156,7 +158,9 @@ class Consumer
         };
 
         $channel->basic_qos(null, 1, null);
-        $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
+        $tag = $channel->basic_consume($this->queueName, '', false, false, false, false, $callback);
+
+        $this->writeConsumerTag($tag);
 
         echo ' [*] Listening to Queue: ', $this->queueName, ' To exit press CTRL+C', "\n";
 

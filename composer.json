@@ -27,7 +27,9 @@
 		"php": ">=7.0",
 		"php-amqplib/php-amqplib": "v2.6.1",
         "illuminate/console": "5.*",
-        "illuminate/support": "5.*"
+        "illuminate/support": "5.*",
+		"vinelab/http": "^1.5",
+		"illuminate/filesystem": "5.x"
     },
 
     "require-dev": {

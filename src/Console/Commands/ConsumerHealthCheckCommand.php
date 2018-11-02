@@ -3,30 +3,32 @@
 namespace Vinelab\Bowler\Console\Commands;
 
 use ErrorException;
-use Vinelab\Bowler\Connection;
 use Illuminate\Console\Command;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use Vinelab\Bowler\Connection;
+use Vinelab\Bowler\Traits\ConsumerTagTrait;
 
 /**
  * @author Abed Halawi <abed.halawi@vinelab.com>
  */
 class ConsumerHealthCheckCommand extends Command
 {
+    use ConsumerTagTrait;
+
     /**
      * The console command name.
      *
      * @var string
      */
     protected $signature = 'bowler:healthcheck:consumer
-                            {queueName : The queue name}
-                            {--c|consumers=1 : The expected number of consumers to be connected to the queue specified by queueName}';
+                            {queueName : The queue name}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Check the health of connected consumers to a queue, with a minimum of 1 connection.';
+    protected $description = 'Check the health of connected consumers to a given queue.';
 
     /**
      * Run the command.
@@ -34,13 +36,13 @@ class ConsumerHealthCheckCommand extends Command
     public function handle()
     {
         $queueName = $this->argument('queueName');
-        $expectedConsumers = (int) $this->option('consumers');
 
         // may or may not be able to connect
         try {
             $connection = app(Connection::class);
         } catch (ErrorException $e) {
             $this->error('Unable to connect to RabbitMQ.');
+
             return 1;
         }
 
@@ -56,15 +58,31 @@ class ConsumerHealthCheckCommand extends Command
                 []
             );
 
-            // consumer count and minimum consumers connected should match
-            if ($consumerCount !== $expectedConsumers) {
-                $this->error('Health check failed. Minimum consumer count not met: expected '.$expectedConsumers.' got '.$consumerCount);
+            $response = $connection->fetchQueueConsumers($queueName);
+
+            if ($response && isset($response->consumer_details) && !empty($response->consumer_details)) {
+                // read consumer tag
+                $tag = $this->readConsumerTag();
+
+                // find consumer tag within the list of returned consumers
+                foreach ($response->consumer_details as $consumer) {
+                    if (isset($consumer->consumer_tag) && $consumer->consumer_tag == $tag) {
+                        $this->info('Healthy consumer with tag '.$tag);
+
+                        return 0;
+                    }
+                }
+
+                $this->error('Health check failed! Could not find consumer with tag "'.$tag.'"');
+
                 return 1;
             }
 
-            $this->info('Consumers healthy with '.$consumerCount.' live connections.');
+            $this->error('No consumers connected to queue "'.$queueName.'"');
+
+            return 1;
         } catch (AMQPProtocolChannelException $e) {
-            switch($e->getCode()) {
+            switch ($e->getCode()) {
                 case 404:
                     $this->error('Queue with name '.$queueName.' does not exist.');
                     break;
