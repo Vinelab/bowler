@@ -19,8 +19,14 @@ class BowlerServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // register facade to resolve instance
         $this->app->singleton('vinelab.bowler.registrator', function ($app) {
             return new RegisterQueues();
+        });
+
+        // use the same Registrator instance all over the app (to make it injectable).
+        $this->app->singleton(RegisterQueues::class, function ($app) {
+            return $app['vinelab.bowler.registrator'];
         });
 
         // Bind connection to env configuration
