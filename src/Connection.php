@@ -35,7 +35,7 @@ class Connection
      *
      * @var string
      */
-    private $host;
+    private $host = 'localhost';
 
     /**
      * Management plugin's port.
@@ -49,14 +49,14 @@ class Connection
      *
      * @var string
      */
-    private $username;
+    private $username = 'guest';
 
     /**
      * RabbitMQ server password.
      *
      * @var string
      */
-    private $password;
+    private $password = 'guest';
 
     /**
      * @param string $host      the ip of the rabbitmq server, default: localhost
