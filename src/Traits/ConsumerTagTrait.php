@@ -9,18 +9,18 @@ use Storage;
  */
 trait ConsumerTagTrait
 {
-    public function getConsumerTagFilePath()
+    public function getConsumerTagFilename()
     {
-        return storage_path().'/app/rabbitmq-consumer.tag';
+        return 'rabbitmq-consumer.tag';
     }
 
     private function writeConsumerTag($tag)
     {
-        Storage::disk('local')->put($this->getConsumerTagFilePath(), $tag);
+        Storage::disk('local')->put($this->getConsumerTagFilename(), $tag);
     }
 
     public function readConsumerTag()
     {
-        return Storage::disk('local')->get($this->getConsumerTagFilePath());
+        return Storage::disk('local')->get($this->getConsumerTagFilename());
     }
 }
