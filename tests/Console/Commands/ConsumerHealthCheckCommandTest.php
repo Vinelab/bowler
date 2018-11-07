@@ -3,12 +3,14 @@
 namespace Vinelab\Bowler\Tests\Console\Commands;
 
 use Mockery as M;
+use Vinelab\Bowler\Connection;
+use Vinelab\Bowler\Tests\TestCase;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
-use Vinelab\Bowler\Connection;
-use Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand;
-use Vinelab\Bowler\Tests\TestCase;
 
+/**
+ * @author Abed Halawi <abed.halawi@vinelab.com>
+ */
 class ConsumerHealthCheckCommandTest extends TestCase
 {
     public function tearDown()
@@ -18,19 +20,28 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
     public function test_checking_consumer_successfully()
     {
-        $command = M::mock('Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand[error]');
-
-        $queueName = 'queue-to-consume';
+        $command = M::mock('Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand[error,readConsumerTag]');
+        $queueName = 'the-queue';
+        $consumerTag = 'tag-1234';
 
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
 
         $mConnection = M::mock(Connection::class);
+
+        $command->shouldReceive('readConsumerTag')->once()->andReturn($consumerTag);
+        $mConnection->shouldReceive('fetchQueueConsumers')->once()->andReturn(json_decode(json_encode([
+            'consumer_details' => [
+                ['consumer_tag' => $consumerTag],
+                ['consumer_tag' => 'another-tag-here'],
+            ],
+        ])));
+
         $mChannel = M::mock(AMQPChannel::class);
         $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 1]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
-        $this->app->bind(Connection::class, function() use($mConnection) {
+        $this->app->bind(Connection::class, function () use ($mConnection) {
             return $mConnection;
         });
 
@@ -39,52 +50,65 @@ class ConsumerHealthCheckCommandTest extends TestCase
         $this->assertEquals(0, $code);
     }
 
-    public function test_with_0_expected_1_connected()
+    public function test_with_no_consumers_connected()
     {
         // should err out requesting minimum to be greater than 0
         $command = M::mock('Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand[error]');
-        $command->shouldReceive('error')->once()->with('Health check failed. Minimum consumer count not met: expected 0 got 1');
+        $command->shouldReceive('error')->once()->with('No consumers connected to queue "queue-to-consume"');
 
         $queueName = 'queue-to-consume';
 
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
 
         $mConnection = M::mock(Connection::class);
+        $mConnection->shouldReceive('fetchQueueConsumers')->once()->andReturn(json_decode(json_encode([])));
+
         $mChannel = M::mock(AMQPChannel::class);
         $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 1]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
-        $this->app->bind(Connection::class, function() use($mConnection) {
+        $this->app->bind(Connection::class, function () use ($mConnection) {
             return $mConnection;
         });
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName, '--consumers' => 0]);
+        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
         $this->assertEquals(1, $code);
     }
 
-    public function test_with_1_expected_0_connected()
+    public function test_with_consumer_tag_not_found()
     {
         // should err out requesting minimum to be greater than 0
-        $command = M::mock('Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand[error]');
-        $command->shouldReceive('error')->once()->with('Health check failed. Minimum consumer count not met: expected 1 got 0');
+        $command = M::mock('Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand[error,readConsumerTag]');
 
         $queueName = 'queue-to-consume';
+        $consumerTag = 'amqp.98oyiuahksjdf';
+
+        $command->shouldReceive('error')->once()->with('Health check failed! Could not find consumer with tag "'.$consumerTag.'"');
 
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
 
         $mConnection = M::mock(Connection::class);
+
+        $command->shouldReceive('readConsumerTag')->once()->andReturn($consumerTag);
+        $mConnection->shouldReceive('fetchQueueConsumers')->once()->andReturn(json_decode(json_encode([
+            'consumer_details' => [
+                ['consumer_tag' => 'nope-not-me'],
+                ['consumer_tag' => 'another-tag-here'],
+            ],
+        ])));
+
         $mChannel = M::mock(AMQPChannel::class);
         $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 0]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
-        $this->app->bind(Connection::class, function() use($mConnection) {
+        $this->app->bind(Connection::class, function () use ($mConnection) {
             return $mConnection;
         });
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName, '--consumers' => 1]);
+        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
         $this->assertEquals(1, $code);
     }
@@ -106,7 +130,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
             ->andThrow($exception);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
-        $this->app->bind(Connection::class, function() use($mConnection) {
+        $this->app->bind(Connection::class, function () use ($mConnection) {
             return $mConnection;
         });
 
