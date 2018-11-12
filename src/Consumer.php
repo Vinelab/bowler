@@ -139,10 +139,10 @@ class Consumer
             $channel->queue_bind($this->queueName, $this->exchangeName);
         }
 
-        // Instantiate Handler
-        $queueHandler = app($handlerClass);
+        $callback = function ($message) use ($handlerClass, $exceptionHandler) {
+            // Instantiate Handler
+            $queueHandler = app($handlerClass);
 
-        $callback = function ($message) use ($queueHandler, $exceptionHandler) {
             $broker = new MessageBroker($message);
 
             try {
