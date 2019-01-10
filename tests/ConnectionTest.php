@@ -46,4 +46,16 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals('response', $response);
     }
+
+    public function test_set_configurations_default()
+    {
+        $heartbeat = $this->app['config']->get('queue.connections.rabbitmq.heartbeat');
+        $this->assertEquals(15, $heartbeat);
+
+        $connectionTimeout = $this->app['config']->get('queue.connections.rabbitmq.connection_timeout');
+        $this->assertEquals(30, $connectionTimeout);
+
+        $readWriteTimeout = $this->app['config']->get('queue.connections.rabbitmq.read_write_timeout');
+        $this->assertEquals(30, $readWriteTimeout);
+    }
 }
