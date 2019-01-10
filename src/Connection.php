@@ -91,7 +91,7 @@ class Connection
     public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $connectionTimeout = 30, $readWriteTimeout = 30, $heartbeat = 15)
     {
         $this->host = $host;
-        $this->poart = $port;
+        $this->port = $port;
         $this->username = $username;
         $this->password = $password;
         $this->connectionTimeout = $connectionTimeout;
