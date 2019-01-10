@@ -11,6 +11,7 @@ use Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand;
 /**
  * @author Ali Issa <ali@vinelab.com>
  * @author Kinane Domloje <kinane@vinelab.com>
+ * @author Charalampos Raftopoulos <harris@vinelab.com>
  */
 class BowlerServiceProvider extends ServiceProvider
 {
@@ -34,8 +35,11 @@ class BowlerServiceProvider extends ServiceProvider
         $rbmqPort = config('queue.connections.rabbitmq.port');
         $rbmqUsername = config('queue.connections.rabbitmq.username');
         $rbmqPassword = config('queue.connections.rabbitmq.password');
-        $this->app->bind(Connection::class, function () use ($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword) {
-            return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword);
+        $rbmqConnectionTimeout = (int) config('queue.connections.rabbitmq.connection_timeout');
+        $rbmqReadWriteTimeout = (int) config('queue.connections.rabbitmq.read_write_timeout');
+        $rbmqHeartbeat = (int) config('queue.connections.rabbitmq.heartbeat');
+        $this->app->bind(Connection::class, function () use ($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat) {
+            return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat);
         });
 
         $this->app->bind(

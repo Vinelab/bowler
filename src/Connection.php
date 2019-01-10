@@ -59,17 +59,44 @@ class Connection
     private $password = 'guest';
 
     /**
+     * RabbitMQ connection timeout.
+     *
+     * @var int
+     */
+    private $connectionTimeout = 30;
+
+    /**
+     * RabbitMQ read/write timeout.
+     *
+     * @var int
+     */
+    private $readWriteTimeout = 30;
+
+    /**
+     * RabbitMQ heartbeat frequency.
+     *
+     * @var int
+     */
+    private $heartbeat = 15;
+
+    /**
      * @param string $host      the ip of the rabbitmq server, default: localhost
      * @param int    $port.     default: 5672
      * @param string $username, default: guest
      * @param string $password, default: guest
+     * @param int    $connectionTimeout, default: 30
+     * @param int    $readWriteTimeout, default: 30
+     * @param int    $heartbeat, default: 15
      */
-    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
+    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $connectionTimeout = 30, $readWriteTimeout = 30, $heartbeat = 15)
     {
         $this->host = $host;
         $this->poart = $port;
         $this->username = $username;
         $this->password = $password;
+        $this->connectionTimeout = $connectionTimeout;
+        $this->readWriteTimeout = $readWriteTimeout;
+        $this->heartbeat = $heartbeat;
 
         $this->connection = new AMQPStreamConnection(
             $host,
@@ -81,11 +108,11 @@ class Connection
             $login_method = 'AMQPLAIN',
             $login_response = null,
             $locale = 'en_US',
-            $connection_timeout = 30,
-            $read_write_timeout = 30,
+            $connectionTimeout,
+            $readWriteTimeout,
             $context = null,
             $keepalive = false,
-            $heartbeat = 15
+            $heartbeat
         );
 
         $this->channel = $this->connection->channel();
