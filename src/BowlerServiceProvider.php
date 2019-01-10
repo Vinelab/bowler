@@ -35,9 +35,10 @@ class BowlerServiceProvider extends ServiceProvider
         $rbmqPort = config('queue.connections.rabbitmq.port');
         $rbmqUsername = config('queue.connections.rabbitmq.username');
         $rbmqPassword = config('queue.connections.rabbitmq.password');
-        $rbmqConnectionTimeout = (int) config('queue.connections.rabbitmq.connection_timeout');
-        $rbmqReadWriteTimeout = (int) config('queue.connections.rabbitmq.read_write_timeout');
-        $rbmqHeartbeat = (int) config('queue.connections.rabbitmq.heartbeat');
+        $rbmqConnectionTimeout = config('queue.connections.rabbitmq.connection_timeout') ? (int) config('queue.connections.rabbitmq.connection_timeout') : 30;
+        $rbmqReadWriteTimeout = config('queue.connections.rabbitmq.read_write_timeout') ? (int) config('queue.connections.rabbitmq.read_write_timeout') : 30;
+        $rbmqHeartbeat = config('queue.connections.rabbitmq.heartbeat') ? (int) config('queue.connections.rabbitmq.heartbeat') : 15;
+
         $this->app->bind(Connection::class, function () use ($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat) {
             return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat);
         });
