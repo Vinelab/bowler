@@ -42,9 +42,9 @@ In order to configure rabbitmq host, port, username, password and configure the 
     'port' => port,
     'username' => 'username',
     'password' => 'password',
-    'connection_timeout' => connection_timeout,
-    'read_write_timeout' => read_write_timeout,
-    'heartbeat' => heartbeat,
+    'connection_timeout' => 30,
+    'read_write_timeout' => 30,
+    'heartbeat' => 15,
 ],
 ```
 
