@@ -3,8 +3,11 @@
 namespace Vinelab\Bowler\Tests;
 
 use Mockery as M;
+use ReflectionClass;
 use Vinelab\Bowler\Connection;
+use Illuminate\Support\Facades\Config;
 use Vinelab\Http\Client as HTTPClient;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 /**
  * @author Abed Halawi <abed.halawi@vinelab.com>
@@ -21,7 +24,7 @@ class ConnectionTest extends TestCase
         $queueName = 'the-queue';
         $mClient = M::mock(HTTPClient::class);
         $request = [
-            'url' => 'localhost:15672/api/queues/%2F/'.$queueName,
+            'url' => 'localhost:15672/api/queues/%2F/' . $queueName,
             'params' => ['columns' => 'consumer_details.consumer_tag'],
             'auth' => [
                 'username' => 'guest',
@@ -47,15 +50,24 @@ class ConnectionTest extends TestCase
         $this->assertEquals('response', $response);
     }
 
-    public function test_set_configurations_default()
+    public function test_set_default_configurations_values()
     {
-        $heartbeat = $this->app['config']->get('queue.connections.rabbitmq.heartbeat');
-        $this->assertEquals(15, $heartbeat);
+        $connection = $this->app[Connection::class];
+        $this->assertEquals(30, $this->getProtectedProperty($connection, 'readWriteTimeout'));
+        $this->assertEquals(30, $this->getProtectedProperty($connection, 'connectionTimeout'));
+        $this->assertEquals(15, $this->getProtectedProperty($connection, 'heartbeat'));
+    }
 
-        $connectionTimeout = $this->app['config']->get('queue.connections.rabbitmq.connection_timeout');
-        $this->assertEquals(30, $connectionTimeout);
+    public function test_set_altered_configurations_values()
+    {
+        $this->markTestIncomplete();
+    }
 
-        $readWriteTimeout = $this->app['config']->get('queue.connections.rabbitmq.read_write_timeout');
-        $this->assertEquals(30, $readWriteTimeout);
+    protected static function getProtectedProperty($class, $value)
+    {
+        $reflection = new ReflectionClass($class);
+        $property = $reflection->getProperty($value);
+        $property->setAccessible(true);
+        return $property->getValue($class);
     }
 }
