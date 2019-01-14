@@ -5,6 +5,7 @@ namespace Vinelab\Bowler\Tests;
 use Mockery as M;
 use ReflectionClass;
 use Vinelab\Bowler\Connection;
+use PhpAmqpLib\Wire\IO\StreamIO;
 use Illuminate\Support\Facades\Config;
 use Vinelab\Http\Client as HTTPClient;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -60,7 +61,37 @@ class ConnectionTest extends TestCase
 
     public function test_set_altered_configurations_values()
     {
-        $this->markTestIncomplete();
+        Config::set('queue.connections.rabbitmq.host', 'localhost');
+        Config::set('queue.connections.rabbitmq.port', 5672);
+        Config::set('queue.connections.rabbitmq.username', 'default');
+        Config::set('queue.connections.rabbitmq.password', 'default');
+        // Config::set('queue.connections.rabbitmq.read_write_timeout', 60);
+        // Config::set('queue.connections.rabbitmq.connection_timeout', 60);
+        // Config::set('queue.connections.rabbitmq.heartbeat', 30);
+
+        // $this->app['config']->set('queue.connections.rabbitmq.read_write_timeout', 120);
+        // $this->app['config']->set('queue.connections.rabbitmq.connection_timeout', 120);
+
+        $rbmqHost = config('queue.connections.rabbitmq.host');
+        $rbmqPort = config('queue.connections.rabbitmq.port');
+        $rbmqUsername = config('queue.connections.rabbitmq.username');
+        $rbmqPassword = config('queue.connections.rabbitmq.password');
+        $rbmqConnectionTimeout = config('queue.connections.rabbitmq.connection_timeout');
+        $rbmqReadWriteTimeout = config('queue.connections.rabbitmq.read_write_timeout');
+        $rbmqHeartbeat = config('queue.connections.rabbitmq.heartbeat');
+
+        $this->app->bind(AMQPStreamConnection::class, function () use ($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat) {
+            return new AMQPStreamConnection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, '/', false, 'AMQPLAIN', null, 'en_US', config('queue.connections.rabbitmq.connection_timeout'), config('queue.connections.rabbitmq.read_write_timeout'), null, false, config('queue.connections.rabbitmq.heartbeat'));
+        });
+
+        $connection = $this->app[Connection::class];
+        
+        $conn = $connection->getConnection();
+        $io = $this->getProtectedProperty($conn, 'io');
+
+        $this->assertEquals(60, $this->getProtectedProperty($io, 'read_write_timeout'));
+        $this->assertEquals(60, $this->getProtectedProperty($io, 'connection_timeout'));
+        $this->assertEquals(30, $this->getProtectedProperty($io, 'heartbeat'));
     }
 
     protected static function getProtectedProperty($class, $value)
@@ -70,4 +101,17 @@ class ConnectionTest extends TestCase
         $property->setAccessible(true);
         return $property->getValue($class);
     }
+
+    // protected function getEnvironmentSetUp($app)
+    // {
+    //     parent::getEnvironmentSetUp($app);
+        
+    //     $app['config']->set('queue.connections.rabbitmq.host', 'localhost');
+    //     $app['config']->set('queue.connections.rabbitmq.port', 5672);
+    //     $app['config']->set('queue.connections.rabbitmq.username', 'guest');
+    //     $app['config']->set('queue.connections.rabbitmq.password', 'guest');
+    //     $app['config']->set('queue.connections.rabbitmq.heartbeat', 30);
+    //     $app['config']->set('queue.connections.rabbitmq.read_write_timeout', 60);
+    //     $app['config']->set('queue.connections.rabbitmq.connection_timeout', 60);
+    // }
 }

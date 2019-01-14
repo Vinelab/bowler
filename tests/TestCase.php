@@ -35,8 +35,8 @@ class TestCase extends OTestCase
         $app['config']->set('queue.connections.rabbitmq.port', 5672);
         $app['config']->set('queue.connections.rabbitmq.username', 'guest');
         $app['config']->set('queue.connections.rabbitmq.password', 'guest');
-        $app['config']->set('queue.connections.rabbitmq.heartbeat', 15);
-        $app['config']->set('queue.connections.rabbitmq.read_write_timeout', 30);
-        $app['config']->set('queue.connections.rabbitmq.connection_timeout', 30);
+        // $app['config']->set('queue.connections.rabbitmq.heartbeat', 15);
+        // $app['config']->set('queue.connections.rabbitmq.read_write_timeout', 30);
+        // $app['config']->set('queue.connections.rabbitmq.connection_timeout', 30);
     }
 }
