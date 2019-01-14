@@ -59,34 +59,74 @@ class Connection
     private $password = 'guest';
 
     /**
+     * RabbitMQ connection timeout.
+     *
+     * @var int
+     */
+    private $connectionTimeout = 30;
+
+    /**
+     * RabbitMQ read/write timeout.
+     *
+     * @var int
+     */
+    private $readWriteTimeout = 30;
+
+    /**
+     * RabbitMQ heartbeat frequency.
+     *
+     * @var int
+     */
+    private $heartbeat = 15;
+
+    /**
      * @param string $host      the ip of the rabbitmq server, default: localhost
      * @param int    $port.     default: 5672
      * @param string $username, default: guest
      * @param string $password, default: guest
+     * @param int    $connectionTimeout, default: 30
+     * @param int    $readWriteTimeout, default: 30
+     * @param int    $heartbeat, default: 15
      */
-    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest')
+    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $connectionTimeout = 30, $readWriteTimeout = 30, $heartbeat = 15)
     {
         $this->host = $host;
-        $this->poart = $port;
+        $this->port = $port;
         $this->username = $username;
         $this->password = $password;
+        $this->connectionTimeout = $connectionTimeout;
+        $this->readWriteTimeout = $readWriteTimeout;
+        $this->heartbeat = $heartbeat;
 
-        $this->connection = new AMQPStreamConnection(
-            $host,
-            $port,
-            $username,
-            $password,
-            $vhost = '/',
-            $insist = false,
-            $login_method = 'AMQPLAIN',
-            $login_response = null,
-            $locale = 'en_US',
-            $connection_timeout = 30,
-            $read_write_timeout = 30,
-            $context = null,
-            $keepalive = false,
-            $heartbeat = 15
-        );
+        $this->initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat);
+    }
+
+    protected function initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat, $vhost = '/',$insist = false, $login_method = 'AMQPLAIN', $login_response = null, $locale = 'en_US', $context = null, $keepalive = false) 
+    {
+        $vhost = '/';
+        $insist = false;
+        $login_method = 'AMQPLAIN';
+        $login_response = null;
+        $locale = 'en_US';
+        $context = null;
+        $keepalive = false;
+
+        $this->connection = app()->makeWith(AMQPStreamConnection::class, [
+            'host' => $host,
+            'port' => $port,
+            'user' => $username,
+            'password' => $password,
+            'vhost' => $vhost,
+            'insist' => $insist,
+            'login_method' => $login_method,
+            'login_response' => $login_response,
+            'locale' => $locale,
+            'connection_timeout' => $connectionTimeout,
+            'read_write_timeout' => $readWriteTimeout,
+            'context' => $context,
+            'keepalive' => $keepalive,
+            'heartbeat' => $heartbeat,
+        ]);
 
         $this->channel = $this->connection->channel();
     }
