@@ -98,22 +98,35 @@ class Connection
         $this->readWriteTimeout = $readWriteTimeout;
         $this->heartbeat = $heartbeat;
 
-        $this->connection = new AMQPStreamConnection(
-            $host,
-            $port,
-            $username,
-            $password,
-            $vhost = '/',
-            $insist = false,
-            $login_method = 'AMQPLAIN',
-            $login_response = null,
-            $locale = 'en_US',
-            $connectionTimeout,
-            $readWriteTimeout,
-            $context = null,
-            $keepalive = false,
-            $heartbeat
-        );
+        $this->initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat);
+    }
+
+    protected function initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat, $vhost = '/',$insist = false, $login_method = 'AMQPLAIN', $login_response = null, $locale = 'en_US', $context = null, $keepalive = false) 
+    {
+        $vhost = '/';
+        $insist = false;
+        $login_method = 'AMQPLAIN';
+        $login_response = null;
+        $locale = 'en_US';
+        $context = null;
+        $keepalive = false;
+
+        $this->connection = app()->makeWith(AMQPStreamConnection::class, [
+            'host' => $host,
+            'port' => $port,
+            'user' => $username,
+            'password' => $password,
+            'vhost' => $vhost,
+            'insist' => $insist,
+            'login_method' => $login_method,
+            'login_response' => $login_response,
+            'locale' => $locale,
+            'connection_timeout' => $connectionTimeout,
+            'read_write_timeout' => $readWriteTimeout,
+            'context' => $context,
+            'keepalive' => $keepalive,
+            'heartbeat' => $heartbeat,
+        ]);
 
         $this->channel = $this->connection->channel();
     }

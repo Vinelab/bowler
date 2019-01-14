@@ -6,6 +6,7 @@ use Mockery as M;
 use ReflectionClass;
 use Vinelab\Bowler\Connection;
 use PhpAmqpLib\Wire\IO\StreamIO;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Support\Facades\Config;
 use Vinelab\Http\Client as HTTPClient;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -53,65 +54,42 @@ class ConnectionTest extends TestCase
 
     public function test_set_default_configurations_values()
     {
+        $mConnection = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->app->bind(Connection::class, function () use ($mConnection) {
+            return $mConnection;
+        });
         $connection = $this->app[Connection::class];
-        $this->assertEquals(30, $this->getProtectedProperty($connection, 'readWriteTimeout'));
-        $this->assertEquals(30, $this->getProtectedProperty($connection, 'connectionTimeout'));
-        $this->assertEquals(15, $this->getProtectedProperty($connection, 'heartbeat'));
+
+        $this->assertAttributeEquals(15, 'heartbeat', $connection);
+        $this->assertAttributeEquals(30, 'readWriteTimeout', $connection);
+        $this->assertAttributeEquals(30, 'connectionTimeout', $connection);
     }
 
     public function test_set_altered_configurations_values()
     {
-        Config::set('queue.connections.rabbitmq.host', 'localhost');
-        Config::set('queue.connections.rabbitmq.port', 5672);
-        Config::set('queue.connections.rabbitmq.username', 'default');
-        Config::set('queue.connections.rabbitmq.password', 'default');
-        // Config::set('queue.connections.rabbitmq.read_write_timeout', 60);
-        // Config::set('queue.connections.rabbitmq.connection_timeout', 60);
-        // Config::set('queue.connections.rabbitmq.heartbeat', 30);
+        Config::set('queue.connections.rabbitmq.host', 'notlocal');
+        Config::set('queue.connections.rabbitmq.port', 6666);
+        Config::set('queue.connections.rabbitmq.read_write_timeout', 60);
+        Config::set('queue.connections.rabbitmq.connection_timeout', 60);
+        Config::set('queue.connections.rabbitmq.heartbeat', 30);
 
-        // $this->app['config']->set('queue.connections.rabbitmq.read_write_timeout', 120);
-        // $this->app['config']->set('queue.connections.rabbitmq.connection_timeout', 120);
-
-        $rbmqHost = config('queue.connections.rabbitmq.host');
-        $rbmqPort = config('queue.connections.rabbitmq.port');
-        $rbmqUsername = config('queue.connections.rabbitmq.username');
-        $rbmqPassword = config('queue.connections.rabbitmq.password');
-        $rbmqConnectionTimeout = config('queue.connections.rabbitmq.connection_timeout');
-        $rbmqReadWriteTimeout = config('queue.connections.rabbitmq.read_write_timeout');
-        $rbmqHeartbeat = config('queue.connections.rabbitmq.heartbeat');
-
-        $this->app->bind(AMQPStreamConnection::class, function () use ($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat) {
-            return new AMQPStreamConnection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, '/', false, 'AMQPLAIN', null, 'en_US', config('queue.connections.rabbitmq.connection_timeout'), config('queue.connections.rabbitmq.read_write_timeout'), null, false, config('queue.connections.rabbitmq.heartbeat'));
+        $mAMQPStreamConnection = M::mock(AMQPStreamConnection::class);
+        $this->app->bind(AMQPStreamConnection::class, function () use ($mAMQPStreamConnection) {
+            return $mAMQPStreamConnection;
         });
 
+        $mChannel = M::mock(Channel::class);
+        $mAMQPStreamConnection->shouldReceive('channel')->once()->withNoArgs()->andReturn($mChannel);
+        $mAMQPStreamConnection->shouldReceive('close')->once()->withNoArgs();
+        $mChannel->shouldReceive('close')->once()->withNoArgs();
+    
         $connection = $this->app[Connection::class];
-        
-        $conn = $connection->getConnection();
-        $io = $this->getProtectedProperty($conn, 'io');
 
-        $this->assertEquals(60, $this->getProtectedProperty($io, 'read_write_timeout'));
-        $this->assertEquals(60, $this->getProtectedProperty($io, 'connection_timeout'));
-        $this->assertEquals(30, $this->getProtectedProperty($io, 'heartbeat'));
+        $this->assertAttributeEquals(30, 'heartbeat', $connection);
+        $this->assertAttributeEquals(60, 'readWriteTimeout', $connection);
+        $this->assertAttributeEquals(60, 'connectionTimeout', $connection);
     }
-
-    protected static function getProtectedProperty($class, $value)
-    {
-        $reflection = new ReflectionClass($class);
-        $property = $reflection->getProperty($value);
-        $property->setAccessible(true);
-        return $property->getValue($class);
-    }
-
-    // protected function getEnvironmentSetUp($app)
-    // {
-    //     parent::getEnvironmentSetUp($app);
-        
-    //     $app['config']->set('queue.connections.rabbitmq.host', 'localhost');
-    //     $app['config']->set('queue.connections.rabbitmq.port', 5672);
-    //     $app['config']->set('queue.connections.rabbitmq.username', 'guest');
-    //     $app['config']->set('queue.connections.rabbitmq.password', 'guest');
-    //     $app['config']->set('queue.connections.rabbitmq.heartbeat', 30);
-    //     $app['config']->set('queue.connections.rabbitmq.read_write_timeout', 60);
-    //     $app['config']->set('queue.connections.rabbitmq.connection_timeout', 60);
-    // }
 }
