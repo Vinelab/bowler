@@ -80,6 +80,12 @@ class Connection
     private $heartbeat = 15;
 
     /**
+     * RabbitMQ vhost.
+     * @var string
+     */
+    private $vhost = '/';
+
+    /**
      * @param string $host      the ip of the rabbitmq server, default: localhost
      * @param int    $port.     default: 5672
      * @param string $username, default: guest
@@ -88,7 +94,7 @@ class Connection
      * @param int    $readWriteTimeout, default: 30
      * @param int    $heartbeat, default: 15
      */
-    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $connectionTimeout = 30, $readWriteTimeout = 30, $heartbeat = 15)
+    public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $connectionTimeout = 30, $readWriteTimeout = 30, $heartbeat = 15, $vhost = '/')
     {
         $this->host = $host;
         $this->port = $port;
@@ -97,13 +103,13 @@ class Connection
         $this->connectionTimeout = $connectionTimeout;
         $this->readWriteTimeout = $readWriteTimeout;
         $this->heartbeat = $heartbeat;
+        $this->vhost = $vhost;
 
-        $this->initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat);
+        $this->initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat, $vhost);
     }
 
-    protected function initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat, $vhost = '/',$insist = false, $login_method = 'AMQPLAIN', $login_response = null, $locale = 'en_US', $context = null, $keepalive = false) 
+    protected function initAMQPStreamConnection($host, $port, $username, $password, $connectionTimeout, $readWriteTimeout, $heartbeat, $vhost = '/', $insist = false, $login_method = 'AMQPLAIN', $login_response = null, $locale = 'en_US', $context = null, $keepalive = false)
     {
-        $vhost = '/';
         $insist = false;
         $login_method = 'AMQPLAIN';
         $login_response = null;
