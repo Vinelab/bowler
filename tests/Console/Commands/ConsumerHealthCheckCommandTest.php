@@ -6,6 +6,7 @@ use Mockery as M;
 use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Tests\TestCase;
 use PhpAmqpLib\Channel\AMQPChannel;
+use Illuminate\Foundation\Testing\PendingCommand;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 
 /**
@@ -45,9 +46,14 @@ class ConsumerHealthCheckCommandTest extends TestCase
             return $mConnection;
         });
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
+        $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
-        $this->assertEquals(0, $code);
+        if($result instanceof PendingCommand) {
+            $this->assertEquals(0, $result->run());
+        } else {
+            $this->assertEquals(0, $result);
+        }
+
     }
 
     public function test_with_no_consumers_connected()
@@ -72,9 +78,13 @@ class ConsumerHealthCheckCommandTest extends TestCase
             return $mConnection;
         });
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
+        $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
-        $this->assertEquals(1, $code);
+        if($result instanceof PendingCommand) {
+            $this->assertEquals(1, $result->run());
+        } else {
+            $this->assertEquals(1, $result);
+        }
     }
 
     public function test_with_consumer_tag_not_found()
@@ -108,9 +118,13 @@ class ConsumerHealthCheckCommandTest extends TestCase
             return $mConnection;
         });
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
+        $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
-        $this->assertEquals(1, $code);
+        if($result instanceof PendingCommand) {
+            $this->assertEquals(1, $result->run());
+        } else {
+            $this->assertEquals(1, $result);
+        }
     }
 
     public function test_healthcheck_with_queue_does_not_exist()
@@ -134,9 +148,13 @@ class ConsumerHealthCheckCommandTest extends TestCase
             return $mConnection;
         });
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
+        $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
 
-        $this->assertEquals(1, $code);
+        if($result instanceof PendingCommand) {
+            $this->assertEquals(1, $result->run());
+        } else {
+            $this->assertEquals(1, $result);
+        }
     }
 
     public function test_error_connecting_to_rabbitmq()
@@ -150,8 +168,12 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
 
-        $code = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
+        $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
 
-        $this->assertEquals(1, $code);
+        if($result instanceof PendingCommand) {
+            $this->assertEquals(1, $result->run());
+        } else {
+            $this->assertEquals(1, $result);
+        }
     }
 }
