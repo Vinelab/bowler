@@ -66,6 +66,7 @@ class ConnectionTest extends TestCase
         $this->assertAttributeEquals(15, 'heartbeat', $connection);
         $this->assertAttributeEquals(30, 'readWriteTimeout', $connection);
         $this->assertAttributeEquals(30, 'connectionTimeout', $connection);
+        $this->assertAttributeEquals('/', 'vhost', $connection);
     }
 
     public function test_set_altered_configurations_values()
@@ -75,6 +76,7 @@ class ConnectionTest extends TestCase
         Config::set('queue.connections.rabbitmq.read_write_timeout', 60);
         Config::set('queue.connections.rabbitmq.connection_timeout', 60);
         Config::set('queue.connections.rabbitmq.heartbeat', 30);
+        Config::set('queue.connections.rabbitmq.vhost', '/test-vhost');
 
         $mAMQPStreamConnection = M::mock(AMQPStreamConnection::class);
         $this->app->bind(AMQPStreamConnection::class, function () use ($mAMQPStreamConnection) {
@@ -85,11 +87,12 @@ class ConnectionTest extends TestCase
         $mAMQPStreamConnection->shouldReceive('channel')->once()->withNoArgs()->andReturn($mChannel);
         $mAMQPStreamConnection->shouldReceive('close')->once()->withNoArgs();
         $mChannel->shouldReceive('close')->once()->withNoArgs();
-    
+
         $connection = $this->app[Connection::class];
 
         $this->assertAttributeEquals(30, 'heartbeat', $connection);
         $this->assertAttributeEquals(60, 'readWriteTimeout', $connection);
         $this->assertAttributeEquals(60, 'connectionTimeout', $connection);
+        $this->assertAttributeEquals('/test-vhost', 'vhost', $connection);
     }
 }

@@ -34,7 +34,7 @@ Tools like the Rabbitmq *[Management](https://www.rabbitmq.com/management.html)*
 
 ### Configuration
 
-In order to configure rabbitmq host, port, username, password and configure the timeout values too, add the following inside the connections array in config/queue.php file:
+In order to configure rabbitmq host, port, username, password and configure the timeout and vhost values too, add the following inside the connections array in config/queue.php file:
 
 ```php
 'rabbitmq' => [
@@ -45,10 +45,11 @@ In order to configure rabbitmq host, port, username, password and configure the 
     'connection_timeout' => 30,
     'read_write_timeout' => 30,
     'heartbeat' => 15,
+    'vhost' => '/',
 ],
 ```
 
-The default value for `connection_timeout` and `read_write_timeout` is set to 30 (seconds) and `heartbeat` is set to 15 (seconds).
+The default value for `connection_timeout` and `read_write_timeout` is set to 30 (seconds) and `heartbeat` is set to 15 (seconds). The `vhost` value defaults to '/'.
 
 And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
 
