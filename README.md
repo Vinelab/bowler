@@ -19,7 +19,10 @@ These features will facilitate drastically the way you use Rabbitmq and broaden 
 
 Tools like the Rabbitmq *[Management](https://www.rabbitmq.com/management.html)* plugin, will certainly help you monitor the server's activity and visualize the setup.
 
-## Installation
+## Supported Laravel versions
+Starting version [v0.4.2](https://github.com/Vinelab/bowler/releases/tag/v0.4.2) this library requires Laravel 5.4 or later version.
+
+## Setup
 
 ### Composer
 ```php
