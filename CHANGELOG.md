@@ -1,13 +1,13 @@
 # Changelog
 All notable changes to `bolwer` will be documented in this file.
 
-## [New Release]
+## [0.4.4] - 2019-02-20
 ### Changed
 - Update to `php-amqplib v2.8.1`
 
 ## [0.4.3] - 2019-02-04
 ### Added
-- Configurable connection `vhost` param.
+- Configurable connection `vhost` param @cerpusoddarne.
 
 ## [0.4.2] - 2019-01-14
 ### Added
