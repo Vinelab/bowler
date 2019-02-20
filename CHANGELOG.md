@@ -9,7 +9,7 @@ All notable changes to `bolwer` will be documented in this file.
 ### Added
 - Configurable connection `vhost` param.
 
-## [0.3.0] - 2019-01-14
+## [0.4.2] - 2019-01-14
 ### Added
 - Configurable connection `connection_timeout`, `heartbeat` and `read_write_timeout` params.
 
