@@ -5,7 +5,11 @@ namespace Vinelab\Bowler\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \App\Foundation\Pagination\PaginationQuery
+ * @method static void queue(string $queue, string $className, array $options)
+ * @method static void subscriber(string $queue, string $className, array $bindingKeys, string $exchangeName, string $exchangeType)
+ * @method static array getHandlers()
+ *
+ * @see \Vinelab\Bowler\RegisterQueues
  */
 class Registrator extends Facade
 {

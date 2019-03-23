@@ -53,6 +53,7 @@ class ConsumeCommand extends Command
 
     /**
      * Run the command.
+     * @throws UnregisteredQueueException
      */
     public function handle()
     {

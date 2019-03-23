@@ -15,10 +15,14 @@ class MessageBroker
     /**
      * The received message.
      *
-     * @var PhpAmqpLib\Message\AMQPMessage
+     * @var AMQPMessage
      */
     protected $message;
 
+    /**
+     * MessageBroker constructor.
+     * @param AMQPMessage $message
+     */
     public function __construct(AMQPMessage $message)
     {
         $this->message = $message;
@@ -27,7 +31,7 @@ class MessageBroker
     /**
      * Get message.
      *
-     * @return PhpAmqpLib\Message\AMQPMessage
+     * @return AMQPMessage
      */
     public function getMessage()
     {

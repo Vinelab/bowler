@@ -2,12 +2,16 @@
 
 namespace {{namespace}};
 
+use Exception;
+use PhpAmqpLib\Message\AMQPMessage;
+use Vinelab\Bowler\MessageBroker;
+
 class {{handler}}
 {
     /**
      * Handle message.
      *
-     * @param PhpAmqpLib\Message\AMQPMessage $msg
+     * @param AMQPMessage $msg
      *
      * @return void
      */
@@ -19,8 +23,8 @@ class {{handler}}
     /**
      * Handle error
      *
-     * @param \Exception                    $e
-     * @param Vinelab\Bowler\MessageBroker  $broker
+     * @param Exception $e
+     * @param MessageBroker $broker
      *
      * @return void
      */

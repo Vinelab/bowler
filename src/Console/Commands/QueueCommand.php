@@ -2,7 +2,9 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Vinelab\Bowler\Generators\HandlerGenerator;
 
 /**
@@ -57,6 +59,9 @@ class QueueCommand extends Command
         }
     }
 
+    /**
+     * @return array
+     */
     public function getArguments()
     {
         return [
