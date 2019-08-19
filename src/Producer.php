@@ -19,7 +19,7 @@ class Producer
     /**
      * The main class of the package where we define the channel and the connection.
      *
-     * @var Vinelab\Bowler\Connection
+     * @var Connection
      */
     protected $connection;
 
@@ -73,7 +73,7 @@ class Producer
     protected $deliveryMode;
 
     /**
-     * @param Vinelab\Bowler\Connection $connection
+     * @param Connection $connection
      */
     public function __construct(Connection $connection)
     {

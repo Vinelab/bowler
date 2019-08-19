@@ -2,6 +2,7 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Vinelab\Bowler\Generators\HandlerGenerator;
 

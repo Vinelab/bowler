@@ -10,6 +10,9 @@ use Vinelab\Bowler\Exceptions\InvalidSubscriberBindingException;
  */
 class RegisterQueues
 {
+    /**
+     * @var array
+     */
     private $handlers = [];
 
     /**
@@ -35,7 +38,10 @@ class RegisterQueues
      *
      * @param string $queue
      * @param string $className
-     * @param array  $bindingKeys
+     * @param array $bindingKeys
+     * @param string $exchangeName
+     * @param string $exchangeType
+     * @throws InvalidSubscriberBindingException
      */
     public function subscriber($queue, $className, array $bindingKeys, $exchangeName = 'pub-sub', $exchangeType = 'topic')
     {
@@ -57,6 +63,9 @@ class RegisterQueues
         $this->queue($queue, $className, $options);
     }
 
+    /**
+     * @return array
+     */
     public function getHandlers()
     {
         return $this->handlers;
