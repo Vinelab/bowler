@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler\Exceptions;
 
 use Exception;
+use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -18,9 +19,20 @@ class Handler
      */
     private $exceptionHandler;
 
-    public function __construct(ExceptionHandler $handler)
+    /**
+     * @var Log
+     */
+    private $logger;
+
+    /**
+     * Handler constructor.
+     * @param  ExceptionHandler  $handler
+     * @param  Log  $logger
+     */
+    public function __construct(ExceptionHandler $handler, Log $logger)
     {
         $this->exceptionHandler = $handler;
+        $this->logger = $logger;
     }
 
     /**
@@ -58,6 +70,8 @@ class Handler
     {
         if (method_exists($this->exceptionHandler, 'reportQueue')) {
             $this->exceptionHandler->reportQueue($e, $message);
+        } else {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
         }
     }
 }
