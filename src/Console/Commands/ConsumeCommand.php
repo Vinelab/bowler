@@ -2,12 +2,15 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
+use ErrorException;
 use Illuminate\Console\Command;
 use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Consumer;
+use Vinelab\Bowler\Exceptions\BowlerGeneralException;
+use Vinelab\Bowler\Exceptions\DeclarationMismatchException;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
+use Vinelab\Bowler\Exceptions\InvalidSetupException;
 use Vinelab\Bowler\Exceptions\UnregisteredQueueException;
-use Vinelab\Bowler\Facades\Registrator;
 use Vinelab\Bowler\RegisterQueues;
 
 /**
@@ -16,8 +19,15 @@ use Vinelab\Bowler\RegisterQueues;
  */
 class ConsumeCommand extends Command
 {
-    protected $registerQueues;
+    /**
+     * @var RegisterQueues
+     */
+    protected $registrator;
 
+    /**
+     * ConsumeCommand constructor.
+     * @param  RegisterQueues  $registrator
+     */
     public function __construct(RegisterQueues $registrator)
     {
         parent::__construct();
@@ -54,6 +64,10 @@ class ConsumeCommand extends Command
     /**
      * Run the command.
      * @throws UnregisteredQueueException
+     * @throws ErrorException
+     * @throws BowlerGeneralException
+     * @throws DeclarationMismatchException
+     * @throws InvalidSetupException
      */
     public function handle()
     {

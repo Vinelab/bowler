@@ -2,6 +2,8 @@
 
 namespace Vinelab\Bowler;
 
+use ErrorException;
+use Exception;
 use Vinelab\Bowler\Traits\AdminTrait;
 use Vinelab\Bowler\Traits\ConsumerTagTrait;
 use Vinelab\Bowler\Traits\DeadLetteringTrait;
@@ -24,7 +26,7 @@ class Consumer
     /**
      * The main class of the package where we define the channel and the connection.
      *
-     * @var Vinelab\Bowler\Connection
+     * @var Connection
      */
     private $connection;
 
@@ -92,14 +94,14 @@ class Consumer
     private $arguments = [];
 
     /**
-     * @param Vinelab\Bowler\Connection $connection
-     * @param string                    $queueName
-     * @param string                    $exchangeName
-     * @param string                    $exchangeType
-     * @param array                     $bindingKeys
-     * @param bool                      $passive
-     * @param bool                      $durable
-     * @param bool                      $autoDelete
+     * @param  Connection  $connection
+     * @param  string  $queueName
+     * @param  string  $exchangeName
+     * @param  string  $exchangeType
+     * @param  array  $bindingKeys
+     * @param  bool  $passive
+     * @param  bool  $durable
+     * @param  bool  $autoDelete
      */
     public function __construct(Connection $connection, $queueName, $exchangeName, $exchangeType = 'fanout', $bindingKeys = [], $passive = false, $durable = true, $autoDelete = false)
     {
@@ -116,8 +118,12 @@ class Consumer
     /**
      * consume a message from a specified exchange.
      *
-     * @param string                            $handlerClass
-     * @param Vinelab\Bowler\Exceptions\Handler $exceptionHandler
+     * @param  string  $handlerClass
+     * @param  BowlerExceptionHandler  $exceptionHandler
+     * @throws Exceptions\BowlerGeneralException
+     * @throws Exceptions\DeclarationMismatchException
+     * @throws Exceptions\InvalidSetupException
+     * @throws ErrorException
      */
     public function listenToQueue($handlerClass, BowlerExceptionHandler $exceptionHandler)
     {
@@ -127,7 +133,7 @@ class Consumer
         try {
             $channel->exchange_declare($this->exchangeName, $this->exchangeType, $this->passive, $this->durable, $this->autoDelete);
             $channel->queue_declare($this->queueName, $this->passive, $this->durable, false, $this->autoDelete, false, $this->arguments);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exceptionHandler->handleServerException($e, $this->compileParameters(), $this->arguments);
         }
 
@@ -143,12 +149,17 @@ class Consumer
             // Instantiate Handler
             $queueHandler = app($handlerClass);
 
-            $broker = new MessageBroker($message);
+            /** @var LifecycleManager $lifecycle */
+            $lifecycle = app('vinelab.bowler.lifecycle');
+
+            $broker = new MessageBroker($message, $lifecycle, $this->queueName, $handlerClass);
+
+            $message = $lifecycle->triggerBeforeConsume($message, $this->queueName, $handlerClass);
 
             try {
                 $queueHandler->handle($message);
                 $broker->ackMessage();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $exceptionHandler->reportError($e, $message);
 
                 if (method_exists($queueHandler, 'handleError')) {

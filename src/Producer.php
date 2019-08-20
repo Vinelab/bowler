@@ -103,8 +103,9 @@ class Producer
     /**
      * Send a message to a specified exchange.
      *
-     * @param string $data
-     * @param string $routingKey The routing key used by the exchange to route messages to bounded queues
+     * @param  string  $data
+     * @param  string  $routingKey  The routing key used by the exchange to route messages to bounded queues
+     * @throws Exceptions\UnrecalledAMQPMessageException
      */
     public function send($data = null, $routingKey = null)
     {
@@ -118,7 +119,14 @@ class Producer
 
         $message = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
+        /** @var LifecycleManager $lifecycle */
+        $lifecycle = app('vinelab.bowler.lifecycle');
+
+        $message = $lifecycle->triggerBeforePublish($message, $this->exchangeName, $routingKey);
+
         $channel->basic_publish($message, $this->exchangeName, $routingKey);
+
+        $lifecycle->triggerPublished($message, $this->exchangeName, $routingKey);
 
         echo ' [x] Data Package Sent to ', $this->exchangeName, ' Exchange!', "\n";
     }

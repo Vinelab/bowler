@@ -2,6 +2,7 @@
 
 namespace Vinelab\Bowler;
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -20,12 +21,39 @@ class MessageBroker
     protected $message;
 
     /**
-     * MessageBroker constructor.
-     * @param AMQPMessage $message
+     * Bowler's lifecycle manager
+     *
+     * @var LifecycleManager
      */
-    public function __construct(AMQPMessage $message)
-    {
+    protected $lifecycle;
+
+    /**
+     * @var string
+     */
+    protected $queueName;
+
+    /**
+     * @var string
+     */
+    protected $handlerClass;
+
+    /**
+     * MessageBroker constructor.
+     * @param  AMQPMessage  $message
+     * @param  string  $queueName
+     * @param  string  $handlerClass
+     * @param  LifecycleManager  $lifecycle
+     */
+    public function __construct(
+        AMQPMessage $message,
+        LifecycleManager $lifecycle,
+        string $queueName,
+        string $handlerClass
+    ) {
         $this->message = $message;
+        $this->lifecycle = $lifecycle;
+        $this->queueName = $queueName;
+        $this->handlerClass = $handlerClass;
     }
 
     /**
@@ -43,7 +71,8 @@ class MessageBroker
      */
     public function ackMessage()
     {
-        $this->message->delivery_info['channel']->basic_ack($this->message->delivery_info['delivery_tag'], 0);
+        $this->getChannel()->basic_ack($this->message->delivery_info['delivery_tag'], false);
+        $this->triggerConsumed(new Ack(Ack::MODE_ACK, false, false));
     }
 
     /**
@@ -54,7 +83,8 @@ class MessageBroker
      */
     public function nackMessage($multiple = false, $requeue = false)
     {
-        $this->message->delivery_info['channel']->basic_nack($this->message->delivery_info['delivery_tag'], $multiple, $requeue);
+        $this->getChannel()->basic_nack($this->message->delivery_info['delivery_tag'], $multiple, $requeue);
+        $this->triggerConsumed(new Ack(Ack::MODE_NACK, $requeue, $multiple));
     }
 
     /**
@@ -64,6 +94,23 @@ class MessageBroker
      */
     public function rejectMessage($requeue = false)
     {
-        $this->message->delivery_info['channel']->basic_reject($this->message->delivery_info['delivery_tag'], $requeue);
+        $this->getChannel()->basic_reject($this->message->delivery_info['delivery_tag'], $requeue);
+        $this->triggerConsumed(new Ack(Ack::MODE_REJECT, $requeue, false));
+    }
+
+    /**
+     * @return AMQPChannel
+     */
+    protected function getChannel(): AMQPChannel
+    {
+        return $this->message->delivery_info['channel'];
+    }
+
+    /**
+     * @param  Ack  $ack
+     */
+    protected function triggerConsumed(Ack $ack)
+    {
+        $this->lifecycle->triggerConsumed($this->message, $this->queueName, $this->handlerClass, $ack);
     }
 }

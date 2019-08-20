@@ -2,8 +2,10 @@
 
 namespace Vinelab\Bowler\Exceptions;
 
+use Exception;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
+use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
 
 /**
@@ -24,13 +26,16 @@ class Handler
     /**
      * Map php-mqplib exceptions to Bowler's.
      *
-     * @param \Exception $e
-     * @param array      $parameters
-     * @param array      $arguments
+     * @param  Exception  $e
+     * @param  array  $parameters
+     * @param  array  $arguments
      *
-     * @return mix
+     * @return void
+     * @throws BowlerGeneralException
+     * @throws DeclarationMismatchException
+     * @throws InvalidSetupException
      */
-    public function handleServerException(\Exception $e, $parameters = [], $arguments = [])
+    public function handleServerException(Exception $e, $parameters = [], $arguments = [])
     {
         if ($e instanceof AMQPProtocolChannelException) {
             $e = new DeclarationMismatchException($e, $parameters,  $arguments);
@@ -46,8 +51,8 @@ class Handler
     /**
      * Report error to the app's exceptions Handler.
      *
-     * @param \Exception                         $e
-     * @param mix PhpAmqpLib\Message\AMQPMessage $message
+     * @param Exception $e
+     * @param AMQPMessage $message
      */
     public function reportError($e, $message)
     {

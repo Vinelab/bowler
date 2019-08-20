@@ -5,6 +5,7 @@ namespace Vinelab\Bowler;
 define('__ROOT__', dirname(dirname(dirname(__FILE__))));
 //require_once(__ROOT__.'/vendor/autoload.php');
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use Vinelab\Http\Client as HTTPClient;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
@@ -19,14 +20,14 @@ class Connection
     /**
      * $connection var.
      *
-     * @var string
+     * @var AMQPStreamConnection
      */
     private $connection;
 
     /**
      * $channel var.
      *
-     * @var string
+     * @var AMQPChannel
      */
     private $channel;
 
