@@ -4,7 +4,7 @@ namespace Vinelab\Bowler\Facades;
 
 use Closure;
 use Illuminate\Support\Facades\Facade;
-use Vinelab\Bowler\LifecycleManager;
+use Vinelab\Bowler\MessageLifecycleManager;
 
 /**
  * Class Message
@@ -14,7 +14,7 @@ use Vinelab\Bowler\LifecycleManager;
  * @method static void beforeConsume(Closure $callback)
  * @method static void consumed(Closure $callback)
  *
- * @see LifecycleManager
+ * @see MessageLifecycleManager
  */
 class Message extends Facade
 {

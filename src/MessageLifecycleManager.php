@@ -3,11 +3,18 @@
 namespace Vinelab\Bowler;
 
 use Closure;
+use Exception;
+use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Message\AMQPMessage;
 use Vinelab\Bowler\Exceptions\UnrecalledAMQPMessageException;
 
-class LifecycleManager
+class MessageLifecycleManager
 {
+    /**
+     * @var Log
+     */
+    protected $logger;
+
     /**
      * @var array
      */
@@ -27,6 +34,15 @@ class LifecycleManager
      * @var array
      */
     protected $consumed = [];
+
+    /**
+     * MessageLifecycleManager constructor.
+     * @param  Log  $logger
+     */
+    public function __construct(Log $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * @param  Closure  $callback
@@ -74,7 +90,7 @@ class LifecycleManager
     public function triggerBeforePublish(AMQPMessage $msg, string $exchangeName, $routingKey = null): AMQPMessage
     {
         foreach ($this->beforePublish as $callback) {
-            $msg = $callback($msg, $exchangeName, $routingKey);
+            $msg = $this->executeCallback($msg, $callback, func_get_args());
 
             if (!$msg instanceof AMQPMessage) {
                 throw new UnrecalledAMQPMessageException('Callback must return instance of AMQPMessage');
@@ -93,7 +109,7 @@ class LifecycleManager
     public function triggerPublished(AMQPMessage $msg, string $exchangeName, $routingKey = null)
     {
         foreach ($this->published as $callback) {
-            $callback($msg, $exchangeName, $routingKey);
+            $this->executeCallback($msg, $callback, func_get_args());
         }
     }
 
@@ -107,7 +123,7 @@ class LifecycleManager
     public function triggerBeforeConsume(AMQPMessage $msg, string $queueName, string $handlerClass): AMQPMessage
     {
         foreach ($this->beforeConsume as $callback) {
-            $msg = $callback($msg, $queueName, $handlerClass);
+            $msg = $this->executeCallback($msg, $callback, func_get_args());
 
             if (!$msg instanceof AMQPMessage) {
                 throw new UnrecalledAMQPMessageException('Callback must return instance of AMQPMessage');
@@ -119,7 +135,7 @@ class LifecycleManager
 
     /**
      * @param  AMQPMessage  $msg
-     * @param  string  $queueName
+     * @param  string  $queueName`
      * @param  string  $handlerClass
      * @param  Ack  $ack
      * @return void
@@ -127,7 +143,24 @@ class LifecycleManager
     public function triggerConsumed(AMQPMessage $msg, string $queueName, string $handlerClass, Ack $ack)
     {
         foreach ($this->consumed as $callback) {
-            $callback($msg, $queueName, $handlerClass, $ack);
+            $this->executeCallback($msg, $callback, func_get_args());
         }
+    }
+
+    /**
+     * @param  AMQPMessage  $msg
+     * @param  Closure  $callback
+     * @param  array  $args
+     * @return mixed
+     */
+    protected function executeCallback(AMQPMessage $msg, Closure $callback, array $args)
+    {
+        try {
+            $msg = call_user_func_array($callback, $args);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
+        }
+
+        return $msg;
     }
 }

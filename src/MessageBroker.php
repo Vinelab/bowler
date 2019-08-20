@@ -23,7 +23,7 @@ class MessageBroker
     /**
      * Bowler's lifecycle manager
      *
-     * @var LifecycleManager
+     * @var MessageLifecycleManager
      */
     protected $lifecycle;
 
@@ -42,11 +42,11 @@ class MessageBroker
      * @param  AMQPMessage  $message
      * @param  string  $queueName
      * @param  string  $handlerClass
-     * @param  LifecycleManager  $lifecycle
+     * @param  MessageLifecycleManager  $lifecycle
      */
     public function __construct(
         AMQPMessage $message,
-        LifecycleManager $lifecycle,
+        MessageLifecycleManager $lifecycle,
         string $queueName,
         string $handlerClass
     ) {

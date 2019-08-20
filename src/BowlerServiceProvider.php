@@ -27,7 +27,7 @@ class BowlerServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('vinelab.bowler.lifecycle', function ($app) {
-            return new LifecycleManager();
+            return new MessageLifecycleManager($app['log']);
         });
 
         // use the same Registrator instance all over the app (to make it injectable).

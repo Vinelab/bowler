@@ -2,15 +2,29 @@
 
 namespace Vinelab\Bowler\Tests;
 
+use Illuminate\Contracts\Logging\Log;
 use Illuminate\Support\Arr;
+use Mockery;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use RuntimeException;
 use Vinelab\Bowler\Ack;
 use Vinelab\Bowler\Exceptions\UnrecalledAMQPMessageException;
-use Vinelab\Bowler\LifecycleManager;
+use Vinelab\Bowler\MessageLifecycleManager;
 
-class LifecycleManagerTest extends TestCase
+class MessageLifecycleManagerTest extends TestCase
 {
+    /**
+     * @var Log|Mockery\MockInterface
+     */
+    private $logger;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->logger = Mockery::spy(Log::class);
+    }
+
     /**
      * @throws UnrecalledAMQPMessageException
      */
@@ -18,7 +32,7 @@ class LifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new LifecycleManager();
+        $lifecycle = new MessageLifecycleManager($this->logger);
         $lifecycle->beforePublish(function (AMQPMessage $msg, $exchangeName, $routingKey) use (&$exec) {
             $exec = true;
 
@@ -50,7 +64,7 @@ class LifecycleManagerTest extends TestCase
     {
         $this->expectException(UnrecalledAMQPMessageException::class);
 
-        $lifecycle = new LifecycleManager();
+        $lifecycle = new MessageLifecycleManager($this->logger);
         $lifecycle->beforePublish(function ($msg, $exchangeName, $routingKey) {
             //
         });
@@ -62,7 +76,7 @@ class LifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new LifecycleManager();
+        $lifecycle = new MessageLifecycleManager($this->logger);
         $lifecycle->published(function ($msg, $exchangeName, $routingKey) use (&$exec) {
             $exec = true;
 
@@ -85,7 +99,7 @@ class LifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new LifecycleManager();
+        $lifecycle = new MessageLifecycleManager($this->logger);
         $lifecycle->beforeConsume(function (AMQPMessage $msg, $exchangeName, $handlerClass) use (&$exec) {
             $exec = true;
 
@@ -117,7 +131,7 @@ class LifecycleManagerTest extends TestCase
     {
         $this->expectException(UnrecalledAMQPMessageException::class);
 
-        $lifecycle = new LifecycleManager();
+        $lifecycle = new MessageLifecycleManager($this->logger);
         $lifecycle->beforeConsume(function ($msg, $exchangeName, $handlerClass) {
             //
         });
@@ -129,7 +143,7 @@ class LifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new LifecycleManager();
+        $lifecycle = new MessageLifecycleManager($this->logger);
         $lifecycle->consumed(function ($msg, $exchangeName, $handlerClass, $ack) use (&$exec) {
             $exec = true;
 
@@ -152,5 +166,23 @@ class LifecycleManagerTest extends TestCase
         );
 
         $this->assertTrue($exec, 'Failed asserting that registered callback was executed');
+    }
+
+    /**
+     * @throws UnrecalledAMQPMessageException
+     */
+    public function test_log_error_and_continue_execution_when_exception_is_thrown_from_callback()
+    {
+        $e = new RuntimeException('Oops!');
+
+        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle->beforePublish(function ($msg, $exchangeName, $routingKey) use ($e) {
+            throw $e;
+        });
+
+        $msg = $lifecycle->triggerBeforePublish(new AMQPMessage('example'), 'logs', 'critical');
+
+        $this->assertInstanceOf(AMQPMessage::class, $msg);
+        $this->logger->shouldHaveReceived('error')->once()->with($e->getMessage(), ['exception' => $e]);
     }
 }

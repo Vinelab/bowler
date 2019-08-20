@@ -149,7 +149,7 @@ class Consumer
             // Instantiate Handler
             $queueHandler = app($handlerClass);
 
-            /** @var LifecycleManager $lifecycle */
+            /** @var MessageLifecycleManager $lifecycle */
             $lifecycle = app('vinelab.bowler.lifecycle');
 
             $broker = new MessageBroker($message, $lifecycle, $this->queueName, $handlerClass);

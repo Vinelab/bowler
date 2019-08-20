@@ -119,7 +119,7 @@ class Producer
 
         $message = new AMQPMessage($data, ['delivery_mode' => $this->deliveryMode]);
 
-        /** @var LifecycleManager $lifecycle */
+        /** @var MessageLifecycleManager $lifecycle */
         $lifecycle = app('vinelab.bowler.lifecycle');
 
         $message = $lifecycle->triggerBeforePublish($message, $this->exchangeName, $routingKey);
