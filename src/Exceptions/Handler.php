@@ -7,7 +7,8 @@ use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Message\AMQPMessage;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Vinelab\Bowler\Contracts\BowlerExceptionHandler;
 
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
@@ -68,7 +69,7 @@ class Handler
      */
     public function reportError($e, $message)
     {
-        if (method_exists($this->exceptionHandler, 'reportQueue')) {
+        if ($this->exceptionHandler instanceof BowlerExceptionHandler) {
             $this->exceptionHandler->reportQueue($e, $message);
         } else {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
