@@ -2,6 +2,7 @@
 
 namespace Vinelab\Bowler\Tests;
 
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Logging\Log;
 use Illuminate\Support\Arr;
 use Mockery;
@@ -19,10 +20,16 @@ class MessageLifecycleManagerTest extends TestCase
      */
     private $logger;
 
+    /**
+     * @var Repository
+     */
+    private $config;
+
     protected function setUp()
     {
         parent::setUp();
         $this->logger = Mockery::spy(Log::class);
+        $this->config = $this->app->make('config');
     }
 
     /**
@@ -32,7 +39,7 @@ class MessageLifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->beforePublish(function (AMQPMessage $msg, $exchangeName, $routingKey) use (&$exec) {
             $exec = true;
 
@@ -64,7 +71,7 @@ class MessageLifecycleManagerTest extends TestCase
     {
         $this->expectException(UnrecalledAMQPMessageException::class);
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->beforePublish(function ($msg, $exchangeName, $routingKey) {
             //
         });
@@ -76,7 +83,7 @@ class MessageLifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->published(function ($msg, $exchangeName, $routingKey) use (&$exec) {
             $exec = true;
 
@@ -99,7 +106,7 @@ class MessageLifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->beforeConsume(function (AMQPMessage $msg, $exchangeName, $handlerClass) use (&$exec) {
             $exec = true;
 
@@ -131,7 +138,7 @@ class MessageLifecycleManagerTest extends TestCase
     {
         $this->expectException(UnrecalledAMQPMessageException::class);
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->beforeConsume(function ($msg, $exchangeName, $handlerClass) {
             //
         });
@@ -143,7 +150,7 @@ class MessageLifecycleManagerTest extends TestCase
     {
         $exec = false;
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->consumed(function ($msg, $exchangeName, $handlerClass, $ack) use (&$exec) {
             $exec = true;
 
@@ -171,11 +178,11 @@ class MessageLifecycleManagerTest extends TestCase
     /**
      * @throws UnrecalledAMQPMessageException
      */
-    public function test_log_error_and_continue_execution_when_exception_is_thrown_from_callback()
+    public function test_suppress_error_thrown_from_callback()
     {
         $e = new RuntimeException('Oops!');
 
-        $lifecycle = new MessageLifecycleManager($this->logger);
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
         $lifecycle->beforePublish(function ($msg, $exchangeName, $routingKey) use ($e) {
             throw $e;
         });
@@ -184,5 +191,22 @@ class MessageLifecycleManagerTest extends TestCase
 
         $this->assertInstanceOf(AMQPMessage::class, $msg);
         $this->logger->shouldHaveReceived('error')->once()->with($e->getMessage(), ['exception' => $e]);
+    }
+
+    /**
+     * @throws UnrecalledAMQPMessageException
+     */
+    public function test_disable_suppressing_errors()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
+        $lifecycle->beforePublish(function ($msg, $exchangeName, $routingKey) {
+            throw new RuntimeException('Oops!');
+        });
+
+        $this->config->set('bowler.lifecycle_hooks.fail_on_error', true);
+
+        $lifecycle->triggerBeforePublish(new AMQPMessage('example'), 'logs', 'critical');
     }
 }
