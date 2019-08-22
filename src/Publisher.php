@@ -25,7 +25,6 @@ class Publisher extends Producer
      *
      * @param  string  $routingKey  The routing key used by the exchange to route messages to bounded queues
      * @param  string  $data
-     * @throws Exceptions\UnrecalledAMQPMessageException
      */
     public function publish($routingKey, $data = null)
     {

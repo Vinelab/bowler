@@ -105,7 +105,6 @@ class Producer
      *
      * @param  string  $data
      * @param  string  $routingKey  The routing key used by the exchange to route messages to bounded queues
-     * @throws Exceptions\UnrecalledAMQPMessageException
      */
     public function send($data = null, $routingKey = null)
     {
@@ -122,7 +121,7 @@ class Producer
         /** @var MessageLifecycleManager $lifecycle */
         $lifecycle = app('vinelab.bowler.lifecycle');
 
-        $message = $lifecycle->triggerBeforePublish($message, $this->exchangeName, $routingKey);
+        $lifecycle->triggerBeforePublish($message, $this->exchangeName, $routingKey);
 
         $channel->basic_publish($message, $this->exchangeName, $routingKey);
 
