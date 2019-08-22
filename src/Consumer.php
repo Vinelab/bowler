@@ -154,7 +154,7 @@ class Consumer
 
             $broker = new MessageBroker($message, $lifecycle, $this->queueName, $handlerClass);
 
-            $message = $lifecycle->triggerBeforeConsume($message, $this->queueName, $handlerClass);
+            $lifecycle->triggerBeforeConsume($message, $this->queueName, $handlerClass);
 
             try {
                 $queueHandler->handle($message);

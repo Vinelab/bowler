@@ -10,7 +10,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use RuntimeException;
 use Vinelab\Bowler\Ack;
-use Vinelab\Bowler\Exceptions\UnrecalledAMQPMessageException;
 use Vinelab\Bowler\MessageLifecycleManager;
 
 class MessageLifecycleManagerTest extends TestCase
@@ -32,9 +31,6 @@ class MessageLifecycleManagerTest extends TestCase
         $this->config = $this->app->make('config');
     }
 
-    /**
-     * @throws UnrecalledAMQPMessageException
-     */
     public function test_before_publish()
     {
         $exec = false;
@@ -51,32 +47,17 @@ class MessageLifecycleManagerTest extends TestCase
             $amqpTable->set('x-custom-header', '523292956497346007734586');
 
             $msg->set('application_headers', $amqpTable);
-
-            return $msg;
         });
 
-        $msg = $lifecycle->triggerBeforePublish(new AMQPMessage('example'), 'logs', 'critical');
+        $msg = new AMQPMessage('example');
+
+        $lifecycle->triggerBeforePublish($msg, 'logs', 'critical');
 
         $this->assertTrue($exec, 'Failed asserting that registered callback was executed');
 
         /** @var AMQPTable $amqpTable */
         $amqpTable = Arr::get($msg->get_properties(), 'application_headers', new AMQPTable);
         $this->assertEquals('523292956497346007734586', Arr::get($amqpTable->getNativeData(), 'x-custom-header'));
-    }
-
-    /**
-     * @throws UnrecalledAMQPMessageException
-     */
-    public function test_before_publish_callback_that_doesnt_return_message_throws_exception()
-    {
-        $this->expectException(UnrecalledAMQPMessageException::class);
-
-        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
-        $lifecycle->beforePublish(function ($msg, $exchangeName, $routingKey) {
-            //
-        });
-
-        $lifecycle->triggerBeforePublish(new AMQPMessage('example'), 'logs', 'critical');
     }
 
     public function test_published()
@@ -90,18 +71,15 @@ class MessageLifecycleManagerTest extends TestCase
             $this->assertEquals('example', $msg->body);
             $this->assertEquals('logs', $exchangeName);
             $this->assertEquals('critical', $routingKey);
-
-            return $msg;
         });
 
-        $lifecycle->triggerPublished(new AMQPMessage('example'), 'logs', 'critical');
+        $msg = new AMQPMessage('example');
+
+        $lifecycle->triggerPublished($msg, 'logs', 'critical');
 
         $this->assertTrue($exec, 'Failed asserting that registered callback was executed');
     }
 
-    /**
-     * @throws UnrecalledAMQPMessageException
-     */
     public function test_before_consume()
     {
         $exec = false;
@@ -118,32 +96,17 @@ class MessageLifecycleManagerTest extends TestCase
             $amqpTable->set('x-custom-header', '523292956497346007734586');
 
             $msg->set('application_headers', $amqpTable);
-
-            return $msg;
         });
 
-        $msg = $lifecycle->triggerBeforeConsume(new AMQPMessage('example'), 'logs', 'ProcessLogsHandler');
+        $msg = new AMQPMessage('example');
+
+        $lifecycle->triggerBeforeConsume($msg, 'logs', 'ProcessLogsHandler');
 
         $this->assertTrue($exec, 'Failed asserting that registered callback was executed');
 
         /** @var AMQPTable $amqpTable */
         $amqpTable = Arr::get($msg->get_properties(), 'application_headers', new AMQPTable);
         $this->assertEquals('523292956497346007734586', Arr::get($amqpTable->getNativeData(), 'x-custom-header'));
-    }
-
-    /**
-     * @throws UnrecalledAMQPMessageException
-     */
-    public function test_before_consume_callback_that_doesnt_return_message_throws_exception()
-    {
-        $this->expectException(UnrecalledAMQPMessageException::class);
-
-        $lifecycle = new MessageLifecycleManager($this->logger, $this->config);
-        $lifecycle->beforeConsume(function ($msg, $exchangeName, $handlerClass) {
-            //
-        });
-
-        $lifecycle->triggerBeforeConsume(new AMQPMessage('example'), 'logs', 'ProcessLogsHandler');
     }
 
     public function test_consumed()
@@ -161,8 +124,6 @@ class MessageLifecycleManagerTest extends TestCase
             $this->assertEquals(Ack::MODE_REJECT, $ack->mode);
             $this->assertTrue($ack->requeue);
             $this->assertFalse($ack->multiple);
-
-            return $msg;
         });
 
         $lifecycle->triggerConsumed(
@@ -175,9 +136,6 @@ class MessageLifecycleManagerTest extends TestCase
         $this->assertTrue($exec, 'Failed asserting that registered callback was executed');
     }
 
-    /**
-     * @throws UnrecalledAMQPMessageException
-     */
     public function test_suppress_error_thrown_from_callback()
     {
         $e = new RuntimeException('Oops!');
@@ -187,15 +145,11 @@ class MessageLifecycleManagerTest extends TestCase
             throw $e;
         });
 
-        $msg = $lifecycle->triggerBeforePublish(new AMQPMessage('example'), 'logs', 'critical');
+        $lifecycle->triggerBeforePublish(new AMQPMessage('example'), 'logs', 'critical');
 
-        $this->assertInstanceOf(AMQPMessage::class, $msg);
         $this->logger->shouldHaveReceived('error')->once()->with($e->getMessage(), ['exception' => $e]);
     }
 
-    /**
-     * @throws UnrecalledAMQPMessageException
-     */
     public function test_disable_suppressing_errors()
     {
         $this->expectException(RuntimeException::class);

@@ -23,7 +23,6 @@ class Dispatcher extends Producer
      * @param  string  $routingKey
      * @param  string|null  $data
      * @param  string  $exchangeType
-     * @throws Exceptions\UnrecalledAMQPMessageException
      */
     public function dispatch($exchangeName, $routingKey, $data = null, $exchangeType = 'topic')
     {

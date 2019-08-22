@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Message\AMQPMessage;
-use Vinelab\Bowler\Exceptions\UnrecalledAMQPMessageException;
 
 class MessageLifecycleManager
 {
@@ -92,20 +91,13 @@ class MessageLifecycleManager
      * @param  AMQPMessage  $msg
      * @param  string  $exchangeName
      * @param  null  $routingKey
-     * @return AMQPMessage
-     * @throws UnrecalledAMQPMessageException
+     * @return void
      */
-    public function triggerBeforePublish(AMQPMessage $msg, string $exchangeName, $routingKey = null): AMQPMessage
+    public function triggerBeforePublish(AMQPMessage $msg, string $exchangeName, $routingKey = null)
     {
         foreach ($this->beforePublish as $callback) {
-            $msg = $this->executeCallback($msg, $callback, func_get_args());
-
-            if (!$msg instanceof AMQPMessage) {
-                throw new UnrecalledAMQPMessageException('Callback must return instance of AMQPMessage');
-            }
+            $this->executeCallback($msg, $callback, func_get_args());
         }
-
-        return $msg;
     }
 
     /**
@@ -125,20 +117,13 @@ class MessageLifecycleManager
      * @param  AMQPMessage  $msg
      * @param  string  $queueName
      * @param  string  $handlerClass
-     * @return AMQPMessage
-     * @throws UnrecalledAMQPMessageException
+     * @return void
      */
-    public function triggerBeforeConsume(AMQPMessage $msg, string $queueName, string $handlerClass): AMQPMessage
+    public function triggerBeforeConsume(AMQPMessage $msg, string $queueName, string $handlerClass)
     {
         foreach ($this->beforeConsume as $callback) {
-            $msg = $this->executeCallback($msg, $callback, func_get_args());
-
-            if (!$msg instanceof AMQPMessage) {
-                throw new UnrecalledAMQPMessageException('Callback must return instance of AMQPMessage');
-            }
+            $this->executeCallback($msg, $callback, func_get_args());
         }
-
-        return $msg;
     }
 
     /**
@@ -160,22 +145,18 @@ class MessageLifecycleManager
      * @param  Closure  $callback
      * @param  array  $args
      * @return mixed
-     * @throws Exception
      */
     protected function executeCallback(AMQPMessage $msg, Closure $callback, array $args)
     {
         try {
-            $msg = call_user_func_array($callback, $args);
+            call_user_func_array($callback, $args);
         } catch (Exception $e) {
             $this->handleCallbackError($e);
         }
-
-        return $msg;
     }
 
     /**
      * @param  Exception  $e
-     * @throws Exception
      */
     protected function handleCallbackError(Exception $e)
     {
