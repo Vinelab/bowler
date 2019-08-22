@@ -2,6 +2,12 @@
 
 return [
 
+    'log' => [
+        'message' => [
+            'truncate_length' => 16000,
+        ],
+    ],
+
     'lifecycle_hooks' => [
         'fail_on_error' => false,
     ],
