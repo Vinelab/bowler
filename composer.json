@@ -48,5 +48,13 @@
         "psr-4": {
             "Vinelab\\Bowler\\Tests\\": "tests/"
         }
+    },
+
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Vinelab\\Bowler\\BowlerServiceProvider"
+            ]
+        }
     }
 }
