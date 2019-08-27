@@ -2,12 +2,13 @@
 
 namespace Vinelab\Bowler;
 
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\ServiceProvider;
 use Vinelab\Bowler\Console\Commands\QueueCommand;
 use Vinelab\Bowler\Console\Commands\ConsumeCommand;
 use Vinelab\Bowler\Console\Commands\SubscriberCommand;
 use Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler;
+use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -63,7 +64,9 @@ class BowlerServiceProvider extends ServiceProvider
             return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat, $rbmqVhost);
         });
 
-        $this->app->bind(BowlerExceptionHandler::class, $this->app->getNamespace().'Exceptions\Handler');
+        $this->app->when(BowlerExceptionHandler::class)
+            ->needs(ExceptionHandler::class)
+            ->give($this->app->getNamespace().'Exceptions\Handler');
 
         //register command
         $this->commands([
