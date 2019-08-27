@@ -2,6 +2,7 @@
 
 namespace Vinelab\Bowler\Traits;
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use Vinelab\Bowler\Exceptions\Handler as BowlerExceptionHandler;
 
 /**
@@ -20,6 +21,7 @@ trait DeadLetteringTrait
      */
     public function configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType = 'fanout', $deadLetterRoutingKey = null, $messageTTL = null)
     {
+        /** @var AMQPChannel $channel */
         $channel = $this->connection->getChannel();
 
         try {

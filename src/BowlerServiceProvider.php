@@ -7,6 +7,7 @@ use Vinelab\Bowler\Console\Commands\QueueCommand;
 use Vinelab\Bowler\Console\Commands\ConsumeCommand;
 use Vinelab\Bowler\Console\Commands\SubscriberCommand;
 use Vinelab\Bowler\Console\Commands\ConsumerHealthCheckCommand;
+use Vinelab\Bowler\Contracts\BowlerExceptionHandler;
 
 /**
  * @author Ali Issa <ali@vinelab.com>
@@ -23,6 +24,10 @@ class BowlerServiceProvider extends ServiceProvider
         // register facade to resolve instance
         $this->app->singleton('vinelab.bowler.registrator', function ($app) {
             return new RegisterQueues();
+        });
+
+        $this->app->singleton('vinelab.bowler.lifecycle', function ($app) {
+            return new MessageLifecycleManager($app['log']);
         });
 
         // use the same Registrator instance all over the app (to make it injectable).
@@ -44,18 +49,14 @@ class BowlerServiceProvider extends ServiceProvider
             return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat, $rbmqVhost);
         });
 
-        $this->app->bind(
-            \Vinelab\Bowler\Contracts\BowlerExceptionHandler::class,
-            $this->app->getNamespace().\Exceptions\Handler::class
-        );
+        $this->app->bind(BowlerExceptionHandler::class, $this->app->getNamespace().'Exceptions\Handler');
 
         //register command
-        $commands = [
+        $this->commands([
             QueueCommand::class,
             ConsumeCommand::class,
             SubscriberCommand::class,
             ConsumerHealthCheckCommand::class,
-        ];
-        $this->commands($commands);
+        ]);
     }
 }

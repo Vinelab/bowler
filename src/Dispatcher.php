@@ -19,10 +19,10 @@ class Dispatcher extends Producer
     }
 
     /**
-     * @param string $exchangeName
-     * @param string $routingKey
-     * @param string|null $data
-     * @param string $exchangeType
+     * @param  string  $exchangeName
+     * @param  string  $routingKey
+     * @param  string|null  $data
+     * @param  string  $exchangeType
      */
     public function dispatch($exchangeName, $routingKey, $data = null, $exchangeType = 'topic')
     {

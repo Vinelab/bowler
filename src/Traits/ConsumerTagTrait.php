@@ -2,7 +2,7 @@
 
 namespace Vinelab\Bowler\Traits;
 
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @author Abed Halawi <abed.halawi@vinelab.com>

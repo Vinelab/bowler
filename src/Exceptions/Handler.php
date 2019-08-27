@@ -2,9 +2,13 @@
 
 namespace Vinelab\Bowler\Exceptions;
 
+use Exception;
+use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
-use Vinelab\Bowler\Contracts\BowlerExceptionHandler as ExceptionHandler;
+use PhpAmqpLib\Message\AMQPMessage;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Vinelab\Bowler\Contracts\BowlerExceptionHandler;
 
 /**
  * @author Kinane Domloje <kinane@vinelab.com>
@@ -16,21 +20,35 @@ class Handler
      */
     private $exceptionHandler;
 
-    public function __construct(ExceptionHandler $handler)
+    /**
+     * @var Log
+     */
+    private $logger;
+
+    /**
+     * Handler constructor.
+     * @param  ExceptionHandler  $handler
+     * @param  Log  $logger
+     */
+    public function __construct(ExceptionHandler $handler, Log $logger)
     {
         $this->exceptionHandler = $handler;
+        $this->logger = $logger;
     }
 
     /**
      * Map php-mqplib exceptions to Bowler's.
      *
-     * @param \Exception $e
-     * @param array      $parameters
-     * @param array      $arguments
+     * @param  Exception  $e
+     * @param  array  $parameters
+     * @param  array  $arguments
      *
-     * @return mix
+     * @return void
+     * @throws BowlerGeneralException
+     * @throws DeclarationMismatchException
+     * @throws InvalidSetupException
      */
-    public function handleServerException(\Exception $e, $parameters = [], $arguments = [])
+    public function handleServerException(Exception $e, $parameters = [], $arguments = [])
     {
         if ($e instanceof AMQPProtocolChannelException) {
             $e = new DeclarationMismatchException($e, $parameters,  $arguments);
@@ -46,13 +64,15 @@ class Handler
     /**
      * Report error to the app's exceptions Handler.
      *
-     * @param \Exception                         $e
-     * @param mix PhpAmqpLib\Message\AMQPMessage $message
+     * @param Exception $e
+     * @param AMQPMessage $message
      */
     public function reportError($e, $message)
     {
-        if (method_exists($this->exceptionHandler, 'reportQueue')) {
+        if ($this->exceptionHandler instanceof BowlerExceptionHandler) {
             $this->exceptionHandler->reportQueue($e, $message);
+        } else {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
         }
     }
 }
