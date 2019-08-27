@@ -24,7 +24,7 @@ class BowlerServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'../config/bowler.php' => config_path('bowler.php'),
+            __DIR__.'/../config/bowler.php' => config_path('bowler.php'),
         ]);
     }
 
