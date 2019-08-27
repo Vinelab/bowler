@@ -6,3 +6,4 @@ Homestead.json
 Homestead.yaml
 .DS_Store
 composer.lock
+phpunit.xml

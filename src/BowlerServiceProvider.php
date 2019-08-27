@@ -17,17 +17,31 @@ use Vinelab\Bowler\Contracts\BowlerExceptionHandler;
 class BowlerServiceProvider extends ServiceProvider
 {
     /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__.'../config/bowler.php' => config_path('bowler.php'),
+        ]);
+    }
+
+    /**
      * Register any application services.
      */
     public function register()
     {
+        $this->mergeConfigFrom(dirname(__DIR__).'/config/bowler.php', 'bowler');
+
         // register facade to resolve instance
         $this->app->singleton('vinelab.bowler.registrator', function ($app) {
             return new RegisterQueues();
         });
 
         $this->app->singleton('vinelab.bowler.lifecycle', function ($app) {
-            return new MessageLifecycleManager($app['log']);
+            return new MessageLifecycleManager($app['log'], $app['config']);
         });
 
         // use the same Registrator instance all over the app (to make it injectable).
@@ -37,14 +51,14 @@ class BowlerServiceProvider extends ServiceProvider
 
         $this->app->bind(Connection::class, function () {
             // Bind connection to env configuration
-            $rbmqHost = config('queue.connections.rabbitmq.host');
-            $rbmqPort = config('queue.connections.rabbitmq.port');
-            $rbmqUsername = config('queue.connections.rabbitmq.username');
-            $rbmqPassword = config('queue.connections.rabbitmq.password');
-            $rbmqConnectionTimeout = config('queue.connections.rabbitmq.connection_timeout') ? (int) config('queue.connections.rabbitmq.connection_timeout') : 30;
-            $rbmqReadWriteTimeout = config('queue.connections.rabbitmq.read_write_timeout') ? (int) config('queue.connections.rabbitmq.read_write_timeout') : 30;
-            $rbmqHeartbeat = config('queue.connections.rabbitmq.heartbeat') ? (int) config('queue.connections.rabbitmq.heartbeat') : 15;
-            $rbmqVhost = config('queue.connections.rabbitmq.vhost', '/');
+            $rbmqHost = config('bowler.rabbitmq.host');
+            $rbmqPort = config('bowler.rabbitmq.port');
+            $rbmqUsername = config('bowler.rabbitmq.username');
+            $rbmqPassword = config('bowler.rabbitmq.password');
+            $rbmqConnectionTimeout = config('bowler.rabbitmq.connection_timeout');
+            $rbmqReadWriteTimeout = config('bowler.rabbitmq.read_write_timeout');
+            $rbmqHeartbeat = config('bowler.rabbitmq.heartbeat');
+            $rbmqVhost = config('bowler.rabbitmq.vhost', '/');
 
             return new Connection($rbmqHost, $rbmqPort, $rbmqUsername, $rbmqPassword, $rbmqConnectionTimeout, $rbmqReadWriteTimeout, $rbmqHeartbeat, $rbmqVhost);
         });

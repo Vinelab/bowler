@@ -4,6 +4,7 @@ namespace Vinelab\Bowler;
 
 use Closure;
 use Exception;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -13,6 +14,11 @@ class MessageLifecycleManager
      * @var Log
      */
     protected $logger;
+
+    /**
+     * @var Repository
+     */
+    protected $config;
 
     /**
      * @var array
@@ -37,10 +43,12 @@ class MessageLifecycleManager
     /**
      * MessageLifecycleManager constructor.
      * @param  Log  $logger
+     * @param  Repository  $config
      */
-    public function __construct(Log $logger)
+    public function __construct(Log $logger, Repository $config)
     {
         $this->logger = $logger;
+        $this->config = $config;
     }
 
     /**
@@ -143,6 +151,18 @@ class MessageLifecycleManager
         try {
             call_user_func_array($callback, $args);
         } catch (Exception $e) {
+            $this->handleCallbackError($e);
+        }
+    }
+
+    /**
+     * @param  Exception  $e
+     */
+    protected function handleCallbackError(Exception $e)
+    {
+        if ($this->config->get('bowler.lifecycle_hooks.fail_on_error')) {
+            throw $e;
+        } else {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
         }
     }

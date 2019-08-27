@@ -24,37 +24,34 @@ Starting version [v0.4.2](https://github.com/Vinelab/bowler/releases/tag/v0.4.2)
 
 ## Setup
 
-### Composer
+Install the package via Composer:
+
+```sh
+composer require vinelab/bowler
+```
+
+**Laravel 5.4** users will also need to add the service provider to the `providers` array in `config/app.php`:
+
 ```php
-{
-    "require": {
-        "vinelab/bowler"
-    }
-}
+Vinelab\Bowler\BowlerServiceProvider::class,
+```
+
+After installation, you can publish the package configuration using the `vendor:publish` command. This command will publish the `bowler.php` configuration file to your config directory:
+
+```sh
+php artisan vendor:publish --provider="Vinelab\Bowler\BowlerServiceProvider"
+```
+
+You may configure RabbitMQ credentials in your `.env` file:
+
+```php
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USERNAME=guest
+RABBITMQ_PASSWORD=guest
 ```
 
 ## Usage
-
-### Configuration
-
-In order to configure rabbitmq host, port, username, password and configure the timeout and vhost values too, add the following inside the connections array in config/queue.php file:
-
-```php
-'rabbitmq' => [
-    'host' => 'host',
-    'port' => port,
-    'username' => 'username',
-    'password' => 'password',
-    'connection_timeout' => 30,
-    'read_write_timeout' => 30,
-    'heartbeat' => 15,
-    'vhost' => '/',
-],
-```
-
-The default value for `connection_timeout` and `read_write_timeout` is set to 30 (seconds) and `heartbeat` is set to 15 (seconds). The `vhost` value defaults to '/'.
-
-And register the service provider by adding `Vinelab\Bowler\BowlerServiceProvider::class` to the providers array in `config/app`.
 
 ### Producer
 In order to be able to send a message, a producer instance needs to be created and an exchange needs to be set up.
@@ -286,7 +283,7 @@ If you would like to manually do the configuration, you can surely do so by sett
 Registrator::subscriber($queue, $className, array $bindingKeys, $exchangeName = 'pub-sub', $exchangeType = 'topic');
 ```
 
-## Dispatch (Work Queue)
+### Dispatch (Work Queue)
 Similar to Pub/Sub, except you may define your own exchange and messages will be distributed according to the least busy
 consumer (see [Work Queue - Fair Dispatch](https://www.rabbitmq.com/tutorials/tutorial-two-php.html)).
 
@@ -379,6 +376,32 @@ bowler:healthcheck:consumer {queueName : The queue name}
 Example: `php artisan bowler:healthcheck:consumer the-queue`
 
 Will return exit code `0` for success and `1` for failure along with a message why.
+
+### Lifecycle Hooks
+
+Bowler exposes the following lifecycle hooks:
+
+```php
+use Vinelab\Bowler\Facades\Message;
+
+Message::beforePublish(function (AMQPMessage $msg, string $exchangeName, $routingKey = null) {
+  return $msg;
+});
+
+Message::published(function (AMQPMessage $msg, string $exchangeName, $routingKey = null) {
+  //
+});
+
+Message::beforeConsume(function (AMQPMessage $msg, string $queueName, string $handlerClass) {
+  return $msg;
+});
+
+Message::consumed(function (AMQPMessage $msg, string $queueName, string $handlerClass, Ack $ack) {
+  //
+})
+```
+
+By default, Bowler logs and suppress errors that occur inside the callback. You can configure this behavior via `bowler.lifecycle_hooks.fail_on_error` configuration option.
 
 ### Important Notes
 1. It is of most importance that the users of this package, take onto their responsability the mapping between exchanges and queues. And to make sure that exchanges declaration are matching both on the producer and consumer side, otherwise a `Vinelab\Bowler\Exceptions\DeclarationMismatchException` is thrown.
