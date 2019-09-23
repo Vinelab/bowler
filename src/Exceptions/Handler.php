@@ -24,7 +24,7 @@ class Handler
     private $exceptionHandler;
 
     /**
-     * @var Log
+     * @var \Psr\Log\LoggerInterface|\Illuminate\Contracts\Logging\Log
      */
     private $logger;
 
@@ -36,10 +36,10 @@ class Handler
     /**
      * Handler constructor.
      * @param  ExceptionHandler  $handler
-     * @param  Log  $logger
+     * @param  \Psr\Log\LoggerInterface|\Illuminate\Contracts\Logging\Log  $logger
      * @param  Repository  $config
      */
-    public function __construct(ExceptionHandler $handler, Log $logger, Repository $config)
+    public function __construct(ExceptionHandler $handler, $logger, Repository $config)
     {
         $this->exceptionHandler = $handler;
         $this->logger = $logger;

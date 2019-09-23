@@ -5,13 +5,12 @@ namespace Vinelab\Bowler;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Logging\Log;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class MessageLifecycleManager
 {
     /**
-     * @var Log
+     * @var \Psr\Log\LoggerInterface|\Illuminate\Contracts\Logging\Log
      */
     protected $logger;
 
@@ -42,10 +41,10 @@ class MessageLifecycleManager
 
     /**
      * MessageLifecycleManager constructor.
-     * @param  Log  $logger
+     * @param  \Psr\Log\LoggerInterface|\Illuminate\Contracts\Logging\Log  $logger
      * @param  Repository  $config
      */
-    public function __construct(Log $logger, Repository $config)
+    public function __construct($logger, Repository $config)
     {
         $this->logger = $logger;
         $this->config = $config;
