@@ -50,6 +50,14 @@ class BowlerServiceProvider extends ServiceProvider
             return $app['vinelab.bowler.registrator'];
         });
 
+        $this->app->bind(BowlerExceptionHandler::class, function ($app) {
+            return new BowlerExceptionHandler(
+                $app->make(ExceptionHandler::class),
+                $app->make('log'),
+                $app->make('config')
+            );
+        });
+
         $this->app->bind(Connection::class, function () {
             // Bind connection to env configuration
             $rbmqHost = config('bowler.rabbitmq.host');
