@@ -26,16 +26,16 @@
     "require": {
         "php": ">=7.0",
         "php-amqplib/php-amqplib": "v2.8.1",
-        "illuminate/console": "5.4.*|5.5.*|5.6.*|5.7.*",
-        "illuminate/support": "5.4.*|5.5.*|5.6.*|5.7.*",
-        "vinelab/http": "^1.5",
-        "illuminate/filesystem": "5.4.*|5.5.*|5.6.*|5.7.*"
+        "illuminate/console": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6",
+        "illuminate/support": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6",
+        "illuminate/filesystem": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6",
+        "vinelab/http": "^1.5"
     },
 
     "require-dev": {
         "mockery/mockery": "^1.0",
-        "orchestra/testbench": "3.4.*",
-        "phpunit/phpunit": "~5.7"
+        "orchestra/testbench": "3.4.* || ^4",
+        "phpunit/phpunit": "~5.7 || ~8.3"
     },
 
     "autoload": {

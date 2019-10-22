@@ -7,3 +7,4 @@ Homestead.yaml
 .DS_Store
 composer.lock
 phpunit.xml
+.phpunit.result.cache

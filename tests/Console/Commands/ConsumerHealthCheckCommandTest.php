@@ -14,7 +14,7 @@ use PhpAmqpLib\Exception\AMQPProtocolChannelException;
  */
 class ConsumerHealthCheckCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown() : void
     {
         M::close();
     }

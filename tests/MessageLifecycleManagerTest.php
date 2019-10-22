@@ -24,7 +24,7 @@ class MessageLifecycleManagerTest extends TestCase
      */
     private $config;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
         $this->logger = Mockery::spy(Log::class);
