@@ -172,9 +172,49 @@ class Connection
         return $http->get($request)->json();
     }
 
+    /**
+     * Clean up resources
+     */
     public function __destruct()
     {
-        $this->channel->close();
-        $this->connection->close();
+        if ($this->channel) {
+            $this->channel->close();
+        }
+
+        if ($this->connection) {
+            $this->connection->close();
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getConnectionTimeout()
+    {
+        return $this->connectionTimeout;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReadWriteTimeout()
+    {
+        return $this->readWriteTimeout;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeartbeat()
+    {
+        return $this->heartbeat;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVhost()
+    {
+        return $this->vhost;
     }
 }

@@ -54,6 +54,7 @@ class ConnectionTest extends TestCase
     {
         $mConnection = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
+            ->setMethods(null)
             ->getMock();
 
         $this->app->bind(Connection::class, function () use ($mConnection) {
@@ -61,10 +62,10 @@ class ConnectionTest extends TestCase
         });
         $connection = $this->app[Connection::class];
 
-        $this->assertAttributeEquals(15, 'heartbeat', $connection);
-        $this->assertAttributeEquals(30, 'readWriteTimeout', $connection);
-        $this->assertAttributeEquals(30, 'connectionTimeout', $connection);
-        $this->assertAttributeEquals('/', 'vhost', $connection);
+        $this->assertEquals(15, $connection->getHeartbeat());
+        $this->assertEquals(30, $connection->getReadWriteTimeout());
+        $this->assertEquals(30, $connection->getConnectionTimeout());
+        $this->assertEquals('/', $connection->getVhost());
     }
 
     public function test_set_altered_configurations_values()
@@ -88,9 +89,9 @@ class ConnectionTest extends TestCase
 
         $connection = $this->app[Connection::class];
 
-        $this->assertAttributeEquals(30, 'heartbeat', $connection);
-        $this->assertAttributeEquals(60, 'readWriteTimeout', $connection);
-        $this->assertAttributeEquals(60, 'connectionTimeout', $connection);
-        $this->assertAttributeEquals('/test-vhost', 'vhost', $connection);
+        $this->assertEquals(30, $connection->getHeartbeat());
+        $this->assertEquals(60, $connection->getReadWriteTimeout());
+        $this->assertEquals(60, $connection->getConnectionTimeout());
+        $this->assertEquals('/test-vhost', $connection->getVhost());
     }
 }
