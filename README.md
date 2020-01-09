@@ -156,7 +156,7 @@ Configuring the consumer can be done both manually or from the command line:
             } elseif($e instanceof WhatElseException) {
                 $broker->nackMessage();
             } else {
-                $msg = $borker->getMessage();
+                $msg = $broker->getMessage();
                 if($msg->body) {
                     //
                 }
