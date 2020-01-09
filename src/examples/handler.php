@@ -22,7 +22,7 @@ class handler
         } elseif ($e instanceof WhatElseException) {
             $broker->nackMessage();
         } else {
-            $msg = $borker->getMessage();
+            $msg = $broker->getMessage();
             if ($msg->body) {
             }
         }
