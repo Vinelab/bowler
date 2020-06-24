@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static void queue(string $queue, string $className, array $options)
- * @method static void subscriber(string $queue, string $className, array $bindingKeys, string $exchangeName, string $exchangeType)
+ * @method static void subscriber(string $queue, string $className, array $bindingKeys, string $exchangeName, string $exchangeType = 'topic')
  * @method static array getHandlers()
  *
  * @see \Vinelab\Bowler\RegisterQueues
