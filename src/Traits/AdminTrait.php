@@ -15,7 +15,7 @@ trait AdminTrait
      */
     public function deleteExchange($exchangeName, $unused = true)
     {
-        $this->connection->getChannel()->exchange_delete($queueName, $unused, $empty);
+        $this->connection->getChannel()->exchange_delete($exchangeName, $unused);
     }
 
     /**
