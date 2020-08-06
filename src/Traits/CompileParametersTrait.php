@@ -19,7 +19,7 @@ trait CompileParametersTrait
                 'exchangeName' => property_exists($this, 'exchangeName') ? $this->exchangeName : null,
                 'exchangeType' => property_exists($this, 'exchangeType') ? $this->exchangeType : null,
                 'passive' => property_exists($this, 'passive') ? $this->passive : null,
-                'durable' => property_exists($this, 'durabel') ? $this->durable : null,
+                'durable' => property_exists($this, 'durable') ? $this->durable : null,
                 'autoDelete' => property_exists($this, 'autoDelete') ? $this->autoDelete : null,
                 'deliveryMode' => property_exists($this, 'deliveryMode') ? $this->deliveryMode : null,
             ];
