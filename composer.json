@@ -26,9 +26,9 @@
     "require": {
         "php": ">=7.0",
         "php-amqplib/php-amqplib": "v2.8.1",
-        "illuminate/console": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7",
-        "illuminate/support": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7",
-        "illuminate/filesystem": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7",
+        "illuminate/console": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7 || ^8",
+        "illuminate/support": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7 || ^8",
+        "illuminate/filesystem": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7 || ^8",
         "vinelab/http": "^1.5"
     },
 
