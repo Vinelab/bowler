@@ -28,7 +28,7 @@ _**Table of Contents**_
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Manual](####manual)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Console](####console)<br>
 &nbsp;&nbsp;&nbsp;[Publisher/Subscriber](###publisher/subscriber)<br>
-&nbsp;&nbsp;&nbsp;[Dispatcher](###dispatcher-(work queue))<br>
+&nbsp;&nbsp;&nbsp;[Dispatcher](###dispatcher-(work-queue))<br>
 &nbsp;&nbsp;&nbsp;[Dead Lettering](###dead-lettering)<br>
 &nbsp;&nbsp;&nbsp;[Error Handling](###error-handling)<br>
 &nbsp;&nbsp;&nbsp;[Error Reporting](###error-reporting)<br>
@@ -259,7 +259,7 @@ $bowlerPublisher = new Publisher($connection);
 $bowlerPublisher->publish('warning', $data);
 ```
 
-> Or inject the Publisher similarly to what we've seen [here](###Producer).
+> Or inject the Publisher similarly to what we've seen [here](###producer).
 
 As you might have noted, here we instantiate a `Publisher` not a `Producer` object. Publisher is a Producer specification, it holds the default Pub/Sub **exchange** setup.
 
@@ -288,7 +288,7 @@ Registrator::subscriber('reporting-pub-sub', 'App\Messaging\Handlers\ReportingMe
 > Notice that it is not required to specify the exchange since it uses the default `pub-sub` exchange.
 
 ##### ii. Handle messages
-Like we've seen [earlier](####Manual).
+Like we've seen [earlier](####manual).
 
 ##### iii. Run the consumer
 From the command line use the `bowler:consume` command.
@@ -299,7 +299,7 @@ The Pub/Sub implementation is meant to be used as-is. It is possible to consume 
 
 > If no binding keys are provided a `Vinelab\Bowler\Exception\InvalidSubscriberBindingException` is thrown.
 
-If you would like to configure manually, you can surely do so by setting up the Producer and Consumer as explained [earlier](##Usage).
+If you would like to configure manually, you can surely do so by setting up the Producer and Consumer as explained [earlier](##usage).
 
 ##### Signature
 ```php
