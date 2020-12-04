@@ -19,24 +19,24 @@ These features will facilitate drastically the way you use Rabbitmq and broaden 
 
 Tools like the Rabbitmq *[Management](https://www.rabbitmq.com/management.html)* plugin, will certainly help you monitor the server's activity and visualize the setup.
 
-Table of Contents
+_**Table of Contents**_
 
-[Setup](##Setup)<br>
-[Usage](##Usage)<br>
-&nbsp;&nbsp;&nbsp;[Producer](###Producer)<br>
-&nbsp;&nbsp;&nbsp;[Consumer](###Consumer)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Manual](####Manual)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Console](####Console)<br>
-&nbsp;&nbsp;&nbsp;[Publisher/Subscriber](###Publisher/Subscriber)<br>
-&nbsp;&nbsp;&nbsp;[Dispatcher](###Dispatcher (Work Queue))<br>
-&nbsp;&nbsp;&nbsp;[Dead Lettering](###Dead Lettering)<br>
-&nbsp;&nbsp;&nbsp;[Error Handling](###Error Handling)<br>
-&nbsp;&nbsp;&nbsp;[Error Reporting](###Error Reporting)<br>
-&nbsp;&nbsp;&nbsp;[Health Checks](###Health Checks)<br>
-&nbsp;&nbsp;&nbsp;[Lifecycle Hooks](###Lifecycle Hooks)<br>
-&nbsp;&nbsp;&nbsp;[Testing](###Testing)<br>
-[Notes](##Importtant Notes)<br>
-[Todo](##TODO)<br>
+[Setup](##setup)<br>
+[Usage](##usage)<br>
+&nbsp;&nbsp;&nbsp;[Producer](###producer)<br>
+&nbsp;&nbsp;&nbsp;[Consumer](###consumer)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Manual](####manual)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Console](####console)<br>
+&nbsp;&nbsp;&nbsp;[Publisher/Subscriber](###publisher/subscriber)<br>
+&nbsp;&nbsp;&nbsp;[Dispatcher](###dispatcher-(work queue))<br>
+&nbsp;&nbsp;&nbsp;[Dead Lettering](###dead-lettering)<br>
+&nbsp;&nbsp;&nbsp;[Error Handling](###error-handling)<br>
+&nbsp;&nbsp;&nbsp;[Error Reporting](###error-reporting)<br>
+&nbsp;&nbsp;&nbsp;[Health Checks](###health-checks)<br>
+&nbsp;&nbsp;&nbsp;[Lifecycle Hooks](###lifecycle-hooks)<br>
+&nbsp;&nbsp;&nbsp;[Testing](###testing)<br>
+[Important Notes](##importtant-notes)<br>
+[Todo](##todo)<br>
 
 ## Supported Laravel versions
 Starting version [v0.4.2](https://github.com/Vinelab/bowler/releases/tag/v0.4.2) this library requires Laravel 5.4 or later versions.
