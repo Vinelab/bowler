@@ -35,7 +35,7 @@ _**Table of Contents**_
 &nbsp;&nbsp;&nbsp;[Health Checks](#health-checks)<br>
 &nbsp;&nbsp;&nbsp;[Lifecycle Hooks](#lifecycle-hooks)<br>
 &nbsp;&nbsp;&nbsp;[Testing](#testing)<br>
-[Important Notes](#importtant-notes)<br>
+[Important Notes](#important-notes)<br>
 [Todo](#todo)<br>
 
 ## Supported Laravel versions
