@@ -15,7 +15,7 @@ class {{handler}}
      *
      * @return void
      */
-    public function handle($msg)
+    public function handle(AMQPMessage $msg)
     {
         //
     }
@@ -23,7 +23,7 @@ class {{handler}}
     /**
      * Handle error
      *
-     * @param Exception $e
+     * @param Exception|Throwable $e
      * @param MessageBroker $broker
      *
      * @return void

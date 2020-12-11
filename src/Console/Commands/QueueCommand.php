@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler\Console\Commands;
 
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Vinelab\Bowler\Generators\HandlerGenerator;
@@ -43,7 +44,7 @@ class QueueCommand extends Command
         $handlerGenerator = new HandlerGenerator();
 
         $queue = $this->argument('queueName');
-        $handler = studly_case(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
+        $handler = Str::studly(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
 
         try {
             $handlerGenerator->generate($queue, $handler, self::TYPE);
