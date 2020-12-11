@@ -40,6 +40,7 @@ _**Table of Contents**_
 
 ## Supported Laravel versions
 Starting version [v0.4.2](https://github.com/Vinelab/bowler/releases/tag/v0.4.2) this library requires Laravel 5.4 or later versions.
+Starting version [v0.5.0](https://github.com/Vinelab/bowler/releases/tag/v0.5.0) this library requires Laravel 5.7 or later versions.
 
 ## Setup
 
