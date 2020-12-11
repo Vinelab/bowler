@@ -14,7 +14,7 @@ use PhpAmqpLib\Exception\AMQPProtocolChannelException;
  */
 class ConsumerHealthCheckCommandTest extends TestCase
 {
-    public function tearDown() : void
+    public function tearDown(): void
     {
         M::close();
     }
@@ -38,7 +38,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
         ])));
 
         $mChannel = M::mock(AMQPChannel::class);
-        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
+
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 1]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
@@ -48,7 +48,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
-        if($result instanceof PendingCommand) {
+        if ($result instanceof PendingCommand) {
             $this->assertEquals(0, $result->run());
         } else {
             $this->assertEquals(0, $result);
@@ -70,8 +70,8 @@ class ConsumerHealthCheckCommandTest extends TestCase
         $mConnection->shouldReceive('fetchQueueConsumers')->once()->andReturn(json_decode(json_encode([])));
 
         $mChannel = M::mock(AMQPChannel::class);
-        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 1]);
+
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
         $this->app->bind(Connection::class, function () use ($mConnection) {
@@ -80,7 +80,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
-        if($result instanceof PendingCommand) {
+        if ($result instanceof PendingCommand) {
             $this->assertEquals(1, $result->run());
         } else {
             $this->assertEquals(1, $result);
@@ -95,7 +95,9 @@ class ConsumerHealthCheckCommandTest extends TestCase
         $queueName = 'queue-to-consume';
         $consumerTag = 'amqp.98oyiuahksjdf';
 
-        $command->shouldReceive('error')->once()->with('Health check failed! Could not find consumer with tag "'.$consumerTag.'"');
+        $command->shouldReceive('error')
+            ->once()
+            ->with('Health check failed! Could not find consumer with tag "' . $consumerTag . '"');
 
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
 
@@ -110,7 +112,6 @@ class ConsumerHealthCheckCommandTest extends TestCase
         ])));
 
         $mChannel = M::mock(AMQPChannel::class);
-        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $mChannel->shouldReceive('queue_declare')->once()->andReturn([$queueName, 10, 0]);
         $mConnection->shouldReceive('getChannel')->once()->andReturn($mChannel);
 
@@ -120,7 +121,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => $queueName]);
 
-        if($result instanceof PendingCommand) {
+        if ($result instanceof PendingCommand) {
             $this->assertEquals(1, $result->run());
         } else {
             $this->assertEquals(1, $result);
@@ -136,8 +137,8 @@ class ConsumerHealthCheckCommandTest extends TestCase
         $this->app['Illuminate\Contracts\Console\Kernel']->registerCommand($command);
 
         $mConnection = M::mock(Connection::class);
+
         $mChannel = M::mock(AMQPChannel::class);
-        $mChannel::$PROTOCOL_CONSTANTS_CLASS = 'PhpAmqpLib\Wire\Constants091';
         $exception = new AMQPProtocolChannelException(404, "NOT_FOUND - no queue 'the-queue' in vhost '/'", [50, 10]);
         $mChannel->shouldReceive('queue_declare')->once()
             ->with('the-queue', true, false, false, false, [])
@@ -150,7 +151,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
 
-        if($result instanceof PendingCommand) {
+        if ($result instanceof PendingCommand) {
             $this->assertEquals(1, $result->run());
         } else {
             $this->assertEquals(1, $result);
@@ -170,7 +171,7 @@ class ConsumerHealthCheckCommandTest extends TestCase
 
         $result = $this->artisan('bowler:healthcheck:consumer', ['queueName' => 'the-queue']);
 
-        if($result instanceof PendingCommand) {
+        if ($result instanceof PendingCommand) {
             $this->assertEquals(1, $result->run());
         } else {
             $this->assertEquals(1, $result);

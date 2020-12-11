@@ -2,7 +2,7 @@
 
 namespace Vinelab\Bowler\Console\Commands;
 
-use ErrorException;
+use Exception;
 use Illuminate\Console\Command;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use Vinelab\Bowler\Connection;
@@ -40,7 +40,7 @@ class ConsumerHealthCheckCommand extends Command
         // may or may not be able to connect
         try {
             $connection = app(Connection::class);
-        } catch (ErrorException $e) {
+        } catch (Exception $e) {
             $this->error('Unable to connect to RabbitMQ.');
 
             return 1;
