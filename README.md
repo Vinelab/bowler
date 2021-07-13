@@ -22,6 +22,7 @@ Tools like the Rabbitmq *[Management](https://www.rabbitmq.com/management.html)*
 _**Table of Contents**_
 
 [Setup](#setup)<br>
+[Development](#development)<br>
 [Usage](#usage)<br>
 &nbsp;&nbsp;&nbsp;[Producer](#producer)<br>
 &nbsp;&nbsp;&nbsp;[Consumer](#consumer)<br>
@@ -70,6 +71,32 @@ RABBITMQ_HOST=localhost
 RABBITMQ_PORT=5672
 RABBITMQ_USERNAME=guest
 RABBITMQ_PASSWORD=guest
+```
+
+## Development
+
+Create the Docker container
+```sh
+docker-compose up -d
+
+```
+
+Bash into the container
+```sh
+docker-compose exec app bash
+
+```
+
+Install dependencies
+```sh
+composer install
+
+```
+
+Run tests
+```sh
+./vendor/bin/phpunit
+
 ```
 
 ## Usage
