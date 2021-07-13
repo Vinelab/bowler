@@ -164,6 +164,8 @@ class Consumer
 
                 if (method_exists($queueHandler, 'handleError')) {
                     $queueHandler->handleError($e, $broker);
+                } else {
+                    throw $e;
                 }
             }
         };
