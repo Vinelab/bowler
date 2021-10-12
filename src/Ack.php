@@ -32,6 +32,7 @@ class Ack
 
     /**
      * Ack constructor.
+     *
      * @param  string  $mode
      * @param  bool  $requeue
      * @param  bool  $multiple

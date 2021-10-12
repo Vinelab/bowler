@@ -41,18 +41,18 @@ class SubscriberCommand extends Command
         $queue = $this->argument('queueName');
 
         if ($this->option('expressive')) {
-            $queue = $queue.'-pub-sub';
+            $queue = $queue . '-pub-sub';
         }
 
-        $handler = Str::studly(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
+        $handler = Str::studly(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')) . 'Handler');
 
         try {
             $handlerGenerator->generate($queue, $handler, self::TYPE);
 
             $this->info(
-                'Queue '.$queue.' added successfully and bound to the default `pub-sub` exchange.'.
-                "\n".
-                'Handler class '.$handler.' created successfully.'.
+                'Queue ' . $queue . ' added successfully and bound to the default `pub-sub` exchange.' .
+                "\n" .
+                'Handler class ' . $handler . ' created successfully.' .
                 "\n"
             );
         } catch (Exception $e) {

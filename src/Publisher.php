@@ -11,7 +11,7 @@ class Publisher extends Producer
      * Part of the out-of-the-box Pub/Sub implementation
      * Set the default exchange named `pub-sub` of type `topic`.
      *
-     * @param Connection $connection
+     * @param  Connection  $connection
      */
     public function __construct(Connection $connection)
     {

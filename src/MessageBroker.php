@@ -39,6 +39,7 @@ class MessageBroker
 
     /**
      * MessageBroker constructor.
+     *
      * @param  AMQPMessage  $message
      * @param  string  $queueName
      * @param  string  $handlerClass
@@ -78,8 +79,8 @@ class MessageBroker
     /**
      * Negatively acknowledge a message.
      *
-     * @param bool $multiple
-     * @param bool $requeue
+     * @param  bool  $multiple
+     * @param  bool  $requeue
      */
     public function nackMessage($multiple = false, $requeue = false)
     {
@@ -90,7 +91,7 @@ class MessageBroker
     /**
      * Reject a message.
      *
-     * @param bool $requeue
+     * @param  bool  $requeue
      */
     public function rejectMessage($requeue = false)
     {

@@ -67,24 +67,24 @@ class ConsumerHealthCheckCommand extends Command
                 // find consumer tag within the list of returned consumers
                 foreach ($response->consumer_details as $consumer) {
                     if (isset($consumer->consumer_tag) && $consumer->consumer_tag == $tag) {
-                        $this->info('Healthy consumer with tag '.$tag);
+                        $this->info('Healthy consumer with tag ' . $tag);
 
                         return 0;
                     }
                 }
 
-                $this->error('Health check failed! Could not find consumer with tag "'.$tag.'"');
+                $this->error('Health check failed! Could not find consumer with tag "' . $tag . '"');
 
                 return 1;
             }
 
-            $this->error('No consumers connected to queue "'.$queueName.'"');
+            $this->error('No consumers connected to queue "' . $queueName . '"');
 
             return 1;
         } catch (AMQPProtocolChannelException $e) {
             switch ($e->getCode()) {
                 case 404:
-                    $this->error('Queue with name '.$queueName.' does not exist.');
+                    $this->error('Queue with name ' . $queueName . ' does not exist.');
                     break;
                 default:
                     $this->error('An unknown channel exception occurred.');

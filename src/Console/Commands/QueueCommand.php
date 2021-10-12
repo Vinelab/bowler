@@ -44,15 +44,15 @@ class QueueCommand extends Command
         $handlerGenerator = new HandlerGenerator();
 
         $queue = $this->argument('queueName');
-        $handler = Str::studly(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')).'Handler');
+        $handler = Str::studly(preg_replace('/Handler(\.php)?$/', '', $this->argument('handler')) . 'Handler');
 
         try {
             $handlerGenerator->generate($queue, $handler, self::TYPE);
 
             $this->info(
-                'Queue '.$queue.' added successfully.'.
-                "\n".
-                'Handler class '.$handler.' created successfully.'.
+                'Queue ' . $queue . ' added successfully.' .
+                "\n" .
+                'Handler class ' . $handler . ' created successfully.' .
                 "\n"
             );
         } catch (Exception $e) {

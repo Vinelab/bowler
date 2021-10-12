@@ -25,7 +25,7 @@ class BowlerServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/bowler.php' => config_path('bowler.php'),
+            __DIR__ . '/../config/bowler.php' => config_path('bowler.php'),
         ]);
     }
 
@@ -34,7 +34,7 @@ class BowlerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(dirname(__DIR__).'/config/bowler.php', 'bowler');
+        $this->mergeConfigFrom(dirname(__DIR__) . '/config/bowler.php', 'bowler');
 
         // register facade to resolve instance
         $this->app->singleton('vinelab.bowler.registrator', function ($app) {
@@ -74,7 +74,7 @@ class BowlerServiceProvider extends ServiceProvider
 
         $this->app->when(BowlerExceptionHandler::class)
             ->needs(ExceptionHandler::class)
-            ->give($this->app->getNamespace().'Exceptions\Handler');
+            ->give($this->app->getNamespace() . 'Exceptions\Handler');
 
         //register command
         $this->commands([

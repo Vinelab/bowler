@@ -13,11 +13,11 @@ trait DeadLetteringTrait
     /**
      * Configure Dead Lettering by creating a queue and exchange, and prepares the arguments array to be passed to the messaging queue.
      *
-     * @param string $deadLetterQueueName
-     * @param string $deadLetterExchangeName
-     * @param string $deadLetterExchangeType
-     * @param string $deadLetterRoutingKey
-     * @param int    $messageTTL
+     * @param  string  $deadLetterQueueName
+     * @param  string  $deadLetterExchangeName
+     * @param  string  $deadLetterExchangeType
+     * @param  string  $deadLetterRoutingKey
+     * @param  int  $messageTTL
      */
     public function configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType = 'fanout', $deadLetterRoutingKey = null, $messageTTL = null)
     {
@@ -30,7 +30,7 @@ trait DeadLetteringTrait
             $channel->queue_declare($deadLetterQueueName, $this->passive, $this->durable, false, $this->autoDelete);
         } catch (\Exception $e) {
             app(BowlerExceptionHandler::class)->handleServerException($e, compact($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL),
-                            $this->arguments);
+                $this->arguments);
         }
 
         $channel->queue_bind($deadLetterQueueName, $deadLetterExchangeName, $deadLetterRoutingKey);
@@ -41,9 +41,9 @@ trait DeadLetteringTrait
     /**
      * Compiles the arguments array to be passed to the messaging queue.
      *
-     * @param string $deadLetterExchangeName
-     * @param string $deadLetterRoutingKey
-     * @param int    $messageTTL
+     * @param  string  $deadLetterExchangeName
+     * @param  string  $deadLetterRoutingKey
+     * @param  int  $messageTTL
      */
     private function compileArguments($deadLetterExchangeName, $deadLetterRoutingKey, $messageTTL)
     {

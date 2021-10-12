@@ -3,6 +3,7 @@
 namespace Vinelab\Bowler;
 
 define('__ROOT__', dirname(dirname(dirname(__FILE__))));
+
 //require_once(__ROOT__.'/vendor/autoload.php');
 
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -82,18 +83,19 @@ class Connection
 
     /**
      * RabbitMQ vhost.
+     *
      * @var string
      */
     private $vhost = '/';
 
     /**
-     * @param string $host      the ip of the rabbitmq server, default: localhost
-     * @param int    $port.     default: 5672
-     * @param string $username, default: guest
-     * @param string $password, default: guest
-     * @param int    $connectionTimeout, default: 30
-     * @param int    $readWriteTimeout, default: 30
-     * @param int    $heartbeat, default: 15
+     * @param  string  $host  the ip of the rabbitmq server, default: localhost
+     * @param  int  $port  .     default: 5672
+     * @param  string  $username  , default: guest
+     * @param  string  $password  , default: guest
+     * @param  int  $connectionTimeout  , default: 30
+     * @param  int  $readWriteTimeout  , default: 30
+     * @param  int  $heartbeat  , default: 15
      */
     public function __construct($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $connectionTimeout = 30, $readWriteTimeout = 30, $heartbeat = 15, $vhost = '/')
     {
@@ -151,8 +153,8 @@ class Connection
     /**
      * Fetch the list of consumers details for the given queue name using the management API.
      *
-     * @param  string $queueName
-     * @param  string $columns
+     * @param  string  $queueName
+     * @param  string  $columns
      *
      * @return array
      */
@@ -161,7 +163,7 @@ class Connection
         $http = app(HTTPClient::class);
 
         $request = [
-            'url' => $this->host.':'.$this->managementPort.'/api/queues/%2F/'.$queueName,
+            'url' => $this->host . ':' . $this->managementPort . '/api/queues/%2F/' . $queueName,
             'params' => ['columns' => $columns],
             'auth' => [
                 'username' => $this->username,

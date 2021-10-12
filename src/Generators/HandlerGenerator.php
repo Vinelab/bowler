@@ -31,7 +31,9 @@ class HandlerGenerator
     {
         // Get queue stub content and replace variables with values
         $queueContent = file_get_contents($this->getQueueStub());
-        $queueContent = str_replace(['{{type}}', '{{queue}}', '{{handler}}'], [$type, "'".$queue."'", "'".$handlerNamespace.'\\'.$handler."'"], $queueContent);
+        $queueContent = str_replace(['{{type}}', '{{queue}}', '{{handler}}'], [$type,
+                                                                               "'" . $queue . "'",
+                                                                               "'" . $handlerNamespace . '\\' . $handler . "'"], $queueContent);
 
         // Remove `<?php` string if file already exist
         if (file_exists($queuePath) && !empty(file_get_contents($queuePath))) {
@@ -54,7 +56,7 @@ class HandlerGenerator
         }
 
         // Create Handler
-        file_put_contents($handlerPath.$handler.'.php', $handlerContent);
+        file_put_contents($handlerPath . $handler . '.php', $handlerContent);
     }
 
     /**
@@ -62,7 +64,7 @@ class HandlerGenerator
      */
     private function findQueuePath()
     {
-        return app_path().'/Messaging/queues.php';
+        return app_path() . '/Messaging/queues.php';
     }
 
     /**
@@ -70,7 +72,7 @@ class HandlerGenerator
      */
     private function findHandlerPath()
     {
-        return app_path().'/Messaging/Handlers/';
+        return app_path() . '/Messaging/Handlers/';
     }
 
     /**
@@ -80,7 +82,7 @@ class HandlerGenerator
     {
         $rootNamespace = $this->findRootNamespace();
 
-        return $rootNamespace.'\Messaging\Handlers';
+        return $rootNamespace . '\Messaging\Handlers';
     }
 
     /**
@@ -88,7 +90,7 @@ class HandlerGenerator
      */
     private function getQueueStub()
     {
-        return __DIR__.'/stubs/queue.stub';
+        return __DIR__ . '/stubs/queue.stub';
     }
 
     /**
@@ -96,7 +98,7 @@ class HandlerGenerator
      */
     private function getHandlerStub()
     {
-        return __DIR__.'/stubs/handler.stub';
+        return __DIR__ . '/stubs/handler.stub';
     }
 
     /**
@@ -109,10 +111,10 @@ class HandlerGenerator
     private function findRootNamespace()
     {
         // read composer.json file contents to determine the namespace
-        $composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
+        $composer = json_decode(file_get_contents(base_path() . '/composer.json'), true);
         // see which one refers to the "src/" directory
         foreach ($composer['autoload']['psr-4'] as $namespace => $directory) {
-            if ($directory === $this->getSourceDirectoryName().'/') {
+            if ($directory === $this->getSourceDirectoryName() . '/') {
                 return trim($namespace, '\\');
             }
         }
@@ -128,7 +130,7 @@ class HandlerGenerator
      */
     private function getSourceDirectoryName()
     {
-        if (file_exists(base_path().'/'.$this->srcDirectoryName)) {
+        if (file_exists(base_path() . '/' . $this->srcDirectoryName)) {
             return $this->srcDirectoryName;
         }
 

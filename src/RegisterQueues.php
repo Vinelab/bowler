@@ -18,9 +18,9 @@ class RegisterQueues
     /**
      * Registrator::queue.
      *
-     * @param string $queue
-     * @param string $className
-     * @param array  $options
+     * @param  string  $queue
+     * @param  string  $className
+     * @param  array  $options
      */
     public function queue($queue, $className, $options = [])
     {
@@ -36,22 +36,23 @@ class RegisterQueues
      * Registrator::subscriber.
      * Default out-of-box Publisher/Subscriber setup.
      *
-     * @param string $queue
-     * @param string $className
-     * @param array $bindingKeys
-     * @param string $exchangeName
-     * @param string $exchangeType
+     * @param  string  $queue
+     * @param  string  $className
+     * @param  array  $bindingKeys
+     * @param  string  $exchangeName
+     * @param  string  $exchangeType
+     * @param  array  $options
      * @throws InvalidSubscriberBindingException
      */
-    public function subscriber($queue, $className, array $bindingKeys, $exchangeName = 'pub-sub', $exchangeType = 'topic')
+    public function subscriber(string $queue, string $className, array $bindingKeys, string $exchangeName = 'pub-sub', string $exchangeType = 'topic', array $options = [])
     {
         if (empty($bindingKeys)) {
-            throw new InvalidSubscriberBindingException('Missing bindingKeys for Subscriber queue: '.$queue.'.');
+            throw new InvalidSubscriberBindingException('Missing bindingKeys for Subscriber queue: ' . $queue . '.');
         }
 
         // Default pub/sub setup
         // We only need the bindingKeys to enable key based pub/sub
-        $options = [
+        $defaultOptions = [
             'exchangeName' => $exchangeName,
             'exchangeType' => $exchangeType,
             'bindingKeys' => $bindingKeys,
@@ -59,6 +60,9 @@ class RegisterQueues
             'durable' => true,
             'autoDelete' => false,
         ];
+
+        // Append to and/or override default options
+        $options = array_merge($defaultOptions, $options);
 
         $this->queue($queue, $className, $options);
     }
