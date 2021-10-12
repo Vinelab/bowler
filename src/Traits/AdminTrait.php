@@ -10,8 +10,8 @@ trait AdminTrait
     /**
      * Delete a exchange.
      *
-     * @param string $exchangeName
-     * @param bool   $unused
+     * @param  string  $exchangeName
+     * @param  bool  $unused
      */
     public function deleteExchange($exchangeName, $unused = true)
     {
@@ -21,9 +21,9 @@ trait AdminTrait
     /**
      * Delete a queue.
      *
-     * @param string $queueName
-     * @param bool   $unused
-     * @param bool   $empty
+     * @param  string  $queueName
+     * @param  bool  $unused
+     * @param  bool  $empty
      */
     public function deleteQueue($queueName, $unused = true, $empty = true)
     {
@@ -33,7 +33,7 @@ trait AdminTrait
     /**
      * Purge a queue.
      *
-     * @param string $queueName
+     * @param  string  $queueName
      */
     public function purgeQueue($queueName)
     {

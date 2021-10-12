@@ -41,6 +41,7 @@ class MessageLifecycleManager
 
     /**
      * MessageLifecycleManager constructor.
+     *
      * @param  \Psr\Log\LoggerInterface|\Illuminate\Contracts\Logging\Log  $logger
      * @param  Repository  $config
      */
@@ -127,7 +128,7 @@ class MessageLifecycleManager
 
     /**
      * @param  AMQPMessage  $msg
-     * @param  string  $queueName`
+     * @param  string  $queueName  `
      * @param  string  $handlerClass
      * @param  Ack  $ack
      * @return void

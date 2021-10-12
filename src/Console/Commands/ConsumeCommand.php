@@ -26,6 +26,7 @@ class ConsumeCommand extends Command
 
     /**
      * ConsumeCommand constructor.
+     *
      * @param  RegisterQueues  $registrator
      */
     public function __construct(RegisterQueues $registrator)
@@ -63,6 +64,7 @@ class ConsumeCommand extends Command
 
     /**
      * Run the command.
+     *
      * @throws UnregisteredQueueException
      * @throws ErrorException
      * @throws BowlerGeneralException
@@ -74,7 +76,8 @@ class ConsumeCommand extends Command
         $queueName = $this->argument('queueName');
 
         // Options
-        $exchangeName = ($name = $this->option('exchangeName')) ? $name : $queueName; // If the exchange name has not been set, use the queue name
+        $exchangeName = ($name = $this->option('exchangeName')) ? $name
+            : $queueName; // If the exchange name has not been set, use the queue name
         $exchangeType = $this->option('exchangeType');
         $bindingKeys = (array) $this->option('bindingKeys');
         $passive = (bool) $this->option('passive');
@@ -82,8 +85,10 @@ class ConsumeCommand extends Command
         $autoDelete = (bool) $this->option('autoDelete');
 
         // Dead Lettering
-        $deadLetterQueueName = ($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : (($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : null);
-        $deadLetterExchangeName = ($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : (($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : null);
+        $deadLetterQueueName = ($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName
+            : (($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName : null);
+        $deadLetterExchangeName = ($dlExchangeName = $this->option('deadLetterExchangeName')) ? $dlExchangeName
+            : (($dlQueueName = $this->option('deadLetterQueueName')) ? $dlQueueName : null);
         $deadLetterExchangeType = $this->option('deadLetterExchangeType');
         $deadLetterRoutingKey = $this->option('deadLetterRoutingKey');
         $messageTTL = ($ttl = $this->option('messageTTL')) ? (int) $ttl : null;
@@ -94,18 +99,19 @@ class ConsumeCommand extends Command
         foreach ($handlers as $handler) {
             if ($handler->queueName == $queueName) {
 
-              // If options are set in Registrator:queue(string $queueName,string $Handler, array $options).
-              if (!empty($handler->options)) {
-                  // Use whatever the user has set/provided, to override our defaults.
-                  extract($handler->options);
-              }
+                // If options are set in Registrator:queue(string $queueName,string $Handler, array $options).
+                if (!empty($handler->options)) {
+                    // Use whatever the user has set/provided, to override our defaults.
+                    extract($handler->options);
+                }
 
                 $bowlerConsumer = new Consumer(app(Connection::class), $handler->queueName, $exchangeName, $exchangeType, $bindingKeys, $passive, $durable, $autoDelete);
 
                 if ($deadLetterQueueName) {
 
                     // If configured as options and deadLetterExchangeName is not specified, default to deadLetterQueueName.
-                    $deadLetterExchangeName = isset($deadLetterExchangeName) ? $deadLetterExchangeName : $deadLetterQueueName;
+                    $deadLetterExchangeName = isset($deadLetterExchangeName) ? $deadLetterExchangeName
+                        : $deadLetterQueueName;
 
                     $bowlerConsumer->configureDeadLettering($deadLetterQueueName, $deadLetterExchangeName, $deadLetterExchangeType, $deadLetterRoutingKey, $messageTTL);
                 }
@@ -114,15 +120,15 @@ class ConsumeCommand extends Command
             }
         }
 
-        throw new UnregisteredQueueException('No registered queue found with name '.$queueName.'.');
+        throw new UnregisteredQueueException('No registered queue found with name ' . $queueName . '.');
     }
 
     public function loadQueuesDefinitions()
     {
-        $path = app_path().'/Messaging/queues.php';
+        $path = app_path() . '/Messaging/queues.php';
 
         if (!file_exists($path)) {
-            return $this->error('Queues definitions file not found. Please create it at '.$path);
+            return $this->error('Queues definitions file not found. Please create it at ' . $path);
         }
 
         require $path;

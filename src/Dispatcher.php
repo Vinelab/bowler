@@ -11,7 +11,7 @@ class Dispatcher extends Producer
      * Part of the fair dispatch implementation
      * Allow setting the exchange name and type with default of `topic`.
      *
-     * @param Connection $connection
+     * @param  Connection  $connection
      */
     public function __construct(Connection $connection)
     {

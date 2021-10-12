@@ -73,7 +73,7 @@ class Producer
     protected $deliveryMode;
 
     /**
-     * @param Connection $connection
+     * @param  Connection  $connection
      */
     public function __construct(Connection $connection)
     {
@@ -83,12 +83,12 @@ class Producer
     /**
      * Setup Producer.
      *
-     * @param string $exchangeName
-     * @param string $exchangeType
-     * @param bool   $passive
-     * @param bool   $durable
-     * @param bool   $autoDelete
-     * @param int    $deliveryMode
+     * @param  string  $exchangeName
+     * @param  string  $exchangeType
+     * @param  bool  $passive
+     * @param  bool  $durable
+     * @param  bool  $autoDelete
+     * @param  int  $deliveryMode
      */
     public function setup($exchangeName, $exchangeType = 'fanout', $passive = false, $durable = true, $autoDelete = false, $deliveryMode = 2)
     {

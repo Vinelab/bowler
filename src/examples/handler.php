@@ -10,7 +10,7 @@ class handler
 {
     public function handle($msg)
     {
-        echo 'Author: '.$msg->body;
+        echo 'Author: ' . $msg->body;
     }
 
     public function handleError($e, $broker)
