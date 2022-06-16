@@ -44,6 +44,8 @@ Starting version [v0.4.2](https://github.com/Vinelab/bowler/releases/tag/v0.4.2)
 
 Starting version [v0.5.0](https://github.com/Vinelab/bowler/releases/tag/v0.5.0) this library requires Laravel 5.7 or later versions.
 
+Starting version [v0.9.0](https://github.com/Vinelab/bowler/releases/tag/v0.9.0) this library requires Laravel 6.0 or later versions.
+
 ## Setup
 
 Install the package via Composer:

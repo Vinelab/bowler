@@ -24,17 +24,17 @@
     ],
 
     "require": {
-        "php": "^7.0",
-        "php-amqplib/php-amqplib": "v3.0.*",
-        "illuminate/console": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7 || ^8 || ^9",
-        "illuminate/support": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7 || ^8 || ^9",
-        "illuminate/filesystem": "5.4.*|5.5.*|5.6.*|5.7.*|5.8.* || ^6 || ^7 || ^8 || ^9",
+        "php": "8.*",
+        "php-amqplib/php-amqplib": "v3.2.*",
+        "illuminate/console": "^6 || ^7 || ^8 || ^9",
+        "illuminate/support": "^6 || ^7 || ^8 || ^9",
+        "illuminate/filesystem": "^6 || ^7 || ^8 || ^9",
         "vinelab/http": "^1.5"
     },
 
     "require-dev": {
         "mockery/mockery": "^1.0",
-        "orchestra/testbench": "3.4.* || ^4",
+        "orchestra/testbench": "4.9.* || ^4 || ^5 || ^6 || ^7",
         "phpunit/phpunit": "~5.7 || ~8.3 || ^9"
     },
 

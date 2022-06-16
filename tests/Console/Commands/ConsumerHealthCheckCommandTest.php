@@ -6,7 +6,7 @@ use Mockery as M;
 use Vinelab\Bowler\Connection;
 use Vinelab\Bowler\Tests\TestCase;
 use PhpAmqpLib\Channel\AMQPChannel;
-use Illuminate\Foundation\Testing\PendingCommand;
+use Illuminate\Testing\PendingCommand;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 
 /**

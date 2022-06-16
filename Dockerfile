@@ -1,3 +1,3 @@
-FROM vinelab/nginx-php:7.4
+FROM vinelab/nginx-php:8.1
 
 COPY . /code
